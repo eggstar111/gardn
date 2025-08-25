@@ -181,71 +181,6 @@ static void tick_hornet_aggro(Simulation *sim, Entity &ent) {
     }
 }
 
-static void tick_hornet_aggro_advanced(Simulation *sim, Entity &ent) {
-    if (sim->ent_alive(ent.target)) {
-        Entity &target = sim->get_ent(ent.target);
-        Vector v(target.x - ent.x, target.y - ent.y);
-        
-        Vector target_velocity = target.velocity;
-        float missile_speed = 40.0f * PLAYER_ACCELERATION;
-        float time_to_hit = v.magnitude() / (missile_speed - target_velocity.magnitude());
-        Vector predicted_pos = Vector(target.x, target.y) + target_velocity * time_to_hit;
-        
-        Vector adjusted_v = predicted_pos - Vector(ent.x, ent.y);
-        _focus_lose_clause(ent, adjusted_v);
-
-        float original_angle = ent.angle;
-        
-        if (ent.ai_tick >= 1.5 * TPS) {
-            ent.set_angle(original_angle + M_PI);  // 旋转180度
-            
-            Entity &missile = alloc_petal(sim, PetalID::kMissile, ent);
-            missile.set_angle(adjusted_v.angle());  // 使用预判角度
-            missile.acceleration.unit_normal(adjusted_v.angle())
-                .set_magnitude(missile_speed);
-            
-            ent.set_angle(original_angle);
-            
-            Vector kb = Vector(cosf(original_angle), sinf(original_angle)) * -2.5f * PLAYER_ACCELERATION;
-            ent.velocity += kb;
-            
-            ent.ai_tick = 0;
-        }
-        float dist = v.magnitude();
-        if (dist > 300) {
-            v.set_magnitude(PLAYER_ACCELERATION * 0.975);
-            ent.acceleration = v;
-        } else {
-            ent.acceleration.set(0,0);
-        }
-        ent.set_angle(v.angle());
-        if (ent.ai_tick >= 1.5 * TPS && dist < 800) {
-            ent.ai_tick = 0;
-            //spawn missile;
-            Entity &missile = alloc_petal(sim, PetalID::kMissile, ent);
-            missile.damage = 10;
-            missile.health = missile.max_health = 10;
-            //missile.health = missile.max_health = 20;
-            //missile.despawn_tick = 1;
-            entity_set_despawn_tick(missile, 3 * TPS);
-            missile.set_angle(ent.angle);
-            missile.acceleration.unit_normal(ent.angle).set_magnitude(40 * PLAYER_ACCELERATION);
-            Vector kb;
-            kb.unit_normal(ent.angle - M_PI).set_magnitude(2.5 * PLAYER_ACCELERATION);
-            ent.velocity += kb;            
-        }
-        return;
-    } else {
-        if (!(ent.target == NULL_ENTITY)) {
-            ent.ai_state = AIState::kIdle;
-            ent.ai_tick = 0;
-            ent.target = NULL_ENTITY;
-        }
-        ent.target = find_nearest_enemy(sim, ent, ent.detection_radius);
-        tick_bee_passive(sim, ent);;
-    }
-}
-
 static void tick_centipede_passive(Simulation *sim, Entity &ent) {
     switch(ent.ai_state) {
         case AIState::kIdle: {
@@ -423,6 +358,50 @@ static void tick_digger(Simulation *sim, Entity &ent) {
     }
 }
 
+static void tick_hornet_new_ai(Simulation *sim, Entity &ent) {
+    if (sim->ent_alive(ent.target)) {
+        Entity &target = sim->get_ent(ent.target);
+        Vector v(target.x - ent.x, target.y - ent.y);
+        _focus_lose_clause(ent, v);
+
+        float target_angle = v.angle();
+        float rotation_step = M_PI / (TPS / 4); 
+        if (std::abs(target_angle - ent.angle) > rotation_step) {
+            ent.set_angle(ent.angle + rotation_step * ((target_angle > ent.angle) ? 1 : -1));
+        } else {
+            ent.set_angle(target_angle);
+        }
+
+        if (ent.ai_tick >= TPS) { 
+            ent.ai_tick = 0;
+            Vector missile_dir = v;
+            missile_dir.set_magnitude(300.0f); 
+
+            Entity &missile = alloc_petal(sim, PetalID::kMissile, ent);
+            missile.damage = 10;
+            missile.health = missile.max_health = 10;
+            entity_set_despawn_tick(missile, 3 * TPS);
+            missile.set_angle(missile_dir.angle());
+            missile.acceleration = missile_dir;
+
+            target_angle = ent.angle - M_PI;
+            if (std::abs(target_angle - ent.angle) > rotation_step) {
+                ent.set_angle(ent.angle + rotation_step * ((target_angle > ent.angle) ? 1 : -1));
+            } else {
+                ent.set_angle(target_angle);
+            }
+        }
+    } else {
+        if (!(ent.target == NULL_ENTITY)) {
+            ent.ai_state = AIState::kIdle;
+            ent.ai_tick = 0;
+            ent.target = NULL_ENTITY;
+        }
+        ent.target = find_nearest_enemy(sim, ent, ent.detection_radius);
+        tick_bee_passive(sim, ent);
+    }
+}
+
 void tick_ai_behavior(Simulation *sim, Entity &ent) {
     if (ent.pending_delete) return;
     if (sim->ent_alive(ent.seg_head)) return;
@@ -502,7 +481,7 @@ void tick_ai_behavior(Simulation *sim, Entity &ent) {
         case MobID::kHornet:
         #ifdef DEV
             if (BIT_AT(ent.custom_flags, EntityCustomFlags::kIsVariant)) { // 生成时设置的标记
-                tick_hornet_aggro(sim, ent);
+                tick_hornet_new_ai(sim, ent);
             } else {
                 tick_hornet_aggro(sim, ent);
             }

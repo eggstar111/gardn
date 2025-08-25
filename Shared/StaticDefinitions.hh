@@ -111,6 +111,9 @@ namespace MobID {
         kShinyLadybug,
         kSquare,
         kDigger,
+        #ifdef DEV
+        kTargetDummy,
+        #endif
         kNumMobs
     };
 };

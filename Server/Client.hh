@@ -26,7 +26,7 @@ public:
     uint8_t verified = 0;
     uint8_t seen_arena = 0;
     float x = 0, y = 0;
-    std::string password;
+    bool isAdmin;
     Client();
     void init();
     void remove();

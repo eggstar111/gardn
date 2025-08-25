@@ -71,6 +71,11 @@ static Entity &__alloc_mob(Simulation *sim, MobID::T mob_id, float x, float y, E
         mob.set_angle(0);
         mob.set_color(ColorID::kGray);
     }
+    #ifdef DEV
+    else if (mob_id == MobID::kTargetDummy) {
+        mob.set_angle(0);
+    }
+    #endif
     return mob;
 }
 

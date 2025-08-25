@@ -676,6 +676,51 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             draw_static_flower(ctx, attr.flower_attrs);
             break;
         };
+        #ifdef DEV
+        case MobID::kTargetDummy:
+            ctx.round_line_cap();
+            ctx.begin_path();
+            ctx.set_fill(0xff7C7C7C);
+            ctx.arc(0, 0, 53);
+            ctx.fill();
+            ctx.begin_path();
+            ctx.set_fill(0xff999999);
+            ctx.arc(0, 0, 47);
+            ctx.fill();
+            ctx.begin_path();
+            ctx.move_to(-12, 19);
+            ctx.qcurve_to(0, 19, 12, 19);
+            ctx.set_stroke(0xff111111);
+            ctx.set_line_width(6);
+            ctx.stroke();
+            ctx.begin_path();
+            ctx.ellipse(-14.0f, -10.0f, 6.0f, 12.0f);
+            ctx.set_fill(0xff111111);
+            ctx.fill();
+            ctx.begin_path();
+            ctx.rect(-17, -13, 6, 6 );
+            ctx.set_fill(0xffEEEEEE);
+            ctx.fill();
+            ctx.begin_path();
+            ctx.ellipse(-14.0f, -10.0f, 6.0f, 12.0f);
+            ctx.set_fill(0xff111111);
+            ctx.set_line_width(0.5);
+            ctx.stroke();
+            ctx.begin_path();
+            ctx.ellipse(14, -10, 6, 12);
+            ctx.set_stroke(0xff111111);
+            ctx.fill();
+            ctx.begin_path();
+            ctx.rect(11, -13, 6, 6);
+            ctx.set_fill(0xffEEEEEE);
+            ctx.fill();
+            ctx.begin_path();
+            ctx.ellipse(14, -10, 6, 12);
+            ctx.set_stroke(0xff111111);
+            ctx.set_line_width(0.5);
+            ctx.stroke();
+            break;
+        #endif
         default:
             assert(!"Didn't cover mob render");
             break;

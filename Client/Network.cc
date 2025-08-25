@@ -70,8 +70,8 @@ void Game::spawn_in() {
     if (Game::on_game_screen == 0) {
         writer.write<uint8_t>(Serverbound::kClientSpawn);
         std::string name = Game::nickname;
-        std::string password = Game::password;
         writer.write<std::string>(name);
+        std::string password = Game::password;
         writer.write<std::string>(password);
         socket.send(writer.packet, writer.at - writer.packet);
     } else Game::on_game_screen = 0;

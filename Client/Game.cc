@@ -125,7 +125,11 @@ void Game::init() {
     );
     game_ui_window.add_child(
         new Ui::HContainer({
+            #ifdef DEV
+            new Ui::StaticText(20, "the gardn project 开发分支服，随时重启！")
+            #else
             new Ui::StaticText(20, "the gardn project")
+            #endif
         }, 20, 0, { .h_justify = Ui::Style::Left, .v_justify = Ui::Style::Top })
     );
     Ui::make_petal_tooltips();
