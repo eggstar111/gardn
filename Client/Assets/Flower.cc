@@ -117,4 +117,12 @@ void draw_static_flower(Renderer &ctx, FlowerRenderAttributes attributes) {
         ctx.translate(0, -35);
         draw_static_petal(PetalID::kAntennae, ctx);
     }
+    #ifdef DEV
+    else if (BIT_AT(attributes.equip_flags, EquipmentFlags::kCrown))
+    {
+        RenderContext g(&ctx);
+        ctx.translate(0, 0);
+        draw_static_petal(PetalID::kCrown, ctx);
+    }
+    #endif
 }

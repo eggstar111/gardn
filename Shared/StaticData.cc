@@ -1,5 +1,7 @@
 #include <Shared/StaticData.hh>
 
+#include <Shared/Vector.hh>
+
 #include <cmath>
 
 uint32_t const MAX_LEVEL = 99;
@@ -9,7 +11,7 @@ float const PETAL_DISABLE_DELAY = 45.0f; //seconds
 float const PLAYER_ACCELERATION = 5.0f;
 float const DEFAULT_FRICTION = 1.0f/3.0f;
 float const SUMMON_RETREAT_RADIUS = 600.0f;
-float const DIGGER_SPAWN_CHANCE = 0.25f;
+float const DIGGER_SPAWN_CHANCE = 0.75f;
 
 float const BASE_FLOWER_RADIUS = 25.0f;
 float const BASE_PETAL_ROTATION_SPEED = 2.5f;
@@ -54,6 +56,8 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
     }},
     {"Dandelion", "Its interesting properties prevent healing effects on affected units",
         10.0, 10.0, 10.0, 1.0, 1, RarityID::kRare, {
+        .secondary_reload = 0.5, 
+        .defend_only = 1,
         .icon_angle = 1,
         .rotation_style = PetalAttributes::kFollowRot 
     }},
@@ -125,7 +129,7 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .poison_damage = { 20.0, 0.5 }
     }},
     {"Egg", "Something interesting might pop out of this",
-        50.0, 1.0, 15.0, 1.0, 1, RarityID::kEpic, { 
+        50.0, 1.0, 15.0, 1.0, 1, RarityID::kLegendary, { 
         .secondary_reload = 3.5,
         .defend_only = 1,
         .rotation_style = PetalAttributes::kNoRot,
@@ -138,7 +142,7 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .defend_only = 1
     }},
     {"Stick", "Harnesses the power of the wind",
-        10.0, 1.0, 15.0, 3.0, 1, RarityID::kLegendary, { 
+        10.0, 1.0, 15.0, 3.0, 1, RarityID::kMythic, { 
         .secondary_reload = 4.0,
         .defend_only = 1,
         .icon_angle = 1,
@@ -216,7 +220,19 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
     {"Corn", "Takes a long time to spawn, but has a lot of health",
         500.0, 2.5, 16.0, 10.0, 1, RarityID::kEpic, {
         .icon_angle = 0.5
+    }}
+    #ifdef DEV
+    , {"M28", "Wow, A yummy M28",
+        150.0, 15.5, 16.0, 5.0, 1, RarityID::kUnique, {
+        .icon_angle = 0.5
+    }}
+    , {"Pharaoh's Crown", "Allows your flower to sense foes from farther away",
+    0.0, 0.0, 12.5, 0.0, 0, RarityID::kUnique, { .equipment = EquipmentFlags::kCrown }}
+    , {"Corruption", "Corrupts one's soul, turning them against their own kind.",
+        0.0, 0.0, 0, 0.0, 0, RarityID::kUnique, {
+        .icon_angle = 0.5
     }},
+    #endif
 };
 
 struct MobData const MOB_DATA[MobID::kNumMobs] = {
@@ -267,6 +283,9 @@ struct MobData const MOB_DATA[MobID::kNumMobs] = {
         "Someone overfed this one, you might be next.",
         RarityID::kRare, {600.0}, 35.0, {75.0}, 50, {
         PetalID::kIris, PetalID::kWing, PetalID::kBlueIris, PetalID::kTriplet, PetalID::kBeetleEgg, PetalID::kThirdEye
+        #ifdef DEV
+        , PetalID::kCrown
+        #endif
     }, { .aggro_radius = 750 }},
     {
         "Ladybug",
@@ -333,6 +352,9 @@ struct MobData const MOB_DATA[MobID::kNumMobs] = {
         "Spooky.",
         RarityID::kUnusual, {35.0}, 10.0, {15.0}, 8, {
         PetalID::kStinger, PetalID::kWeb, PetalID::kFaster, PetalID::kTriweb
+        #ifdef DEV
+        , PetalID::kM28
+        #endif
     }, { .poison_damage = { 5.0, 3.0 } }},
     {
         "Ant Hole",
@@ -395,7 +417,7 @@ std::array<StaticArray<float, MAX_DROPS_PER_MOB>, MobID::kNumMobs> const MOB_DRO
     for (MobID::T id = 0; id < MobID::kNumMobs; ++id) {
         for (PetalID::T const drop_id : MOB_DATA[id].drops) {
             float chance = fclamp((BASE_NUM * RARITY_MULT[PETAL_DATA[drop_id].rarity]) / (PETAL_AGGREGATE_DROPS[drop_id] * MOB_SPAWN_RATES[id] * MOB_DATA[id].attributes.segments), 0, 1);
-            ret[id].push(chance);
+            ret[id].push(fmin(chance * 3, 1));
         }
     }
     return ret;
@@ -426,6 +448,7 @@ uint32_t level_to_score(uint32_t level) {
 uint32_t loadout_slots_at_level(uint32_t level) {
     if (level > MAX_LEVEL) level = MAX_LEVEL;
     uint32_t ret = 5 + level / LEVELS_PER_EXTRA_SLOT;
+    if (level == MAX_LEVEL) ++ret;
     if (ret > MAX_SLOT_COUNT) return MAX_SLOT_COUNT;
     return ret;
 }

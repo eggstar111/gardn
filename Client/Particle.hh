@@ -25,9 +25,11 @@ namespace Particle {
         float y_velocity;
         float radius;
         float opacity;
+        uint32_t color = 0x80ffffff;
     };
 
     void tick_title(Renderer &, double);
     void tick_game(Renderer &, double);
+    void add_mythic_particle(float, float);
     void add_unique_particle(float, float);
 }

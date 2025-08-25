@@ -181,6 +181,71 @@ static void tick_hornet_aggro(Simulation *sim, Entity &ent) {
     }
 }
 
+static void tick_hornet_aggro_advanced(Simulation *sim, Entity &ent) {
+    if (sim->ent_alive(ent.target)) {
+        Entity &target = sim->get_ent(ent.target);
+        Vector v(target.x - ent.x, target.y - ent.y);
+        
+        Vector target_velocity = target.velocity;
+        float missile_speed = 40.0f * PLAYER_ACCELERATION;
+        float time_to_hit = v.magnitude() / (missile_speed - target_velocity.magnitude());
+        Vector predicted_pos = Vector(target.x, target.y) + target_velocity * time_to_hit;
+        
+        Vector adjusted_v = predicted_pos - Vector(ent.x, ent.y);
+        _focus_lose_clause(ent, adjusted_v);
+
+        float original_angle = ent.angle;
+        
+        if (ent.ai_tick >= 1.5 * TPS) {
+            ent.set_angle(original_angle + M_PI);  // 旋转180度
+            
+            Entity &missile = alloc_petal(sim, PetalID::kMissile, ent);
+            missile.set_angle(adjusted_v.angle());  // 使用预判角度
+            missile.acceleration.unit_normal(adjusted_v.angle())
+                .set_magnitude(missile_speed);
+            
+            ent.set_angle(original_angle);
+            
+            Vector kb = Vector(cosf(original_angle), sinf(original_angle)) * -2.5f * PLAYER_ACCELERATION;
+            ent.velocity += kb;
+            
+            ent.ai_tick = 0;
+        }
+        float dist = v.magnitude();
+        if (dist > 300) {
+            v.set_magnitude(PLAYER_ACCELERATION * 0.975);
+            ent.acceleration = v;
+        } else {
+            ent.acceleration.set(0,0);
+        }
+        ent.set_angle(v.angle());
+        if (ent.ai_tick >= 1.5 * TPS && dist < 800) {
+            ent.ai_tick = 0;
+            //spawn missile;
+            Entity &missile = alloc_petal(sim, PetalID::kMissile, ent);
+            missile.damage = 10;
+            missile.health = missile.max_health = 10;
+            //missile.health = missile.max_health = 20;
+            //missile.despawn_tick = 1;
+            entity_set_despawn_tick(missile, 3 * TPS);
+            missile.set_angle(ent.angle);
+            missile.acceleration.unit_normal(ent.angle).set_magnitude(40 * PLAYER_ACCELERATION);
+            Vector kb;
+            kb.unit_normal(ent.angle - M_PI).set_magnitude(2.5 * PLAYER_ACCELERATION);
+            ent.velocity += kb;            
+        }
+        return;
+    } else {
+        if (!(ent.target == NULL_ENTITY)) {
+            ent.ai_state = AIState::kIdle;
+            ent.ai_tick = 0;
+            ent.target = NULL_ENTITY;
+        }
+        ent.target = find_nearest_enemy(sim, ent, ent.detection_radius);
+        tick_bee_passive(sim, ent);;
+    }
+}
+
 static void tick_centipede_passive(Simulation *sim, Entity &ent) {
     switch(ent.ai_state) {
         case AIState::kIdle: {
@@ -410,12 +475,12 @@ void tick_ai_behavior(Simulation *sim, Entity &ent) {
             tick_default_aggro(sim, ent, 0.95);
             break;
         case MobID::kScorpion:
-            tick_default_aggro(sim, ent, 1.20);
+            tick_default_aggro(sim, ent, 0.95);
             break;
         case MobID::kSpider:
             if (ent.lifetime % (TPS) == 0) 
                 alloc_web(sim, 25, ent);
-            tick_default_aggro(sim, ent, 1.20);
+            tick_default_aggro(sim, ent, 0.95);
             break;
         case MobID::kQueenAnt:
             if (ent.lifetime % (2 * TPS) == 0) {
@@ -423,14 +488,28 @@ void tick_ai_behavior(Simulation *sim, Entity &ent) {
                 behind.unit_normal(ent.angle + M_PI);
                 behind *= ent.radius;
                 Entity &spawned = alloc_mob(sim, MobID::kSoldierAnt, ent.x + behind.x, ent.y + behind.y, ent.team);
-                entity_set_despawn_tick(spawned, 10 * TPS);
+                spawned.set_parent(ent.parent);
+            }
+            if (ent.lifetime + 1 % (10 * 60 * TPS) == 0) {
+                Vector behind;
+                behind.unit_normal(ent.angle + M_PI);
+                behind *= ent.radius;
+                Entity &spawned = alloc_mob(sim, MobID::kQueenAnt, ent.x + behind.x, ent.y + behind.y, ent.team);
                 spawned.set_parent(ent.parent);
             }
             tick_default_aggro(sim, ent, 0.95);
             break;
         case MobID::kHornet:
-            tick_hornet_aggro(sim, ent);
+        #ifdef DEV
+            if (BIT_AT(ent.custom_flags, EntityCustomFlags::kIsVariant)) { // 生成时设置的标记
+                tick_hornet_aggro(sim, ent);
+            } else {
+                tick_hornet_aggro(sim, ent);
+            }
             break;
+        #else
+            tick_hornet_aggro(sim, ent);
+        #endif
         case MobID::kBoulder:
         case MobID::kRock:
         case MobID::kCactus:

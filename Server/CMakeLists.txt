@@ -12,6 +12,7 @@ set(SOURCES
     EntityFunctions/Misc.cc
     Process/Ai.cc
     Process/Camera.cc
+    Process/Chat.cc
     Process/Collision.cc
     Process/Culling.cc
     Process/Flower.cc
@@ -63,11 +64,14 @@ if(DEBUG)
 else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ffast-math")
 endif()
+if (DEV)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEV=1")
+endif()
 
 if(WASM_SERVER)
     set(CMAKE_CXX_COMPILER "em++")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWASM_SERVER=1")
-    add_link_options(-sEXIT_RUNTIME=0 -sEXPORTED_FUNCTIONS=_main,_on_connect,_on_disconnect,_tick,_on_message)
+    add_link_options(-sEXIT_RUNTIME=0 -sEXPORTED_FUNCTIONS=_main,_on_connect,_on_disconnect,_tick,_on_message,_malloc,_free,_restore_player -sEXPORTED_RUNTIME_METHODS=HEAPU8)
     if (NOT DEBUG) 
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --closure=1")
     endif()

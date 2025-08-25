@@ -123,10 +123,11 @@ public:
 
 #define STORED \
     X(0, Game::nickname) \
-    X(1, Game::seen_mobs) \
-    X(2, Game::seen_petals) \
-    X(3, Input::keyboard_movement) \
-    X(4, Input::movement_helper)
+    X(1, Game::password) \
+    X(2, Game::seen_mobs) \
+    X(3, Game::seen_petals) \
+    X(4, Input::keyboard_movement) \
+    X(5, Input::movement_helper)
 
 #define X(ct, name) static auto checker_##ct = MutationObserver(name);
 STORED
@@ -170,7 +171,32 @@ void Storage::retrieve() {
             Game::nickname = reader.read<std::string>();
         }
     }
-    #ifdef DEBUG
+    {
+        uint32_t len = EM_ASM_INT({
+            let a = window.localStorage.password;
+            if (!a) return 0;
+            let encoded = new TextEncoder().encode(a).slice(0, $1);
+            let cutIndex = $1;
+            let decoder = new TextDecoder('utf-8', { fatal: true });
+            while (cutIndex > 0) {
+                try {
+                    decoder.decode(encoded.slice(0, cutIndex));
+                    encoded = encoded.slice(0, cutIndex);
+                    HEAPU8.set(encoded, $0);
+                    return encoded.length;
+                } catch (e) {
+                    cutIndex--;
+                }
+            }
+            return 0;
+        }, buffer, MAX_PASSWORD_LENGTH);
+        if (len > 0 && len <= MAX_PASSWORD_LENGTH) {
+            std::string ref;
+            for (uint32_t i = 0; i < len; ++i) ref.push_back(StorageProtocol::buffer[i]);
+            Game::password = ref;
+        }
+    }
+    #ifdef DEV
     for (MobID::T i = 0; i < MobID::kNumMobs; ++i) Game::seen_mobs[i] = 1;
     for (PetalID::T i = PetalID::kBasic; i < PetalID::kNumPetals; ++i) Game::seen_petals[i] = 1;
     #endif

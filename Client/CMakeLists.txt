@@ -10,6 +10,7 @@ set(SRCS
     Assets/Mob.cc
     Assets/Petal.cc
     Assets/Web.cc
+    Render/RenderChat.cc
     Render/RenderDrop.cc
     Render/RenderFlower.cc
     Render/RenderHealth.cc
@@ -31,6 +32,7 @@ set(SRCS
     Socket.cc
     StaticData.cc
     Storage.cc
+    Ui/InGame/ChatInput.cc
     Ui/InGame/InputFreeze.cc
     Ui/InGame/Leaderboard.cc
     Ui/InGame/LevelBar.cc
@@ -79,6 +81,9 @@ if(DEBUG)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG=1 -gdwarf-4 -sNO_DISABLE_EXCEPTION_CATCHING")
 else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ffast-math --closure=1")
+endif()
+if (DEV)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEV=1")
 endif()
 
 add_link_options(-sEXPORTED_RUNTIME_METHODS=stringToNewUTF8)

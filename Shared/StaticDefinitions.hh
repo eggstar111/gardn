@@ -7,12 +7,13 @@
 inline uint32_t const ARENA_WIDTH = 40000;
 inline uint32_t const ARENA_HEIGHT = 4000;
 
-inline uint32_t const MAX_SLOT_COUNT = 8;
-inline uint32_t const LEVELS_PER_EXTRA_SLOT = 15;
+inline uint32_t const MAX_SLOT_COUNT = 12;
+inline uint32_t const LEVELS_PER_EXTRA_SLOT = 10;
 inline uint32_t const LEADERBOARD_SIZE = 10;
 inline uint32_t const MAX_PETALS_IN_CLUMP = 4;
 inline uint32_t const MAX_DIFFICULTY = 3;
-inline uint32_t const MAX_DROPS_PER_MOB = 6;
+inline uint32_t const MAX_DROPS_PER_MOB = 7;
+inline uint32_t const CHAT_SIZE = 5;
 
 namespace DamageType {
     enum : uint8_t {
@@ -74,6 +75,11 @@ namespace PetalID {
         kBone,
         kYucca,
         kCorn,
+        #ifdef DEV
+        kM28,
+        kCrown,
+        kCorruption,
+        #endif
         kNumPetals
     };
 };
@@ -153,6 +159,12 @@ namespace EntityFlags {
     };
 };
 
+namespace EntityCustomFlags {
+    enum {
+        kIsVariant
+    };
+};
+
 namespace FaceFlags {
     enum {
         kAttacking,
@@ -170,6 +182,9 @@ namespace EquipmentFlags {
         kAntennae,
         kObserver,
         kCutter,
+        #ifdef DEV
+        kCrown,
+        #endif
         kNone
     };
 };

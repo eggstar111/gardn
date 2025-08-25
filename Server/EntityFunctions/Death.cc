@@ -92,13 +92,13 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
         for (uint32_t i = 0; i < ent.loadout_count + MAX_SLOT_COUNT; ++i) {
             DEBUG_ONLY(assert(ent.loadout_ids[i] < PetalID::kNumPetals));
             PetalTracker::remove_petal(sim, ent.loadout_ids[i]);
-            if (ent.loadout_ids[i] != PetalID::kNone && ent.loadout_ids[i] != PetalID::kBasic && frand() < 0.95)
+            if (ent.loadout_ids[i] != PetalID::kNone && ent.loadout_ids[i] != PetalID::kBasic && ent.loadout_ids[i] != PetalID::kCorruption && frand() < 0.95)
                 potential.push_back(ent.loadout_ids[i]);
         }
         for (uint32_t i = 0; i < ent.deleted_petals.size(); ++i) {
             DEBUG_ONLY(assert(ent.deleted_petals[i] < PetalID::kNumPetals));
             PetalTracker::remove_petal(sim, ent.deleted_petals[i]);
-            if (ent.deleted_petals[i] != PetalID::kNone && ent.deleted_petals[i] != PetalID::kBasic && frand() < 0.95)
+            if (ent.deleted_petals[i] != PetalID::kNone && ent.deleted_petals[i] != PetalID::kBasic && ent.deleted_petals[i] != PetalID::kCorruption && frand() < 0.95)
                 potential.push_back(ent.deleted_petals[i]);
         }
         //no need to deleted_petals.clear, the player dies
@@ -112,7 +112,7 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
             numDrops = 3;
         for (uint32_t i = 0; i < numDrops; ++i) {
             PetalID::T p_id = potential.back();
-            if (PETAL_DATA[p_id].rarity >= RarityID::kRare && frand() < 0.05) p_id = PetalID::kPollen;
+            if (PETAL_DATA[p_id].rarity >= RarityID::kRare && frand() < 0.15) success_drops.push_back(PetalID::kPollen);
             success_drops.push_back(p_id);
             potential.pop_back();
         }
@@ -147,6 +147,8 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
             PetalTracker::add_petal(sim, PetalID::kBasic);
             camera.set_inventory(i, PetalID::kBasic);
         }
+        PetalTracker::add_petal(sim, PetalID::kRose);
+        camera.set_inventory(loadout_slots_at_level(respawn_level), PetalID::kRose);
     } else if (ent.has_component(kDrop)) {
         if (BIT_AT(ent.flags, EntityFlags::kIsDespawning))
             PetalTracker::remove_petal(sim, ent.drop_id);

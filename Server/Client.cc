@@ -4,11 +4,16 @@
 #include <Server/PetalTracker.hh>
 #include <Server/Server.hh>
 #include <Server/Spawn.hh>
+#include <Server/picosha2.h>
 
 #include <Shared/Binary.hh>
 #include <Shared/Config.hh>
+#include <Shared/Helpers.hh>
 
 #include <iostream>
+#include <sstream>
+#include <algorithm>
+#include <cctype>
 
 static uint32_t const RARITY_TO_XP[RarityID::kNumRarities] = { 2, 10, 50, 200, 1000, 5000, 0 };
 
@@ -86,6 +91,8 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             VALIDATE(validator.validate_float());
             float x = reader.read<float>();
             float y = reader.read<float>();
+            if (x) client->x = x;
+            if (y) client->y = y;
             if (x == 0 && y == 0) player.acceleration.set(0,0);
             else {
                 if (std::abs(x) > 5e3 || std::abs(y) > 5e3) break;
@@ -113,6 +120,13 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             player_spawn(simulation, camera, player);
             //unnecessary: name = UTF8Parser::trunc_string(name, MAX_NAME_LENGTH);
             player.set_name(name);
+            std::string password;
+            VALIDATE(validator.validate_string(MAX_PASSWORD_LENGTH));
+            reader.read<std::string>(password);
+            VALIDATE(UTF8Parser::is_valid_utf8(password));
+            client->password = password;
+            std::cout << "player_spawn " << name_or_unnamed(player.name)
+                << " <" << +player.id.hash << "," << +player.id.id << ">" << std::endl;
             break;
         }
         case Serverbound::kPetalDelete: {
@@ -151,6 +165,139 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             player.set_loadout_ids(pos1, player.loadout_ids[pos2]);
             player.set_loadout_ids(pos2, tmp);
             break;
+        }
+        case Serverbound::kChatSend: {
+            if (!client->alive()) break;
+            Simulation *simulation = &client->game->simulation;
+            Entity &camera = simulation->get_ent(client->camera);
+            Entity &player = simulation->get_ent(camera.player);
+            if (player.chat_sent != NULL_ENTITY) break;
+            std::string text;
+            VALIDATE(validator.validate_string(MAX_CHAT_LENGTH));
+            reader.read<std::string>(text);
+            VALIDATE(UTF8Parser::is_valid_utf8(text));
+            text = UTF8Parser::trunc_string(text, MAX_CHAT_LENGTH);
+            if (text.size() == 0) break;
+            player.chat_sent = alloc_chat(simulation, text, player).id;
+            std::cout << "chat " << name_or_unnamed(player.name) << ": " << text << std::endl;
+            //commands
+            if (text[0] == '/') command(client, text.substr(1));
+            break;
+        }
+    }
+}
+
+void Client::command(Client *client, std::string const &text) {
+    Simulation *simulation = &client->game->simulation;
+    Entity &camera = simulation->get_ent(client->camera);
+    Entity &player = simulation->get_ent(camera.player);
+    float x = player.x + (client->x / camera.fov) * 1.03;
+    float y = player.y + (client->y / camera.fov) * 1.03;
+
+    #ifdef DEV
+    bool isAdmin = true;
+    #else
+    bool isAdmin = picosha2::hash256_hex_string(client->password) == PASSWORD;
+    #endif
+
+    std::istringstream iss(text);
+    std::string command, arg;
+    iss >> command;
+    std::transform(command.begin(), command.end(), command.begin(), ::tolower);
+
+    if (command == "kill") {
+        simulation->get_ent(player.parent).set_killed_by(name_or_unnamed(player.name));
+        simulation->request_delete(player.id);
+    }
+
+    if (!isAdmin) return;
+
+    if (command == "drop" || command == "give") {
+        PetalID::T id;
+        while (iss >> arg) {
+            try { id = std::stoi(arg); }
+            catch (const std::invalid_argument &) { continue; }
+            catch (const std::out_of_range &) { continue; }
+            if (id >= PetalID::kNumPetals) continue;
+            Entity &drop = alloc_drop(simulation, id);
+            drop.set_x(player.x), drop.set_y(player.y);
+        }
+    } else if (command == "dropto") {
+        PetalID::T id;
+        while (iss >> arg) {
+            try { id = std::stoi(arg); }
+            catch (const std::invalid_argument &) { continue; }
+            catch (const std::out_of_range &) { continue; }
+            if (id >= PetalID::kNumPetals) continue;
+            Entity &drop = alloc_drop(simulation, id);
+            drop.set_x(x), drop.set_y(y);
+        }
+    } else if (command == "tp") {
+        try { iss >> arg, x = std::stof(arg), iss >> arg, y = std::stof(arg); }
+        catch (const std::invalid_argument &) { return; }
+        catch (const std::out_of_range &) { return; }
+        player.set_x(x), player.set_y(y);
+    } else if (command == "tpto") {
+        player.set_x(x), player.set_y(y);
+    } else if (command == "xp") {
+        uint32_t xp;
+        try { iss >> arg, xp = uint32_t(std::stoul(arg)); }
+        catch (const std::invalid_argument &) { return; }
+        catch (const std::out_of_range &) { return; }
+        player.set_score(player.score + xp);
+    } else if (command == "spawn") {
+        MobID::T id;
+        while (iss >> arg) {
+            try { id = std::stoi(arg); }
+            catch (const std::invalid_argument &) { continue; }
+            catch (const std::out_of_range &) { continue; }
+            if (id >= MobID::kNumMobs) continue;
+            alloc_mob(simulation, id, player.x, player.y, NULL_ENTITY);
+        }
+    } else if (command == "spawnto") {
+        MobID::T id;
+        while (iss >> arg) {
+            try { id = std::stoi(arg); }
+            catch (const std::invalid_argument &) { continue; }
+            catch (const std::out_of_range &) { continue; }
+            if (id >= MobID::kNumMobs) continue;
+            alloc_mob(simulation, id, x, y, NULL_ENTITY);
+        }
+    } else if (command == "spawnally") {
+        MobID::T id;
+        while (iss >> arg) {
+            try { id = std::stoi(arg); }
+            catch (const std::invalid_argument &) { continue; }
+            catch (const std::out_of_range &) { continue; }
+            if (id >= MobID::kNumMobs) continue;
+            alloc_mob(simulation, id, player.x, player.y, player.team);
+        }
+    } else if (command == "spawnallyto") {
+        MobID::T id;
+        while (iss >> arg) {
+            try { id = std::stoi(arg); }
+            catch (const std::invalid_argument &) { continue; }
+            catch (const std::out_of_range &) { continue; }
+            if (id >= MobID::kNumMobs) continue;
+            alloc_mob(simulation, id, x, y, player.team);
+        }
+    } else if (command == "spawnenemy") {
+        MobID::T id;
+        while (iss >> arg) {
+            try { id = std::stoi(arg); }
+            catch (const std::invalid_argument &) { continue; }
+            catch (const std::out_of_range &) { continue; }
+            if (id >= MobID::kNumMobs) continue;
+            alloc_mob(simulation, id, player.x, player.y, player.id);
+        }
+    } else if (command == "spawnenemyto") {
+        MobID::T id;
+        while (iss >> arg) {
+            try { id = std::stoi(arg); }
+            catch (const std::invalid_argument &) { continue; }
+            catch (const std::out_of_range &) { continue; }
+            if (id >= MobID::kNumMobs) continue;
+            alloc_mob(simulation, id, x, y, player.id);
         }
     }
 }

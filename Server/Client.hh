@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Shared/Entity.hh>
 #include <Shared/EntityDef.hh>
 
 #include <cstdint>
@@ -24,6 +25,8 @@ public:
     WebSocket *ws;
     uint8_t verified = 0;
     uint8_t seen_arena = 0;
+    float x = 0, y = 0;
+    std::string password;
     Client();
     void init();
     void remove();
@@ -32,6 +35,7 @@ public:
 
     void send_packet(uint8_t const *, size_t);
     static void on_message(WebSocket *, std::string_view, uint64_t);
+    static void command(Client *client, std::string const &);
     static void on_disconnect(WebSocket *, int, std::string_view);
 };
 

@@ -17,6 +17,7 @@ struct PlayerBuffs {
     uint8_t yinyang_count;
     uint8_t is_poisonous : 1;
     uint8_t has_cutter : 1;
+    uint8_t has_corruption : 1;
     uint8_t equip_flags;
 };
 
@@ -40,6 +41,11 @@ static struct PlayerBuffs _get_petal_passive_buffs(Simulation *sim, Entity &play
             buffs.extra_range = 75;
         } else if (slot_petal_id == PetalID::kCutter) {
             buffs.has_cutter = 1;
+        } else if (slot_petal_id == PetalID::kCorruption) {
+            buffs.extra_health += 1000;
+            buffs.has_corruption = 1;
+            if (player.acceleration.magnitude() > PLAYER_ACCELERATION) player.acceleration.set_magnitude(PLAYER_ACCELERATION);
+            player.acceleration = player.acceleration * 1.2;
         } else if (slot_petal_id == PetalID::kYinYang) {
             ++buffs.yinyang_count;
         }
@@ -137,6 +143,7 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
             if (!sim->ent_alive(petal_slot.ent_id)) {
                 petal_slot.ent_id = NULL_ENTITY;
                 game_tick_t reload_time = (petal_data.reload * TPS);
+                if (buffs.has_corruption) reload_time = reload_time * 0.5f;
                 if (!slot.already_spawned) reload_time += TPS;
                 float this_reload = reload_time == 0 ? 1 : (float) petal_slot.reload / reload_time;
                 min_reload = std::min(min_reload, this_reload);
@@ -224,7 +231,7 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
         player.set_face_flags(player.face_flags | (1 << FaceFlags::kPoisoned));
     if (player.dandy_ticks > 0)
         player.set_face_flags(player.face_flags | (1 << FaceFlags::kDandelioned));
-    if (buffs.yinyang_count != MAX_SLOT_COUNT) {
+    if (buffs.yinyang_count < 8) {
         switch (buffs.yinyang_count % 3) {
             case 0:
                 player.heading_angle += (BASE_PETAL_ROTATION_SPEED + buffs.extra_rot) / TPS;

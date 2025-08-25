@@ -60,7 +60,7 @@ static Entity &__alloc_mob(Simulation *sim, MobID::T mob_id, float x, float y, E
     mob.set_health_ratio(1);
 
     mob.detection_radius = data.attributes.aggro_radius;
-    mob.score_reward = data.xp;
+    mob.score_reward = data.xp * 3;
 
     mob.add_component(kName);
     mob.set_name(data.name);
@@ -78,6 +78,7 @@ Entity &alloc_mob(Simulation *sim, MobID::T mob_id, float x, float y, EntityID c
     struct MobData const &data = MOB_DATA[mob_id];
     if (data.attributes.segments <= 1) {
         Entity &ent = __alloc_mob(sim, mob_id, x, y, team);
+        if (mob_id == MobID::kHornet && frand() < 0.5f) { BIT_SET(ent.custom_flags, EntityCustomFlags::kIsVariant); } else
         if (mob_id == MobID::kAntHole) {
             std::vector<MobID::T> const spawns = { 
                 MobID::kBabyAnt, MobID::kBabyAnt, MobID::kBabyAnt, 
@@ -159,7 +160,7 @@ Entity &alloc_petal(Simulation *sim, PetalID::T petal_id, Entity const &parent) 
     petal.set_health_ratio(1);
     petal.poison_damage = petal_data.attributes.poison_damage;
     if (petal_id == PetalID::kPincer) petal.slow_inflict = TPS * 1.5;
-    if (petal_id == PetalID::kBone) petal.armor = 4;
+    if (petal_id == PetalID::kBone) petal.armor = 14;
 
     if (parent.id == NULL_ENTITY) petal.base_entity = petal.id;
     else petal.base_entity = parent.id;
@@ -181,6 +182,19 @@ Entity &alloc_web(Simulation *sim, float radius, Entity const &parent) {
     web.add_component(kWeb);
     entity_set_despawn_tick(web, 10 * TPS);
     return web;
+}
+
+Entity &alloc_chat(Simulation *sim, std::string &text, Entity const &parent) {
+    Entity &chat = sim->alloc_ent();
+    chat.add_component(kPhysics);
+    chat.set_radius(18 / 2 * text.size());
+    chat.add_component(kRelations);
+    chat.set_parent(parent.id);
+    chat.set_color(parent.color);
+    chat.add_component(kChat);
+    chat.set_text(text);
+    entity_set_despawn_tick(chat, 10 * TPS);
+    return chat;
 }
 
 void player_spawn(Simulation *sim, Entity &camera, Entity &player) {
