@@ -41,11 +41,13 @@ static struct PlayerBuffs _get_petal_passive_buffs(Simulation *sim, Entity &play
             buffs.extra_range = 75;
         } else if (slot_petal_id == PetalID::kCutter) {
             buffs.has_cutter = 1;
+        #ifdef DEV
         } else if (slot_petal_id == PetalID::kCorruption) {
             buffs.extra_health += 1000;
             buffs.has_corruption = 1;
             if (player.acceleration.magnitude() > PLAYER_ACCELERATION) player.acceleration.set_magnitude(PLAYER_ACCELERATION);
             player.acceleration = player.acceleration * 1.2;
+        #endif
         } else if (slot_petal_id == PetalID::kYinYang) {
             ++buffs.yinyang_count;
         }

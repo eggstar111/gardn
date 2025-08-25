@@ -92,13 +92,21 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
         for (uint32_t i = 0; i < ent.loadout_count + MAX_SLOT_COUNT; ++i) {
             DEBUG_ONLY(assert(ent.loadout_ids[i] < PetalID::kNumPetals));
             PetalTracker::remove_petal(sim, ent.loadout_ids[i]);
+            #ifdef DEV
             if (ent.loadout_ids[i] != PetalID::kNone && ent.loadout_ids[i] != PetalID::kBasic && ent.loadout_ids[i] != PetalID::kCorruption && frand() < 0.95)
+            #else
+            if (ent.loadout_ids[i] != PetalID::kNone && ent.loadout_ids[i] != PetalID::kBasic && frand() < 0.95)
+            #endif
                 potential.push_back(ent.loadout_ids[i]);
         }
         for (uint32_t i = 0; i < ent.deleted_petals.size(); ++i) {
             DEBUG_ONLY(assert(ent.deleted_petals[i] < PetalID::kNumPetals));
             PetalTracker::remove_petal(sim, ent.deleted_petals[i]);
+            #ifdef DEV
             if (ent.deleted_petals[i] != PetalID::kNone && ent.deleted_petals[i] != PetalID::kBasic && ent.deleted_petals[i] != PetalID::kCorruption && frand() < 0.95)
+            #else
+            if (ent.deleted_petals[i] != PetalID::kNone && ent.deleted_petals[i] != PetalID::kBasic && frand() < 0.95)
+            #endif
                 potential.push_back(ent.deleted_petals[i]);
         }
         //no need to deleted_petals.clear, the player dies
