@@ -104,7 +104,7 @@ void GameInstance::add_client(Client *client) {
     ent.set_fov(BASE_FOV);
     ent.set_respawn_level(1);
     #ifdef DEV
-        if (simulation.get_ent(team).color == ColorID::kRed) {
+    if (simulation.get_ent(team).color == ColorID::kRed) {
         ent.set_respawn_level(99);
         ent.set_inventory(loadout_slots_at_level(ent.respawn_level) - 1, PetalID::kCorruption);
         for (uint32_t i = 0; i < loadout_slots_at_level(ent.respawn_level) - 1; ++i)
