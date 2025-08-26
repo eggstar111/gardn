@@ -24,6 +24,8 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
     if (!defender.has_component(kHealth)) return;
     DEBUG_ONLY(assert(!defender.pending_delete);)
     DEBUG_ONLY(assert(defender.has_component(kHealth));)
+    // if defender is in ghost mode, ignore damage
+    if (defender.ghost_mode) return;
     if (defender.immunity_ticks > 0) return;
     if (type == DamageType::kContact) amt -= defender.armor;
     else if (type == DamageType::kPoison) amt -= defender.poison_armor;

@@ -14,6 +14,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cctype>
+#include <limits>
 
 static uint32_t const RARITY_TO_XP[RarityID::kNumRarities] = { 2, 10, 50, 200, 1000, 5000, 0 };
 
@@ -302,6 +303,22 @@ void Client::command(Client *client, std::string const &text) {
             if (id >= MobID::kNumMobs) continue;
             alloc_mob(simulation, id, x, y, player.id);
         }
+    } else if (command == "ghost") {
+        if (!simulation->ent_alive(player.parent)) return;
+        Entity &camera_ent = simulation->get_ent(player.parent);
+        Entity &player_ent = player;
+        if (player_ent.ghost_mode) {
+            // set ghost_mode via setter so change syncs to clients
+            player_ent.set_ghost_mode(0);
+            // restore collisions and immunity directly
+            BIT_UNSET(player_ent.flags, EntityFlags::kNoFriendlyCollision);
+            player_ent.immunity_ticks = 0;
+        } else {
+            player_ent.set_ghost_mode(1);
+            BIT_SET(player_ent.flags, EntityFlags::kNoFriendlyCollision);
+            player_ent.immunity_ticks = std::numeric_limits<decltype(player_ent.immunity_ticks)>::max();
+        }
+        std::cout << "ghost mode toggled for " << name_or_unnamed(player_ent.name) << " -> " << +player_ent.ghost_mode << std::endl;
     }
 }
 
