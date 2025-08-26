@@ -91,7 +91,8 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             VALIDATE(validator.validate_float());
             float x = reader.read<float>();
             float y = reader.read<float>();
-            if (x || y) client->x = x, client->y = y;
+            if (x) client->x = x;
+            if (y) client->y = y;
             if (x == 0 && y == 0) player.acceleration.set(0,0);
             else {
                 if (std::abs(x) > 5e3 || std::abs(y) > 5e3) break;
@@ -123,11 +124,7 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             VALIDATE(validator.validate_string(MAX_PASSWORD_LENGTH));
             reader.read<std::string>(password);
             VALIDATE(UTF8Parser::is_valid_utf8(password));
-            #ifdef DEV
-            client->isAdmin = true;
-            #else
-            client->isAdmin = picosha2::hash256_hex_string(password) == PASSWORD;
-            #endif
+            client->password = password;
             std::cout << "player_spawn " << name_or_unnamed(player.name)
                 << " <" << +player.id.hash << "," << +player.id.id << ">" << std::endl;
             break;
@@ -141,6 +138,7 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             uint8_t pos = reader.read<uint8_t>();
             if (pos >= MAX_SLOT_COUNT + player.loadout_count) break;
             PetalID::T old_id = player.loadout_ids[pos];
+            if (old_id == 51) break;
             if (old_id != PetalID::kNone && old_id != PetalID::kBasic) {
                 uint8_t rarity = PETAL_DATA[old_id].rarity;
                 player.set_score(player.score + RARITY_TO_XP[rarity]);
@@ -163,6 +161,7 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             if (pos1 >= MAX_SLOT_COUNT + player.loadout_count) break;
             VALIDATE(validator.validate_uint8());
             uint8_t pos2 = reader.read<uint8_t>();
+            if (player.loadout_ids[pos1] == 51 || player.loadout_ids[pos2] == 51) break;
             if (pos2 >= MAX_SLOT_COUNT + player.loadout_count) break;
             PetalID::T tmp = player.loadout_ids[pos1];
             player.set_loadout_ids(pos1, player.loadout_ids[pos2]);
@@ -197,6 +196,12 @@ void Client::command(Client *client, std::string const &text) {
     float x = player.x + (client->x / camera.fov) * 1.03;
     float y = player.y + (client->y / camera.fov) * 1.03;
 
+    #ifdef DEV
+    bool isAdmin = true;
+    #else
+    bool isAdmin = picosha2::hash256_hex_string(client->password) == PASSWORD;
+    #endif
+
     std::istringstream iss(text);
     std::string command, arg;
     iss >> command;
@@ -207,7 +212,7 @@ void Client::command(Client *client, std::string const &text) {
         simulation->request_delete(player.id);
     }
 
-    if (!client->isAdmin) return;
+    if (!isAdmin) return;
 
     if (command == "drop" || command == "give") {
         PetalID::T id;
