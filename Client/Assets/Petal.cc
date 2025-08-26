@@ -24,6 +24,7 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
         case PetalID::kLight:
         case PetalID::kTwin:
         case PetalID::kTriplet:
+        case PetalID::kQuint:
             ctx.set_fill(0xffffffff);
             ctx.set_stroke(0xffcfcfcf);
             ctx.set_line_width(3);
@@ -200,6 +201,7 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.stroke();
             break;
         case PetalID::kWing:
+        case PetalID::kTriWing:
             ctx.begin_path();
             ctx.partial_arc(0,0,15,-1.5707963267948966,1.5707963267948966,0);
             ctx.qcurve_to(10,0,0,-15);
@@ -298,6 +300,7 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.fill();
             break;
         case PetalID::kPoisonPeas:
+        case PetalID::kPoisonPeas2:
             ctx.set_fill(0xffce76db);
             ctx.set_stroke(0xffa760b1);
             ctx.set_line_width(3);
