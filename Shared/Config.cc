@@ -12,4 +12,4 @@ extern const uint32_t MAX_PASSWORD_LENGTH = 64;
 extern const std::string PASSWORD = "a621ab606db2a11f63edc576a729843b8269250dc324206871d90635ac5e531c";
 
 //your ws host url may not follow this format, change it to fit your needs
-extern std::string const WS_URL = "ws://154.12.60.44:"+std::to_string(SERVER_PORT);
+extern std::string const WS_URL = "ws://localhost:"+std::to_string(SERVER_PORT);

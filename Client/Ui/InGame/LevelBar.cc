@@ -40,8 +40,17 @@ void LevelBar::on_render(Renderer &ctx) {
     ctx.move_to(-width / 2, 0);
     ctx.line_to(-width / 2 + width * ((float) progress), 0);
     ctx.stroke();
-    char text[16];
-    std::snprintf(text, 15, "Lvl %d Flower", level);
+    char text[64];
+    if (Game::alive()) {
+        Entity &player = Game::simulation.get_ent(Game::player_id);
+        if (player.has_component(kFlower) && player.ghost_mode) {
+            std::snprintf(text, sizeof(text), "Lvl %d Flower (ghost mode)", level);
+        } else {
+            std::snprintf(text, sizeof(text), "Lvl %d Flower", level);
+        }
+    } else {
+        std::snprintf(text, sizeof(text), "Lvl %d Flower", level);
+    }
     ctx.draw_text(text, { .size = 16 });
     ctx.translate(0, -height/2 - 16);
     ctx.draw_text(Game::nickname.c_str(), { .size = 24 });
