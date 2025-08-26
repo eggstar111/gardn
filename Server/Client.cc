@@ -92,8 +92,7 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             VALIDATE(validator.validate_float());
             float x = reader.read<float>();
             float y = reader.read<float>();
-            if (x) client->x = x;
-            if (y) client->y = y;
+            if (x || y) client->x = x, client->y = y;
             if (x == 0 && y == 0) player.acceleration.set(0,0);
             else {
                 if (std::abs(x) > 5e3 || std::abs(y) > 5e3) break;
@@ -125,7 +124,11 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             VALIDATE(validator.validate_string(MAX_PASSWORD_LENGTH));
             reader.read<std::string>(password);
             VALIDATE(UTF8Parser::is_valid_utf8(password));
-            client->password = password;
+            #ifdef DEV
+            client->isAdmin = true;
+            #else
+            client->isAdmin = picosha2::hash256_hex_string(password) == PASSWORD;
+            #endif
             std::cout << "player_spawn " << name_or_unnamed(player.name)
                 << " <" << +player.id.hash << "," << +player.id.id << ">" << std::endl;
             break;
@@ -201,12 +204,6 @@ void Client::command(Client *client, std::string const &text) {
     float x = player.x + (client->x / camera.fov) * 1.03;
     float y = player.y + (client->y / camera.fov) * 1.03;
 
-    #ifdef DEV
-    bool isAdmin = true;
-    #else
-    bool isAdmin = picosha2::hash256_hex_string(client->password) == PASSWORD;
-    #endif
-
     std::istringstream iss(text);
     std::string command, arg;
     iss >> command;
@@ -217,7 +214,7 @@ void Client::command(Client *client, std::string const &text) {
         simulation->request_delete(player.id);
     }
 
-    if (!isAdmin) return;
+    if (!client->isAdmin) return;
 
     if (command == "drop" || command == "give") {
         PetalID::T id;
