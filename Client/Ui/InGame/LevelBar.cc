@@ -44,12 +44,12 @@ void LevelBar::on_render(Renderer &ctx) {
     if (Game::alive()) {
         Entity &player = Game::simulation.get_ent(Game::player_id);
         if (player.has_component(kFlower) && player.ghost_mode) {
-            std::snprintf(text, sizeof(text), "Lvl %d Flower (ghost mode)", level);
+            std::snprintf(text, 63, "Lvl %d Flower (ghost mode)", level);
         } else {
-            std::snprintf(text, sizeof(text), "Lvl %d Flower", level);
+            std::snprintf(text, 63, "Lvl %d Flower", level);
         }
     } else {
-        std::snprintf(text, sizeof(text), "Lvl %d Flower", level);
+        std::snprintf(text, 63, "Lvl %d Flower", level);
     }
     ctx.draw_text(text, { .size = 16 });
     ctx.translate(0, -height/2 - 16);
