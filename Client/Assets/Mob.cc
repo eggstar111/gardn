@@ -678,13 +678,14 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
         };
         #ifdef DEV
         case MobID::kTargetDummy:
+            SET_BASE_COLOR(0xff999999);
             ctx.round_line_cap();
             ctx.begin_path();
-            ctx.set_fill(0xff7C7C7C);
+            ctx.set_fill(Renderer::HSV(base_color, 0.8));
             ctx.arc(0, 0, 53);
             ctx.fill();
             ctx.begin_path();
-            ctx.set_fill(0xff999999);
+            ctx.set_fill(base_color);
             ctx.arc(0, 0, 47);
             ctx.fill();
             ctx.begin_path();

@@ -2113,6 +2113,13 @@ void draw_loadout_background(Renderer &ctx, uint8_t id, float reload) {
     ctx.begin_path();
     ctx.rect(-25, -25, 50, 50);
     ctx.fill();
+    #ifdef DEV
+    {
+        RenderContext r(&ctx);
+        ctx.translate(-30, -25);
+        ctx.draw_text(std::to_string(id).c_str(), { .size = 18 }); 
+    }
+    #endif
     ctx.clip();
     if (reload < 1) {
         float rld =  1 - (float) reload;

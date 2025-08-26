@@ -4,8 +4,13 @@
 
 #include <cstdint>
 
+#ifdef DEV
+inline uint32_t const ARENA_WIDTH = 2000;
+inline uint32_t const ARENA_HEIGHT = 2000;
+#else
 inline uint32_t const ARENA_WIDTH = 40000;
 inline uint32_t const ARENA_HEIGHT = 4000;
+#endif
 
 inline uint32_t const MAX_SLOT_COUNT = 12;
 inline uint32_t const LEVELS_PER_EXTRA_SLOT = 10;

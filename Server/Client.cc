@@ -141,6 +141,9 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             uint8_t pos = reader.read<uint8_t>();
             if (pos >= MAX_SLOT_COUNT + player.loadout_count) break;
             PetalID::T old_id = player.loadout_ids[pos];
+            #ifdef DEV
+            if (old_id == PetalID::kCorruption) break;
+            #endif
             if (old_id != PetalID::kNone && old_id != PetalID::kBasic) {
                 uint8_t rarity = PETAL_DATA[old_id].rarity;
                 player.set_score(player.score + RARITY_TO_XP[rarity]);
@@ -163,6 +166,9 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             if (pos1 >= MAX_SLOT_COUNT + player.loadout_count) break;
             VALIDATE(validator.validate_uint8());
             uint8_t pos2 = reader.read<uint8_t>();
+            #ifdef DEV
+            if (player.loadout_ids[pos1] == PetalID::kCorruption || player.loadout_ids[pos2] == PetalID::kCorruption) break;
+            #endif
             if (pos2 >= MAX_SLOT_COUNT + player.loadout_count) break;
             PetalID::T tmp = player.loadout_ids[pos1];
             player.set_loadout_ids(pos1, player.loadout_ids[pos2]);
