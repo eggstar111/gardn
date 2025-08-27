@@ -18,7 +18,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
     struct PetalData const &petal_data = PETAL_DATA[petal.petal_id];
     if (petal_data.attributes.rotation_style == PetalAttributes::kPassiveRot) {
         //simulate on clientside
-        float rot_amt = petal.petal_id == PetalID::kWing ? 10.0 : 1.0;
+        float rot_amt = (petal.petal_id == PetalID::kWing || petal.petal_id == PetalID::kTriWing) ? 10.0 : 1.0;
         if (petal.id.id % 2) petal.set_angle(petal.angle + rot_amt / TPS);
         else petal.set_angle(petal.angle - rot_amt / TPS);
     } else if (petal_data.attributes.rotation_style == PetalAttributes::kFollowRot && !(BIT_AT(petal.flags, EntityFlags::kIsDespawning))) {
@@ -94,11 +94,12 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
                     break;
                 case PetalID::kPeas:
                 case PetalID::kPoisonPeas:
+                case PetalID::kPoisonPeas2:
                     if (BIT_AT(player.input, InputFlags::kAttacking)) {
                         Vector delta(petal.x - player.x, petal.y - player.y);
-                        petal.friction = DEFAULT_FRICTION;
-                        petal.acceleration.unit_normal(delta.angle()).set_magnitude(25 * PLAYER_ACCELERATION);
-                        entity_set_despawn_tick(petal, 0.25 * TPS);
+                        petal.friction = DEFAULT_FRICTION / 10;
+                        petal.acceleration.unit_normal(delta.angle()).set_magnitude(10 * PLAYER_ACCELERATION);
+                        entity_set_despawn_tick(petal, 1 * TPS);
                     }
                     break;
                 case PetalID::kMoon: {

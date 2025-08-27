@@ -25,9 +25,9 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
     {"Basic", "A nice petal, not too strong but not too weak",
         10.0, 10.0, 10.0, 2.5, 1, RarityID::kCommon, {}},
     {"Fast", "Weaker than most petals, but reloads very quickly",
-        5.0, 8.0, 7.0, 1.0, 1, RarityID::kCommon, {}},
+        5.0, 8.0, 7.0, 0.8, 1, RarityID::kCommon, {}},
     {"Heavy", "Very resilient and deals more damage, but reloads very slowly",
-        20.0, 20.0, 12.0, 4.5, 1, RarityID::kCommon, {}},
+        20.0, 20.0, 12.0, 3.5, 1, RarityID::kCommon, {}},
     {"Stinger", "It really hurts, but it's really fragile",
         5.0, 35.0, 7.0, 3.5, 1, RarityID::kUnusual, {}},
     {"Leaf", "Gathers energy from the sun to passively heal your flower",
@@ -36,7 +36,7 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .icon_angle = -1
     }},
     {"Twin", "Why stop at one? Why not TWO?!",
-        5.0, 8.0, 7.0, 1.0, 2, RarityID::kUnusual, {}},
+        5.0, 8.0, 7.0, 0.8, 2, RarityID::kUnusual, {}},
     {"Rose", "Its healing properties are amazing. Not so good at combat though",
         5.0, 5.0, 10.0, 3.5, 1, RarityID::kUnusual, { 
         .secondary_reload = 1.0,
@@ -69,30 +69,30 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
     {"Faster", "It's so light it makes your other petals spin faster",
         5.0, 7.0, 7.0, 0.5, 1, RarityID::kRare, {}},
     {"Rock", "Even more durable, but slower to recharge",
-        100.0, 10.0, 12.0, 7.5, 1, RarityID::kRare, {}},
+        100.0, 10.0, 12.0, 4, 1, RarityID::kRare, {}},
     {"Cactus", "Not very strong, but somehow increases your maximum health",
         15.0, 5.0, 15.0, 1.0, 1, RarityID::kRare, {}},
     {"Web", "It's really sticky",
-        10.0, 5.0, 10.0, 3.0, 1, RarityID::kRare, {
+        10.0, 5.0, 10.0, 1.5, 1, RarityID::kRare, {
         .secondary_reload = 0.5,
         .defend_only = 1,
     }},
     {"Wing", "It comes and goes",
-        15.0, 15.0, 10.0, 2.5, 1, RarityID::kRare, {
+        15.0, 15.0, 10.0, 1.5, 1, RarityID::kRare, {
         .icon_angle = 1,
     }},
     {"Peas", "4 in 1 deal",
-        5.0, 8.0, 7.0, 2.0, 4, RarityID::kRare, {
+        5.0, 8.0, 7.0, 1.0, 4, RarityID::kRare, {
         .clump_radius = 8,
         .secondary_reload = 0.1,
         .defend_only = 1,
     }},
     {"Sand", "It's coarse, rough, and gets everywhere",
-        10.0, 3.0, 7.0, 1.5, 4, RarityID::kRare, {
+        10.0, 5.0, 7.0, 1.0, 4, RarityID::kRare, {
         .clump_radius = 10,
     }},
     {"Pincer", "Stuns and poisons targets for a short duration",
-        10.0, 5.0, 10.0, 2.5, 1, RarityID::kRare, {
+        10.0, 5.0, 10.0, 1.5, 1, RarityID::kRare, {
         .icon_angle = 0.7,
         .poison_damage = { 5.0, 1.0 }
     }},
@@ -104,7 +104,7 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .defend_only = 1
     }},
     {"Triplet", "How about THREE?!",
-        5.0, 8.0, 7.0, 1.0, 3, RarityID::kEpic, {}},
+        5.0, 8.0, 7.0, 0.8, 3, RarityID::kEpic, {}},
     {"Egg", "Something interesting might pop out of this",
         50.0, 1.0, 12.5, 1.0, 2, RarityID::kEpic, { 
         .secondary_reload = 3.5,
@@ -117,12 +117,12 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .poison_damage = { 15.0, 4.0 }
     }},
     {"Pollen", "Asthmatics beware",
-        7.0, 8.0, 7.0, 1.5, 3, RarityID::kEpic, {
+        7.0, 8.0, 7.0, 1, 3, RarityID::kEpic, {
         .secondary_reload = 0.5,
         .defend_only = 1
     }},
     {"Peas", "4 in 1 deal, now with a secret ingredient: poison",
-        5.0, 2.0, 7.0, 2.0, 4, RarityID::kEpic, {
+        5.0, 2.0, 7.0, 1.0, 4, RarityID::kEpic, {
         .clump_radius = 8,
         .secondary_reload = 0.1,
         .defend_only = 1,
@@ -154,7 +154,7 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .clump_radius = 10
     }},
     {"Web", "It's really sticky",
-        10.0, 5.0, 10.0, 3.0, 3, RarityID::kLegendary, {
+        10.0, 5.0, 10.0, 1.5, 3, RarityID::kLegendary, {
         .clump_radius = 10,
         .secondary_reload = 0.5,
         .defend_only = 1,
@@ -166,7 +166,7 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .clump_radius = 10,
     }},
     {"Heaviest", "This thing is so heavy that nothing gets in the way",
-        200.0, 10.0, 12.0, 15.0, 1, RarityID::kEpic, {
+        200.0, 10.0, 12.0, 10.0, 1, RarityID::kEpic, {
         .mass = 10,
         .rotation_style = PetalAttributes::kNoRot
     }},
@@ -205,11 +205,11 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .icon_angle = M_PI
     }},
     {"Rice", "Spawns instantly, but not very strong",
-        1.0, 4.0, 13.0, 0.1, 1, RarityID::kEpic, {
+        1.0, 8.0, 13.0, 0.1, 1, RarityID::kEpic, {
         .icon_angle = 0.7
     }},
     {"Bone", "Sturdy",
-        12.0, 10.0, 12.0, 2.5, 1, RarityID::kLegendary, {
+        12.0, 12.0, 12.0, 1.5, 1, RarityID::kLegendary, {
         .icon_angle = 1
     }},
     {"Yucca", "Heals the flower, but only while in the defensive position",
@@ -218,21 +218,36 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .icon_angle = -1
     }},
     {"Corn", "Takes a long time to spawn, but has a lot of health",
-        500.0, 2.5, 16.0, 10.0, 1, RarityID::kEpic, {
+        500.0, 5, 16.0, 8, 1, RarityID::kEpic, {
         .icon_angle = 0.5
-    }}
+    }},
     #ifdef DEV
-    , {"M28", "Wow, A yummy M28",
+    {"M28", "Wow, A yummy M28",
         150.0, 15.5, 16.0, 5.0, 1, RarityID::kUnique, {
         .icon_angle = 0.5
-    }}
-    , {"Pharaoh's Crown", "Allows your flower to sense foes from farther away",
-    0.0, 0.0, 12.5, 0.0, 0, RarityID::kUnique, { .equipment = EquipmentFlags::kCrown }}
-    , {"Corruption", "Corrupts one's soul, turning them against their own kind.",
+    }},
+    {"Pharaoh's Crown", "Allows your flower to sense foes from farther away",
+        0.0, 0.0, 12.5, 0.0, 0, RarityID::kUnique, { 
+        .equipment = EquipmentFlags::kCrown 
+    }},
+    {"Corruption", "Corrupts one's soul, turning them against their own kind.",
         0.0, 0.0, 0, 0.0, 0, RarityID::kUnique, {
         .icon_angle = 0.5
     }},
     #endif
+    { "Peas", "4 in 1 deal, now with a secret ingredient: poison",
+        5.0, 10.0, 10.0, 1.0, 4, RarityID::kLegendary, {
+        .clump_radius = 10,
+        .secondary_reload = 0.1,
+        .defend_only = 1,
+        .poison_damage = { 20.0, 1 }
+    }},
+    { "Quint", "How about FIVE?!",
+        5.0, 8.0, 7.0, 0.8, 5, RarityID::kLegendary, {} },
+    { "Wing", "It comes and goes",
+        15.0, 15.0, 10.0, 1.5, 3, RarityID::kLegendary, {
+        .icon_angle = 1,
+    }},
 };
 
 struct MobData const MOB_DATA[MobID::kNumMobs] = {
@@ -240,19 +255,19 @@ struct MobData const MOB_DATA[MobID::kNumMobs] = {
         "Baby Ant",
         "Weak and defenseless, but big dreams.",
         RarityID::kCommon, {10.0}, 10.0, {14.0}, 1, {
-        PetalID::kLight, PetalID::kLeaf, PetalID::kTwin, PetalID::kRice, PetalID::kTriplet
+        PetalID::kLight, PetalID::kLeaf, PetalID::kTwin, PetalID::kRice, PetalID::kTriplet, PetalID::kQuint, PetalID::kBone
     }, {}},
     {
         "Worker Ant",
         "It's temperamental, probably from working all the time.",
         RarityID::kCommon, {25.0}, 10.0, {14.0}, 3, {
-        PetalID::kLight, PetalID::kLeaf, PetalID::kTwin, PetalID::kCorn, PetalID::kBone
+        PetalID::kLight, PetalID::kLeaf, PetalID::kTwin, PetalID::kCorn, PetalID::kBone, PetalID::kTriplet, PetalID::kQuint
     }, {}},
     {
         "Soldier Ant",
         "It's got wings and it's ready to use them.",
         RarityID::kUnusual, {40.0}, 10.0, {14.0}, 5, {
-        PetalID::kTwin, PetalID::kIris, PetalID::kWing, PetalID::kFaster, PetalID::kTriplet
+        PetalID::kTwin, PetalID::kIris, PetalID::kWing, PetalID::kFaster, PetalID::kTriplet, PetalID::kQuint, PetalID::kBone
     }, {}},
     {
         "Bee",
@@ -264,13 +279,13 @@ struct MobData const MOB_DATA[MobID::kNumMobs] = {
         "Ladybug",
         "Cute and harmless.",
         RarityID::kCommon, {25.0}, 10.0, {30.0}, 3, {
-        PetalID::kLight, PetalID::kRose, PetalID::kTwin, PetalID::kBubble
+        PetalID::kLight, PetalID::kRose, PetalID::kTwin, PetalID::kBubble, PetalID::kTriplet, PetalID::kQuint
     }, {}},
     {
         "Beetle",
         "It's hungry and flowers are its favorite meal.",
         RarityID::kUnusual, {40.0}, 35.0, {35.0}, 10, {
-        PetalID::kIris, PetalID::kSalt, PetalID::kWing, PetalID::kTriplet
+        PetalID::kIris, PetalID::kSalt, PetalID::kWing, PetalID::kTriplet, PetalID::kQuint
     }, {}},
     {
         "Massive Ladybug",
@@ -282,7 +297,7 @@ struct MobData const MOB_DATA[MobID::kNumMobs] = {
         "Massive Beetle",
         "Someone overfed this one, you might be next.",
         RarityID::kRare, {600.0}, 35.0, {75.0}, 50, {
-        PetalID::kIris, PetalID::kWing, PetalID::kBlueIris, PetalID::kTriplet, PetalID::kBeetleEgg, PetalID::kThirdEye
+        PetalID::kIris, PetalID::kWing, PetalID::kBlueIris, PetalID::kTriplet, PetalID::kBeetleEgg, PetalID::kQuint, PetalID::kTriWing
         #ifdef DEV
         , PetalID::kCrown
         #endif
@@ -297,7 +312,7 @@ struct MobData const MOB_DATA[MobID::kNumMobs] = {
         "Hornet",
         "These aren't quite as nice as the little bees.",
         RarityID::kUnusual, {40.0}, 40.0, {40.0}, 12, {
-        PetalID::kDandelion, PetalID::kMissile, PetalID::kWing, PetalID::kBubble, PetalID::kAntennae
+        PetalID::kDandelion, PetalID::kMissile, PetalID::kWing, PetalID::kBubble, PetalID::kAntennae, PetalID::kTriWing
     }, { .aggro_radius = 600 }},
     {
         "Cactus",
@@ -321,13 +336,13 @@ struct MobData const MOB_DATA[MobID::kNumMobs] = {
         "Centipede",
         "It's just there doing its thing.",
         RarityID::kUnusual, {50.0}, 10.0, {35.0}, 2, {
-        PetalID::kLight, PetalID::kTwin, PetalID::kLeaf, PetalID::kPeas, PetalID::kTriplet
+        PetalID::kTwin, PetalID::kLeaf, PetalID::kPeas, PetalID::kTriplet, PetalID::kPoisonPeas, PetalID::kPoisonPeas2, PetalID::kQuint
     }, { .segments = 10 }},
     {
         "Evil Centipede",
         "This one loves flowers.",
         RarityID::kRare, {50.0}, 10.0, {35.0}, 3, {
-        PetalID::kIris, PetalID::kPoisonPeas, PetalID::kBlueIris
+        PetalID::kIris, PetalID::kPoisonPeas, PetalID::kBlueIris, PetalID::kPoisonPeas2
     }, { .segments = 10, .poison_damage = { 5.0, 2.0 } }},
     {
         "Desert Centipede",
@@ -345,13 +360,13 @@ struct MobData const MOB_DATA[MobID::kNumMobs] = {
         "Scorpion",
         "This one stings, now with poison.",
         RarityID::kUnusual, {35.0}, 15.0, {35.0}, 10, {
-        PetalID::kIris, PetalID::kPincer, PetalID::kTriplet, PetalID::kLotus
+        PetalID::kIris, PetalID::kPincer, PetalID::kTriplet, PetalID::kLotus, PetalID::kQuint
     }, { .poison_damage = { 5.0, 1.0 } }},
     {
         "Spider",
         "Spooky.",
         RarityID::kUnusual, {35.0}, 10.0, {15.0}, 8, {
-        PetalID::kStinger, PetalID::kWeb, PetalID::kFaster, PetalID::kTriweb
+        PetalID::kStinger, PetalID::kWeb, PetalID::kFaster, PetalID::kTriweb, PetalID::kThirdEye
         #ifdef DEV
         , PetalID::kM28
         #endif
@@ -360,13 +375,13 @@ struct MobData const MOB_DATA[MobID::kNumMobs] = {
         "Ant Hole",
         "Ants go in, and come out. Can't explain that.",
         RarityID::kRare, {500.0}, 10.0, {45.0}, 25, {
-        PetalID::kIris, PetalID::kWing, PetalID::kAntEgg, PetalID::kTriplet
+        PetalID::kIris, PetalID::kWing, PetalID::kAntEgg, PetalID::kQuint, PetalID::kTriWing, PetalID::kBone
     }, { .stationary = 1 }},
     {
         "Queen Ant",
         "You must have done something really bad if she's chasing you.",
         RarityID::kRare, {350.0}, 10.0, {25.0}, 15, {
-        PetalID::kTwin, PetalID::kIris, PetalID::kWing, PetalID::kAntEgg, PetalID::kTringer
+        PetalID::kQuint, PetalID::kIris, PetalID::kWing, PetalID::kAntEgg, PetalID::kTringer, PetalID::kTriWing
     }, { .aggro_radius = 750 }},
     {
         "Ladybug",
@@ -386,14 +401,12 @@ struct MobData const MOB_DATA[MobID::kNumMobs] = {
         RarityID::kEpic, {250.0}, 25.0, {40.0}, 1, {
         PetalID::kCutter
     }, {}},
-    #ifdef DEV
     {
         "Target Dummy",
         "How do you have this in your gallery?",
         RarityID::kUnique, {10000.0}, 15.0, {50.0}, 50000, {
-        PetalID::kTringer, PetalID::kTringer, PetalID::kTringer
-    }, { .stationary = 1 }},
-    #endif
+        PetalID::kTringer,PetalID::kPoisonPeas2, PetalID::kTriWing
+    }, {.stationary = 1 } },
 };
 
 std::array<StaticArray<float, MAX_DROPS_PER_MOB>, MobID::kNumMobs> const MOB_DROP_CHANCES = [](){
