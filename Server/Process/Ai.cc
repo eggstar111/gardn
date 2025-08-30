@@ -55,6 +55,7 @@ static void default_tick_returning(Simulation *sim, Entity &ent, float speed = 1
 
 
 static void tick_default_passive(Simulation *sim, Entity &ent) {
+   
     switch(ent.ai_state) {
         case AIState::kIdle: {
             default_tick_idle(sim, ent);
@@ -75,6 +76,7 @@ static void tick_default_passive(Simulation *sim, Entity &ent) {
 }
 
 static void tick_default_neutral(Simulation *sim, Entity &ent) {
+   
     if (sim->ent_alive(ent.target)) {
         Entity &target = sim->get_ent(ent.target);
         Vector v(target.x - ent.x, target.y - ent.y);
@@ -93,6 +95,7 @@ static void tick_default_neutral(Simulation *sim, Entity &ent) {
 }
 
 static void tick_default_aggro(Simulation *sim, Entity &ent, float speed) {
+   
     if (sim->ent_alive(ent.target)) {
         Entity &target = sim->get_ent(ent.target);
         Vector v(target.x - ent.x, target.y - ent.y);
@@ -142,6 +145,7 @@ static void tick_bee_passive(Simulation *sim, Entity &ent) {
 }
 
 static void tick_hornet_aggro(Simulation *sim, Entity &ent) {
+   
     if (sim->ent_alive(ent.target)) {
         Entity &target = sim->get_ent(ent.target);
         Vector v(target.x - ent.x, target.y - ent.y);
@@ -182,6 +186,7 @@ static void tick_hornet_aggro(Simulation *sim, Entity &ent) {
 }
 
 static void tick_centipede_passive(Simulation *sim, Entity &ent) {
+   
     switch(ent.ai_state) {
         case AIState::kIdle: {
             ent.set_angle(ent.angle + 0.25 / TPS);
@@ -202,6 +207,7 @@ static void tick_centipede_passive(Simulation *sim, Entity &ent) {
 }
 
 static void tick_centipede_neutral(Simulation *sim, Entity &ent, float speed) {
+   
     if (sim->ent_alive(ent.target)) {
         Entity &target = sim->get_ent(ent.target);
         Vector v(target.x - ent.x, target.y - ent.y);
@@ -237,6 +243,7 @@ static void tick_centipede_neutral(Simulation *sim, Entity &ent, float speed) {
 }
 
 static void tick_centipede_aggro(Simulation *sim, Entity &ent) {
+    
     if (sim->ent_alive(ent.target)) {
         Entity &target = sim->get_ent(ent.target);
         Vector v(target.x - ent.x, target.y - ent.y);
@@ -403,6 +410,12 @@ static void tick_hornet_new_ai(Simulation *sim, Entity &ent) {
 }
 
 void tick_ai_behavior(Simulation *sim, Entity &ent) {
+    if (ent.target != NULL_ENTITY) {
+        Entity& target = sim->get_ent(ent.target);  // 获取目标实体
+        if (target.mob_id == MobID::kTargetDummy) {
+            return;  // 如果目标是假人，跳过目标锁定
+        }
+    }
     if (ent.pending_delete) return;
     if (sim->ent_alive(ent.seg_head)) return;
     ent.acceleration.set(0,0);
