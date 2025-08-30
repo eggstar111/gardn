@@ -65,7 +65,7 @@ void GameInstance::init() {
     #ifdef GAMEMODE_TDM
     team_manager.add_team(ColorID::kBlue);
     team_manager.add_team(ColorID::kRed);
-    for (uint32_t i = 0; i < 10; ++i) {
+    for (uint32_t i = 0; i < 20; ++i) {
         Entity &mob = alloc_mob(&simulation, MobID::kTargetDummy, lerp(MAP_DATA[3].left, MAP_DATA[3].right, frand()), lerp(MAP_DATA[3].top, MAP_DATA[3].bottom, frand()), team_manager.teams[1]);
         mob.set_parent(NULL_ENTITY);
         mob.set_color(simulation.get_ent(team_manager.teams[1]).color);

@@ -404,8 +404,8 @@ struct MobData const MOB_DATA[MobID::kNumMobs] = {
     {
         "Target Dummy",
         "How do you have this in your gallery?",
-        RarityID::kUnique, {500.0}, 15.0, {50.0}, 50000, {
-        PetalID::kTringer,PetalID::kPoisonPeas2, PetalID::kTriWing
+        RarityID::kUnique, {4000.0}, 15.0, {50.0}, 50000, {
+       PetalID::kTringer
     }, {.stationary = 1 } },
 };
 

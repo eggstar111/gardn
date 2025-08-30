@@ -47,10 +47,10 @@ static struct PlayerBuffs _get_petal_passive_buffs(Simulation* sim, Entity& play
 
         }
         else if (slot_petal_id == PetalID::kCorruption) {
-            buffs.extra_health += 150;
+            buffs.extra_health += 300;
             buffs.has_corruption = 1;
             if (player.acceleration.magnitude() > PLAYER_ACCELERATION) player.acceleration.set_magnitude(PLAYER_ACCELERATION);
-            player.acceleration = player.acceleration * 1.05;
+            player.acceleration = player.acceleration * 1.1;
         }
         else if (slot_petal_id == PetalID::kYinYang) {
             ++buffs.yinyang_count;
@@ -151,7 +151,7 @@ void tick_player_behavior(Simulation* sim, Entity& player) {
                 if (!sim->ent_alive(petal_slot.ent_id)) {
                     petal_slot.ent_id = NULL_ENTITY;
                     game_tick_t reload_time = (petal_data.reload * TPS);
-                    if (buffs.has_corruption) reload_time = reload_time * 0.9f;
+                    if (buffs.has_corruption) reload_time = reload_time * 0.5f;
                     if (!slot.already_spawned) reload_time += TPS;
                     float this_reload = reload_time == 0 ? 1 : (float)petal_slot.reload / reload_time;
                     min_reload = std::min(min_reload, this_reload);
