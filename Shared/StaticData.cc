@@ -221,6 +221,10 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         500.0, 5, 16.0, 8, 1, RarityID::kEpic, {
         .icon_angle = 0.5
     }},
+    { "Corruption", "Corrupts one's soul, turning them against their own kind.",
+    0.0, 0.0, 0, 0.0, 0, RarityID::kUnique, {
+    .icon_angle = 0.5
+} },
     #ifdef DEV
     {"M28", "Wow, A yummy M28",
         150.0, 15.5, 16.0, 5.0, 1, RarityID::kUnique, {
@@ -229,10 +233,6 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
     {"Pharaoh's Crown", "Allows your flower to sense foes from farther away",
         0.0, 0.0, 12.5, 0.0, 0, RarityID::kUnique, { 
         .equipment = EquipmentFlags::kCrown 
-    }},
-    {"Corruption", "Corrupts one's soul, turning them against their own kind.",
-        0.0, 0.0, 0, 0.0, 0, RarityID::kUnique, {
-        .icon_angle = 0.5
     }},
     #endif
     { "Peas", "4 in 1 deal, now with a secret ingredient: poison",

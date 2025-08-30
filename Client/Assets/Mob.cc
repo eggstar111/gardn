@@ -676,7 +676,6 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             draw_static_flower(ctx, attr.flower_attrs);
             break;
         };
-        #ifdef DEV
         case MobID::kTargetDummy:
             SET_BASE_COLOR(0xff999999);
             ctx.round_line_cap();
@@ -721,7 +720,6 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.set_line_width(0.5);
             ctx.stroke();
             break;
-        #endif
         default:
             assert(!"Didn't cover mob render");
             break;

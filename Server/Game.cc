@@ -65,14 +65,12 @@ void GameInstance::init() {
     #ifdef GAMEMODE_TDM
     team_manager.add_team(ColorID::kBlue);
     team_manager.add_team(ColorID::kRed);
-    #ifdef DEV
     for (uint32_t i = 0; i < 2; ++i) {
         Entity &mob = alloc_mob(&simulation, MobID::kTargetDummy, lerp(MAP_DATA[3].left, MAP_DATA[3].right, frand()), lerp(MAP_DATA[3].top, MAP_DATA[3].bottom, frand()), team_manager.teams[1]);
         mob.set_parent(NULL_ENTITY);
         mob.set_color(simulation.get_ent(team_manager.teams[1]).color);
         mob.base_entity = NULL_ENTITY;
     }
-    #endif
     #endif
 }
 
@@ -105,7 +103,7 @@ void GameInstance::add_client(Client *client) {
     
     ent.set_fov(BASE_FOV);
     ent.set_respawn_level(1);
-    #ifdef DEV
+
     if (simulation.get_ent(team).color == ColorID::kRed) {
         ent.set_respawn_level(99);
         ent.set_inventory(loadout_slots_at_level(ent.respawn_level) - 1, PetalID::kCorruption);
@@ -123,15 +121,7 @@ void GameInstance::add_client(Client *client) {
     }
         for (uint32_t i = 0; i < loadout_slots_at_level(ent.respawn_level); ++i)
             PetalTracker::add_petal(&simulation, ent.inventory[i]);
-    #else
-    for (uint32_t i = 0; i < loadout_slots_at_level(ent.respawn_level); ++i)
-        ent.set_inventory(i, PetalID::kBasic);
-    ent.set_inventory(loadout_slots_at_level(ent.respawn_level), PetalID::kRose);
-    if (frand() < 0.0001 && PetalTracker::get_count(&simulation, PetalID::kUniqueBasic) == 0)
-        ent.set_inventory(0, PetalID::kUniqueBasic);
-    for (uint32_t i = 0; i < loadout_slots_at_level(ent.respawn_level); ++i)
-        PetalTracker::add_petal(&simulation, ent.inventory[i]);
-    #endif
+   
     client->camera = ent.id;
     client->seen_arena = 0;
 }

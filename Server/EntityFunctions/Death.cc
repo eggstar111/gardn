@@ -92,21 +92,13 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
         for (uint32_t i = 0; i < ent.loadout_count + MAX_SLOT_COUNT; ++i) {
             DEBUG_ONLY(assert(ent.loadout_ids[i] < PetalID::kNumPetals));
             PetalTracker::remove_petal(sim, ent.loadout_ids[i]);
-            #ifdef DEV
             if (ent.loadout_ids[i] != PetalID::kNone && ent.loadout_ids[i] != PetalID::kBasic && ent.loadout_ids[i] != PetalID::kCorruption && frand() < 0.95)
-            #else
-            if (ent.loadout_ids[i] != PetalID::kNone && ent.loadout_ids[i] != PetalID::kBasic && frand() < 0.95)
-            #endif
                 potential.push_back(ent.loadout_ids[i]);
         }
         for (uint32_t i = 0; i < ent.deleted_petals.size(); ++i) {
             DEBUG_ONLY(assert(ent.deleted_petals[i] < PetalID::kNumPetals));
             PetalTracker::remove_petal(sim, ent.deleted_petals[i]);
-            #ifdef DEV
             if (ent.deleted_petals[i] != PetalID::kNone && ent.deleted_petals[i] != PetalID::kBasic && ent.deleted_petals[i] != PetalID::kCorruption && frand() < 0.95)
-            #else
-            if (ent.deleted_petals[i] != PetalID::kNone && ent.deleted_petals[i] != PetalID::kBasic && frand() < 0.95)
-            #endif
                 potential.push_back(ent.deleted_petals[i]);
         }
         //no need to deleted_petals.clear, the player dies
@@ -135,11 +127,9 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
         //set respawn level
         uint32_t respawn_level = div_round_up(3 * score_to_level(ent.score), 4);
         if (respawn_level > MAX_LEVEL) respawn_level = MAX_LEVEL;
-        #ifdef DEV
         if (ent.color == ColorID::kRed) {
             respawn_level = 99;
         }
-        #endif
         camera.set_respawn_level(respawn_level);
         uint32_t max_possible = MAX_SLOT_COUNT + loadout_slots_at_level(respawn_level);
         if (num_left > max_possible) num_left = max_possible;
@@ -160,7 +150,6 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
             PetalTracker::add_petal(sim, PetalID::kBasic);
             camera.set_inventory(i, PetalID::kBasic);
         }
-        #ifdef DEV
         if (ent.color == ColorID::kRed) {
             for (uint32_t i = num_left; i < loadout_slots_at_level(respawn_level); ++i) {
                 PetalTracker::add_petal(sim, PetalID::kStinger);
@@ -178,7 +167,6 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
                 }
             }
         }
-        #endif
         PetalTracker::add_petal(sim, PetalID::kRose);
         camera.set_inventory(loadout_slots_at_level(respawn_level), PetalID::kRose);
     } else if (ent.has_component(kDrop)) {

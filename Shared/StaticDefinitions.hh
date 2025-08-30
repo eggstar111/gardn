@@ -80,10 +80,10 @@ namespace PetalID {
         kBone,
         kYucca,
         kCorn,
+        kCorruption,
         #ifdef DEV
         kM28,
         kCrown,
-        kCorruption,
         #endif
         kPoisonPeas2,
         kQuint,
