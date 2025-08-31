@@ -16,7 +16,7 @@ struct AsymmetricBattle::AsymmetricBattleInternal {
         started(false),
         finished(false),
         restart_message_sent(false),
-        countdown_seconds(3600),
+        countdown_seconds(1800),
         last_broadcast_second(-1),
         winner_color(-1) {
     }

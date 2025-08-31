@@ -106,6 +106,7 @@ void on_collide(Simulation *sim, Entity &ent1, Entity &ent2) {
         if (ent2.health == 0) sim->request_delete(ent2.id);
     }
 
+
     if (ent1.has_component(kDrop) && ent2.has_component(kFlower)) 
         _pickup_drop(sim, ent2, ent1);
     if (ent2.has_component(kDrop) && ent1.has_component(kFlower))

@@ -4,7 +4,7 @@
 #include <Shared/Entity.hh>
 #include <Shared/Simulation.hh>
 #include <Shared/Helpers.hh>
-
+#include <iostream> 
 #include <cmath>
 
 static bool _yggdrasil_revival_clause(Simulation *sim, Entity &player) {
@@ -37,6 +37,7 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
     float damage_dealt = old_health - defender.health;
     //ant hole spawns
     //floor start, ceil end
+
     if (defender.has_component(kMob) && defender.mob_id == MobID::kAntHole) {
         uint32_t const num_waves = ANTHOLE_SPAWNS.size() - 1;
         uint32_t start = ceilf((defender.max_health - old_health) / defender.max_health * num_waves);
@@ -44,11 +45,12 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
         if (defender.health <= 0) end = num_waves + 1;
         for (uint32_t i = start; i < end; ++i) {
             for (MobID::T mob_id : ANTHOLE_SPAWNS[i]) {
-                Entity &child = alloc_mob(sim, mob_id, defender.x, defender.y, defender.team);
+                Entity& child = alloc_mob(sim, mob_id, defender.x, defender.y, defender.team);
                 child.set_parent(defender.id);
                 child.target = defender.target;
             }
         }
+
         /*
         uint32_t start = old_health * num_spawn_waves / defender.max_health;
         uint32_t end = ceilf(defender.health * num_spawn_waves / defender.max_health);
@@ -61,6 +63,31 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
             }
         }
             */
+    }
+    if (defender.has_component(kMob) && defender.mob_id == MobID::kTargetDummy) {
+        const float drop_interval = 0.1f; // 5%
+        uint32_t start = ceilf((defender.max_health - old_health) / (defender.max_health * drop_interval));
+        uint32_t end = ceilf((defender.max_health - defender.health) / (defender.max_health * drop_interval));
+
+        for (uint32_t i = start; i < end; ++i) {
+            std::vector<uint32_t> epic_indices;
+            for (uint32_t idx = 0; idx < PetalID::kNumPetals; ++idx) {
+                if (PETAL_DATA[idx].rarity == RarityID::kEpic)
+                    epic_indices.push_back(idx);
+            }
+
+            if (epic_indices.empty()) continue; 
+
+            uint32_t chosen_idx = epic_indices[rand() % epic_indices.size()];
+
+            Entity& drop = alloc_drop(sim, chosen_idx);
+
+            float radius = defender.radius + 35; 
+            float angle = frand() * 2.0f * M_PI;
+            float dist = radius + frand() * 35.0f; 
+            drop.set_x(defender.x + cos(angle) * dist);
+            drop.set_y(defender.y + sin(angle) * dist);
+        }
     }
     /* yggdrasil revive clause
     if (defender.health == 0 && defender.has_component(kFlower)) {

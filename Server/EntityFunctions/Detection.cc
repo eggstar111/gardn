@@ -14,6 +14,7 @@ EntityID find_nearest_enemy(Simulation *simulation, Entity const &entity, float 
         if (ent.team == entity.team) return;
         if (ent.immunity_ticks > 0) return;
         if (!ent.has_component(kMob) && !ent.has_component(kFlower)) return;
+        if (ent.mob_id == MobID::kTargetDummy) return;
         if (sim->ent_alive(entity.parent)) {
             Entity &parent = sim->get_ent(entity.parent);
             float dist = Vector(ent.x-parent.x,ent.y-parent.y).magnitude();

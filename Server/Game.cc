@@ -27,6 +27,20 @@ static void _update_client(Simulation *sim, Client *client) {
     sim->spatial_hash.query(camera.camera_x, camera.camera_y, 960 / camera.fov + 50, 540 / camera.fov + 50, [&](Simulation *, Entity &ent){
         in_view.insert(ent.id);
     });
+    sim->for_each<kMob>([&](Simulation*, Entity& ent) {
+        if (ent.mob_id == MobID::kTargetDummy) {
+            in_view.insert(ent.id);
+        }
+        });
+
+    sim->for_each<kFlower>([&](Simulation*, Entity& ent) {
+        if (sim->ent_exists(camera.player)) {
+            Entity const& self_player = sim->get_ent(camera.player);
+            if (ent.id != camera.player && ent.team == self_player.team) {
+                in_view.insert(ent.id);
+            }
+        }
+        });
 
     for (EntityID const &i: client->in_view) {
         if (!in_view.contains(i)) {
@@ -65,7 +79,7 @@ void GameInstance::init() {
     #ifdef GAMEMODE_TDM
     team_manager.add_team(ColorID::kBlue);
     team_manager.add_team(ColorID::kRed);
-    for (uint32_t i = 0; i < 20; ++i) {
+    for (uint32_t i = 0; i < 10; ++i) {
         Entity &mob = alloc_mob(&simulation, MobID::kTargetDummy, lerp(MAP_DATA[3].left, MAP_DATA[3].right, frand()), lerp(MAP_DATA[3].top, MAP_DATA[3].bottom, frand()), team_manager.teams[1]);
         mob.set_parent(NULL_ENTITY);
         mob.set_color(simulation.get_ent(team_manager.teams[1]).color);

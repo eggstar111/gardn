@@ -410,12 +410,6 @@ static void tick_hornet_new_ai(Simulation *sim, Entity &ent) {
 }
 
 void tick_ai_behavior(Simulation *sim, Entity &ent) {
-    if (ent.target != NULL_ENTITY) {
-        Entity& target = sim->get_ent(ent.target);  // 获取目标实体
-        if (target.mob_id == MobID::kTargetDummy) {
-            return;  // 如果目标是假人，跳过目标锁定
-        }
-    }
     if (ent.pending_delete) return;
     if (sim->ent_alive(ent.seg_head)) return;
     ent.acceleration.set(0,0);

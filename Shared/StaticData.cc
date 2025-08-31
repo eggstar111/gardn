@@ -32,7 +32,7 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         5.0, 35.0, 7.0, 3.5, 1, RarityID::kUnusual, {}},
     {"Leaf", "Gathers energy from the sun to passively heal your flower",
         10.0, 8.0, 10.0, 1.0, 1, RarityID::kUnusual, {
-        .constant_heal = 1,
+        .constant_heal = 1.5,
         .icon_angle = -1
     }},
     {"Twin", "Why stop at one? Why not TWO?!",
@@ -214,7 +214,7 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
     }},
     {"Yucca", "Heals the flower, but only while in the defensive position",
         10.0, 5.0, 10.0, 1.0, 1, RarityID::kUnusual, {
-        .constant_heal = 1.5,
+        .constant_heal = 3,
         .icon_angle = -1
     }},
     {"Corn", "Takes a long time to spawn, but has a lot of health",
