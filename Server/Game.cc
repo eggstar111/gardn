@@ -27,20 +27,20 @@ static void _update_client(Simulation *sim, Client *client) {
     sim->spatial_hash.query(camera.camera_x, camera.camera_y, 960 / camera.fov + 50, 540 / camera.fov + 50, [&](Simulation *, Entity &ent){
         in_view.insert(ent.id);
     });
-    sim->for_each<kMob>([&](Simulation*, Entity& ent) {
-        if (ent.mob_id == MobID::kTargetDummy) {
+    sim->for_each<kMob>([&](Simulation*, Entity &ent){
+    if (ent.mob_id == MobID::kTargetDummy) {
+        in_view.insert(ent.id);
+    }
+});
+
+sim->for_each<kFlower>([&](Simulation*, Entity &ent){
+    if (sim->ent_exists(camera.player)) {
+        Entity const &self_player = sim->get_ent(camera.player);
+        if (ent.id != camera.player && ent.team == self_player.team) {
             in_view.insert(ent.id);
         }
-        });
-
-    sim->for_each<kFlower>([&](Simulation*, Entity& ent) {
-        if (sim->ent_exists(camera.player)) {
-            Entity const& self_player = sim->get_ent(camera.player);
-            if (ent.id != camera.player && ent.team == self_player.team) {
-                in_view.insert(ent.id);
-            }
-        }
-        });
+    }
+});
 
     for (EntityID const &i: client->in_view) {
         if (!in_view.contains(i)) {
@@ -121,6 +121,7 @@ void GameInstance::add_client(Client *client) {
     if (simulation.get_ent(team).color == ColorID::kRed) {
         ent.set_respawn_level(99);
         ent.set_inventory(loadout_slots_at_level(ent.respawn_level) - 1, PetalID::kCorruption);
+        ent.set_inventory(loadout_slots_at_level(ent.respawn_level) + 1, PetalID::kBubble);
         for (uint32_t i = 0; i < loadout_slots_at_level(ent.respawn_level) - 1; ++i)
             ent.set_inventory(i, PetalID::kStinger);
        
@@ -129,6 +130,7 @@ void GameInstance::add_client(Client *client) {
         for (uint32_t i = 0; i < loadout_slots_at_level(ent.respawn_level); ++i)
             ent.set_inventory(i, PetalID::kBasic);
         ent.set_inventory(loadout_slots_at_level(ent.respawn_level), PetalID::kRose);
+        ent.set_inventory(loadout_slots_at_level(ent.respawn_level) + 1, PetalID::kBubble);
 
         if (frand() < 0.0001 && PetalTracker::get_count(&simulation, PetalID::kUniqueBasic) == 0)
             ent.set_inventory(0, PetalID::kUniqueBasic);
