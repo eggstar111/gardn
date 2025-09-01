@@ -44,21 +44,18 @@ void Minimap::on_render(Renderer& ctx) {
         }
         });
 
-    if (sim.ent_exists(camera.player)) {
-        Entity const& self_player = sim.get_ent(camera.player);
-        sim.for_each<kFlower>([&](Simulation*, Entity const& ent) {
-            if (ent.id != camera.player && ent.team == self_player.team) {
-                uint32_t color = FLOWER_COLORS[ent.color]; // 队伍颜色
-                ctx.set_fill(color);
-                ctx.set_stroke(Renderer::HSV(color, 0.8));
-                ctx.set_line_width(ARENA_WIDTH / 120);
-                ctx.begin_path();
-                ctx.arc(ent.x, ent.y, ARENA_WIDTH / 60);
-                ctx.fill();
-                ctx.stroke();
-            }
-            });
-    }
+    sim.for_each<kFlower>([&](Simulation*, Entity const& ent) {
+        if (ent.id != camera.player && ent.team == camera.team) {
+            uint32_t color = FLOWER_COLORS[ent.color];
+            ctx.set_fill(color);
+            ctx.set_stroke(Renderer::HSV(color, 0.8));
+            ctx.set_line_width(ARENA_WIDTH / 120);
+            ctx.begin_path();
+            ctx.arc(ent.x, ent.y, ARENA_WIDTH / 60);
+            ctx.fill();
+            ctx.stroke();
+        }
+        });
 
     // 绘制摄像机自己在最前面
     ctx.set_fill(0xffffe763);

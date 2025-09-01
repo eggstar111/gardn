@@ -18,6 +18,10 @@ static bool _yggdrasil_revival_clause(Simulation *sim, Entity &player) {
 }
 
 void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_id, float amt, uint8_t type) {
+    if (sim->get_ent(def_id).has_component(kMob) && sim->get_ent(atk_id).has_component(kMob) &&
+        (sim->get_ent(def_id).mob_id == MobID::kTargetDummy || sim->get_ent(atk_id).mob_id == MobID::kTargetDummy)) {
+        return;
+    }
     if (amt <= 0) return;
     if (!sim->ent_alive(def_id)) return;
     Entity &defender = sim->get_ent(def_id);
@@ -65,30 +69,72 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
             */
     }
     if (defender.has_component(kMob) && defender.mob_id == MobID::kTargetDummy) {
-        const float drop_interval = 0.1f; // 5%
+        const float drop_interval = 0.05f;
         uint32_t start = ceilf((defender.max_health - old_health) / (defender.max_health * drop_interval));
         uint32_t end = ceilf((defender.max_health - defender.health) / (defender.max_health * drop_interval));
 
         for (uint32_t i = start; i < end; ++i) {
+            // 掉落史诗道具
             std::vector<uint32_t> epic_indices;
             for (uint32_t idx = 0; idx < PetalID::kNumPetals; ++idx) {
                 if (PETAL_DATA[idx].rarity == RarityID::kEpic)
                     epic_indices.push_back(idx);
             }
+            if (!epic_indices.empty()) {
+                uint32_t chosen_idx = epic_indices[rand() % epic_indices.size()];
+                Entity& drop = alloc_drop(sim, chosen_idx);
+                float radius = defender.radius + 35;
+                float angle = frand() * 2.0f * M_PI;
+                float dist = radius + frand() * 35.0f;
+                drop.set_x(defender.x + cos(angle) * dist);
+                drop.set_y(defender.y + sin(angle) * dist);
+            }
 
-            if (epic_indices.empty()) continue; 
+            // 追溯攻击者父实体
+            Entity* attacker = nullptr;
+            if (sim->ent_alive(atk_id)) {
+                Entity& atk_ent = sim->get_ent(atk_id);
+                // 如果是 Petal，优先取父实体
+                if (atk_ent.has_component(kPetal) && sim->ent_alive(atk_ent.parent)) {
+                    attacker = &sim->get_ent(atk_ent.parent);
+                }
+                else {
+                    // 本体攻击者或者父实体不存在，直接用 atk_ent
+                    attacker = &atk_ent;
+                }
+            }
+            if (attacker) {
+                const int missile_count = 12;
+                const float circle_radius = attacker->radius + 200.0f; // 圆半径 = 父实体半径 + 200
+                float prediction_factor = 7.0f;
+                float predicted_x = attacker->x + attacker->velocity.x * prediction_factor;
+                float predicted_y = attacker->y + attacker->velocity.y * prediction_factor;
+                for (int j = 0; j < missile_count; ++j) {
+                    float angle = 2.0f * M_PI * j / missile_count;
+                    float x = predicted_x + cos(angle) * circle_radius;
+                    float y = predicted_y + sin(angle) * circle_radius;
 
-            uint32_t chosen_idx = epic_indices[rand() % epic_indices.size()];
+                    Entity& missile = alloc_petal(sim, PetalID::kMissile, defender);
+                    missile.damage = 5;
+                    missile.health = missile.max_health = 50;
+                    missile.team = defender.team;
+                    entity_set_despawn_tick(missile, 3 * TPS);
+                    missile.set_x(x);
+                    missile.set_y(y);
 
-            Entity& drop = alloc_drop(sim, chosen_idx);
-
-            float radius = defender.radius + 35; 
-            float angle = frand() * 2.0f * M_PI;
-            float dist = radius + frand() * 35.0f; 
-            drop.set_x(defender.x + cos(angle) * dist);
-            drop.set_y(defender.y + sin(angle) * dist);
+                    // 导弹角度指向圆心
+                    Vector v(predicted_x - x, predicted_y - y);
+                    missile.set_angle(v.angle());
+                    missile.acceleration.unit_normal(v.angle()).set_magnitude(40 * PLAYER_ACCELERATION);
+                }
+            }
         }
     }
+
+
+
+
+
     /* yggdrasil revive clause
     if (defender.health == 0 && defender.has_component(kFlower)) {
         if (_yggdrasil_revival_clause(sim, defender)) {
