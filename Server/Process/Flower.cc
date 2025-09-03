@@ -14,6 +14,8 @@ struct PlayerBuffs {
     float heal;
     float extra_vision;
     float extra_health;
+    float extra_acceleration = 1;
+    float reduce_reload = 1;
     uint8_t yinyang_count;
     uint8_t is_poisonous : 1;
     uint8_t has_cutter : 1;
@@ -47,13 +49,19 @@ static struct PlayerBuffs _get_petal_passive_buffs(Simulation* sim, Entity& play
 
         }
         else if (slot_petal_id == PetalID::kCorruption) {
-            buffs.extra_health += 150;
-            buffs.has_corruption = 1;
-            if (player.acceleration.magnitude() > PLAYER_ACCELERATION) player.acceleration.set_magnitude(PLAYER_ACCELERATION);
-            player.acceleration = player.acceleration * 1.1;
+            buffs.extra_health += 300;
+            buffs.reduce_reload *= 0.8;
+            buffs.extra_acceleration += 0.2;
+            player.radius = BASE_FLOWER_RADIUS * 1.15;
         }
         else if (slot_petal_id == PetalID::kYinYang) {
             ++buffs.yinyang_count;
+        }
+        else if (slot_petal_id == PetalID::kTriplet) {
+            buffs.extra_acceleration += 0.03;
+        }
+        else if (slot_petal_id == PetalID::kQuint) {
+            buffs.extra_acceleration += 0.05;
         }
         if (!player.loadout[i].already_spawned) continue;
         if (slot_petal_id == PetalID::kLeaf)
@@ -127,6 +135,9 @@ void tick_player_behavior(Simulation* sim, Entity& player) {
         camera.set_fov(BASE_FOV * (1 - buffs.extra_vision));
     }
 
+    if (player.acceleration.magnitude() > PLAYER_ACCELERATION * buffs.extra_acceleration)
+        player.acceleration.set_magnitude(PLAYER_ACCELERATION * buffs.extra_acceleration);
+
     DEBUG_ONLY(assert(player.loadout_count <= MAX_SLOT_COUNT);)
         for (uint32_t i = 0; i < player.loadout_count; ++i) {
             LoadoutSlot& slot = player.loadout[i];
@@ -151,7 +162,7 @@ void tick_player_behavior(Simulation* sim, Entity& player) {
                 if (!sim->ent_alive(petal_slot.ent_id)) {
                     petal_slot.ent_id = NULL_ENTITY;
                     game_tick_t reload_time = (petal_data.reload * TPS);
-                    if (buffs.has_corruption) reload_time = reload_time * 0.9f;
+                    reload_time *= buffs.reduce_reload;
                     if (!slot.already_spawned) reload_time += TPS;
                     float this_reload = reload_time == 0 ? 1 : (float)petal_slot.reload / reload_time;
                     min_reload = std::min(min_reload, this_reload);

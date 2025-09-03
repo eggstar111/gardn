@@ -14,6 +14,10 @@ static bool _should_interact(Entity const &ent1, Entity const &ent2) {
     if (BIT_AT((ent1.flags | ent2.flags), EntityFlags::kNoFriendlyCollision)) return false;
     //if (ent1.has_component(kPetal) || ent2.has_component(kPetal)) return false;
     if (ent1.has_component(kMob) && ent2.has_component(kMob)) return true;
+    if ((ent1.has_component(kFlower) && ent2.mob_id == MobID::kTargetDummy) ||
+        (ent2.has_component(kFlower) && ent1.mob_id == MobID::kTargetDummy)) {
+        return true;
+    }
     return false;
 }
 
