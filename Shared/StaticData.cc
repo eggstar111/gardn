@@ -163,7 +163,7 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         0.0, 0.0, 12.5, 0.0, 0, RarityID::kLegendary, { .equipment = EquipmentFlags::kAntennae }},
     {"Cactus", "Not very strong, but somehow increases your maximum health",
         15.0, 5.0, 10.0, 1.0, 3, RarityID::kLegendary, {
-        .clump_radius = 10,
+        .clump_radius = 15,
     }},
     {"Heaviest", "This thing is so heavy that nothing gets in the way",
         200.0, 10.0, 12.0, 10.0, 1, RarityID::kEpic, {

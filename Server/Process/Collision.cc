@@ -24,15 +24,6 @@ static bool _should_interact(Entity const &ent1, Entity const &ent2) {
 static void _pickup_drop(Simulation *sim, Entity &player, Entity &drop) {
     if (!sim->ent_alive(player.parent)) return;
     if (drop.immunity_ticks > 0) return;
-    if (drop.drop_id == PetalID::kBubble) {
-        for (uint32_t i = 0; i < player.loadout_count + MAX_SLOT_COUNT; ++i) {
-            if (player.loadout_ids[i] == PetalID::kBubble) {
-                // 已经有 bubble 了，直接返回，不捡
-                return;
-            }
-        }
-    }
-
     for (uint32_t i = 0; i <  player.loadout_count + MAX_SLOT_COUNT; ++i) {
         if (player.loadout_ids[i] != PetalID::kNone) continue;
         player.set_loadout_ids(i, drop.drop_id);

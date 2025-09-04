@@ -106,7 +106,6 @@ static uint32_t _get_petal_rotation_count(Simulation* sim, Entity& player) {
     }
     return count;
 }
-
 void tick_player_behavior(Simulation* sim, Entity& player) {
     if (player.pending_delete) return;
     DEBUG_ONLY(assert(player.max_health > 0);)
@@ -137,7 +136,7 @@ void tick_player_behavior(Simulation* sim, Entity& player) {
 
     if (player.acceleration.magnitude() > PLAYER_ACCELERATION * buffs.extra_acceleration)
         player.acceleration.set_magnitude(PLAYER_ACCELERATION * buffs.extra_acceleration);
-
+    bool bubble_spawned = false;
     DEBUG_ONLY(assert(player.loadout_count <= MAX_SLOT_COUNT);)
         for (uint32_t i = 0; i < player.loadout_count; ++i) {
             LoadoutSlot& slot = player.loadout[i];
@@ -147,8 +146,17 @@ void tick_player_behavior(Simulation* sim, Entity& player) {
                 slot.update_id(sim, player.loadout_ids[i]);
             PetalID::T slot_petal_id = slot.get_petal_id();
             struct PetalData const& petal_data = PETAL_DATA[slot_petal_id];
+            if (slot_petal_id == PetalID::kBubble) {
+                if (bubble_spawned) {
+                    sim->request_delete(slot.petals[0].ent_id);
+                    slot.reset();
+                    player.set_loadout_reloads(i, 0);
+                    continue;
+                }
+                // 如果是第一个泡泡，标记为已处理
+                bubble_spawned = true;
+            }
             DEBUG_ONLY(assert(petal_data.count <= MAX_PETALS_IN_CLUMP);)
-
                 if (slot_petal_id == PetalID::kNone || petal_data.count == 0)
                     continue;
             //if overleveled timer too large
