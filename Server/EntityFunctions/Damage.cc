@@ -89,13 +89,13 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
                 drop.set_x(defender.x + cos(angle) * dist);
                 drop.set_y(defender.y + sin(angle) * dist);
             }
-
             // 追溯攻击者父实体
             Entity* attacker = nullptr;
             if (sim->ent_alive(atk_id)) {
                 Entity& atk_ent = sim->get_ent(atk_id);
-                // 如果是 Petal，优先取父实体
-                if (atk_ent.has_component(kPetal) && sim->ent_alive(atk_ent.parent)) {
+
+                // 如果不是 Flower 且有父实体，则优先取父实体
+                if (!atk_ent.has_component(kFlower) && !(atk_ent.parent == NULL_ENTITY)) {
                     attacker = &sim->get_ent(atk_ent.parent);
                 }
                 else {

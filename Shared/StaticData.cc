@@ -248,6 +248,12 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         15.0, 15.0, 10.0, 1.5, 3, RarityID::kLegendary, {
         .icon_angle = 1,
     }},
+     { "Web", "It's really sticky and toxic",
+       10.0, 5.0, 10.0, 1.5, 1, RarityID::kEpic, {
+        .secondary_reload = 0.5,
+        .defend_only = 1,
+        .poison_damage = { 5.0, 1.0 },
+    } },
 };
 
 struct MobData const MOB_DATA[MobID::kNumMobs] = {
@@ -366,7 +372,7 @@ struct MobData const MOB_DATA[MobID::kNumMobs] = {
         "Spider",
         "Spooky.",
         RarityID::kUnusual, {35.0}, 10.0, {15.0}, 8, {
-        PetalID::kStinger, PetalID::kWeb, PetalID::kFaster, PetalID::kTriweb, PetalID::kThirdEye
+        PetalID::kStinger, PetalID::kWeb, PetalID::kFaster, PetalID::kTriweb, PetalID::kThirdEye, PetalID::kPoisonWeb
         #ifdef DEV
         , PetalID::kM28
         #endif

@@ -80,7 +80,7 @@ void on_collide(Simulation *sim, Entity &ent1, Entity &ent2) {
     Vector separation(ent1.x - ent2.x, ent1.y - ent2.y);
     float dist = min_dist - separation.magnitude();
     if (dist < 0) return;
-    if (NO(kDrop) && NO(kWeb) && NO(kChat)) {
+    if (NO(kDrop) && NO(kWeb) && NO(kChat) && NO(kPoisonWeb)) {
         if (separation.x == 0 && separation.y == 0)
             separation.unit_normal(frand() * 2 * M_PI);
         else
@@ -119,4 +119,18 @@ void on_collide(Simulation *sim, Entity &ent1, Entity &ent2) {
         ent2.speed_ratio = 0.5;
     if (ent2.has_component(kWeb) && !ent1.has_component(kPetal) && !ent1.has_component(kDrop))
         ent1.speed_ratio = 0.5;
+    if (ent1.has_component(kPoisonWeb) && !ent2.has_component(kPetal) && !ent2.has_component(kDrop)) {
+        ent2.speed_ratio = 0.5;
+        if (ent2.poison_ticks == 0) {
+            ent2.poison_ticks = TPS / 2;
+            inflict_damage(sim, sim->get_ent(ent1.parent).parent, ent2.id, 5 /2 , DamageType::kPoison);
+        }
+    }
+    if (ent2.has_component(kPoisonWeb) && !ent1.has_component(kPetal) && !ent1.has_component(kDrop)) {
+        ent1.speed_ratio = 0.5;
+        if (ent1.poison_ticks == 0) {
+            ent1.poison_ticks = TPS / 2;
+            inflict_damage(sim, sim->get_ent(ent2.parent).parent, ent1.id, 5 / 2  , DamageType::kPoison);
+        }
+    }
 }

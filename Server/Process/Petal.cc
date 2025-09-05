@@ -66,6 +66,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
                     }
                     break;
                 case PetalID::kTriweb:
+                case PetalID::kPoisonWeb:
                 case PetalID::kWeb: {
                     if (BIT_AT(player.input, InputFlags::kAttacking)) {
                         Vector delta(petal.x - player.x, petal.y - player.y);

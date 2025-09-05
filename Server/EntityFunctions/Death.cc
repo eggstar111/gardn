@@ -87,6 +87,8 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
     } else if (ent.has_component(kPetal)) {
         if (ent.petal_id == PetalID::kWeb || ent.petal_id == PetalID::kTriweb)
             alloc_web(sim, 100, ent);
+        if (ent.petal_id == PetalID::kPoisonWeb)
+            alloc_poison_web(sim, 100, ent);
     } else if (ent.has_component(kFlower)) {
         std::vector<PetalID::T> potential = {};
         for (uint32_t i = 0; i < ent.loadout_count + MAX_SLOT_COUNT; ++i) {

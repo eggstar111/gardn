@@ -949,6 +949,22 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
 
             ctx.fill();
             break;
+        case PetalID::kPoisonWeb:
+            ctx.set_fill(0xffce76db);
+            ctx.set_stroke(0xffa760b1);
+            ctx.round_line_cap();
+            ctx.round_line_join();
+            ctx.set_line_width(3);
+            ctx.begin_path();
+            ctx.move_to(11.00, 0.00);
+            ctx.qcurve_to(4.32, 3.14, 3.40, 10.46);
+            ctx.qcurve_to(-1.65, 5.08, -8.90, 6.47);
+            ctx.qcurve_to(-5.34, -0.00, -8.90, -6.47);
+            ctx.qcurve_to(-1.65, -5.08, 3.40, -10.46);
+            ctx.qcurve_to(4.32, -3.14, 11.00, 0.00);
+            ctx.fill();
+            ctx.stroke();
+            break;
         #ifdef DEV
         case PetalID::kM28:
             ctx.begin_path();

@@ -88,6 +88,7 @@ namespace PetalID {
         kPoisonPeas2,
         kQuint,
         kTriWing,
+        kPoisonWeb,
         kNumPetals
     };
 };

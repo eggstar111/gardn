@@ -10,6 +10,7 @@ set(SRCS
     Assets/Mob.cc
     Assets/Petal.cc
     Assets/Web.cc
+    Assets/PoisonWeb.cc
     Render/RenderChat.cc
     Render/RenderDrop.cc
     Render/RenderFlower.cc
@@ -18,6 +19,7 @@ set(SRCS
     Render/RenderName.cc
     Render/RenderPetal.cc
     Render/RenderWeb.cc
+    Render/RenderPoisonWeb.cc
     Render/Renderer.cc
     Debug.cc
     DOM.cc

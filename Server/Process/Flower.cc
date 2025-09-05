@@ -136,6 +136,7 @@ void tick_player_behavior(Simulation* sim, Entity& player) {
 
     if (player.acceleration.magnitude() > PLAYER_ACCELERATION * buffs.extra_acceleration)
         player.acceleration.set_magnitude(PLAYER_ACCELERATION * buffs.extra_acceleration);
+        player.acceleration *= buffs.extra_acceleration;
     bool bubble_spawned = false;
     DEBUG_ONLY(assert(player.loadout_count <= MAX_SLOT_COUNT);)
         for (uint32_t i = 0; i < player.loadout_count; ++i) {
