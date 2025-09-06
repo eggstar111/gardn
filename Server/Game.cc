@@ -85,11 +85,14 @@ void GameInstance::init() {
     team_manager.add_team(ColorID::kBlue);
     team_manager.add_team(ColorID::kRed);
     for (uint32_t i = 0; i < 5; ++i) {
-        Entity &mob = alloc_mob(&simulation, MobID::kTargetDummy, lerp(MAP_DATA[3].left, MAP_DATA[3].right, frand()), lerp(MAP_DATA[3].top, MAP_DATA[3].bottom, frand()), team_manager.teams[1]);
+        float x = lerp(MAP_DATA[3].left, MAP_DATA[3].right, (i + 0.5f) / 5.0f);
+        float y = lerp(MAP_DATA[3].top, MAP_DATA[3].bottom, frand()); // ×ÝÏòÈÔËæ»ú
+        Entity& mob = alloc_mob(&simulation, MobID::kTargetDummy, x, y, team_manager.teams[1]);
         mob.set_parent(NULL_ENTITY);
         mob.set_color(simulation.get_ent(team_manager.teams[1]).color);
         mob.base_entity = NULL_ENTITY;
     }
+
     #endif
 }
 
