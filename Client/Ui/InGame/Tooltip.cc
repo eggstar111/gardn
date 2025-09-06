@@ -77,6 +77,10 @@ static void make_petal_tooltip(PetalID::T id) {
             new Ui::StaticText(12, "Extra Vision: ", {.fill = 0xffcde23b, .h_justify = Style::Left }),
             new Ui::StaticText(12, std::format("{:g}%", 1 / (1 - a.extra_vision) * 100), {.fill = 0xffffffff, .h_justify = Style::Left })
         }, 0, 0, {.h_justify = Style::Left }) : nullptr,
+        a.armor ? new Ui::HContainer({
+            new Ui::StaticText(12, "Armor: ", {.fill = 0xffcde23b, .h_justify = Style::Left }),
+            new Ui::StaticText(12, std::format("{:g}", a.armor), {.fill = 0xffffffff, .h_justify = Style::Left })
+        }, 0, 0, {.h_justify = Style::Left }) : nullptr,
         /* new Ui::Element(0,10),
         new Ui::StaticText(12,
         "Radius: " + std::format("{:g}", d.radius), { .fill =

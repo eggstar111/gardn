@@ -234,6 +234,7 @@ struct PetalAttributes {
     float reduce_reload = 0;
     float extra_range = 0;
     float extra_vision = 0;
+    float armor = 0;
 };
 
 struct PetalData {

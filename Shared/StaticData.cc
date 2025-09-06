@@ -225,7 +225,8 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
     } },
     { "Bone", "Sturdy",
         12.0, 12.0, 12.0, 1.5, 1, RarityID::kLegendary, {
-        .icon_angle = 1
+        .icon_angle = 1,
+        .armor = 14,
     } },
     { "Yucca", "Heals the flower, but only while in the defensive position",
         10.0, 5.0, 10.0, 1.0, 1, RarityID::kUnusual, {

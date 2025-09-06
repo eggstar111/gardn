@@ -42,7 +42,6 @@ static struct PlayerBuffs _get_petal_passive_buffs(Simulation* sim, Entity& play
         }
         else if (slot_petal_id == PetalID::kCorruption) {
             buffs.extra_health += petal_data.attributes.extra_health;
-            buffs.movement_speed += 0.2;
             player.radius = BASE_FLOWER_RADIUS * 1.15;
         }
         else if (slot_petal_id == PetalID::kYinYang) {
@@ -51,9 +50,9 @@ static struct PlayerBuffs _get_petal_passive_buffs(Simulation* sim, Entity& play
         if (petal_data.attributes.reduce_reload) buffs.reduce_reload *= petal_data.attributes.reduce_reload;
         buffs.extra_range += petal_data.attributes.extra_range;
         buffs.extra_vision = std::max(buffs.extra_vision, petal_data.attributes.extra_vision);
+        buffs.movement_speed += petal_data.attributes.movement_speed;
         if (!player.loadout[i].already_spawned) continue;
         buffs.extra_health += petal_data.attributes.extra_health;
-        buffs.movement_speed += petal_data.attributes.movement_speed;
         if (slot_petal_id == PetalID::kLeaf)
             buffs.heal += petal_data.attributes.constant_heal / TPS;
         else if (slot_petal_id == PetalID::kYucca && BIT_AT(player.input, InputFlags::kDefending) && !BIT_AT(player.input, InputFlags::kAttacking))
