@@ -240,9 +240,9 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
     { "Corruption", "Corrupts one's soul, turning them against their own kind.",
         0.0, 0.0, 0, 0.0, 0, RarityID::kUnique, {
         .icon_angle = 0.5,
-        .extra_health = 300,
-        .movement_speed = 0.10,
-        .reduce_reload = 0.8,
+        .extra_health = 500,
+        .movement_speed = 0.2,
+        .reduce_reload = 0.5,
 
 } },
     #ifdef DEV
