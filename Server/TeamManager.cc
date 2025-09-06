@@ -18,7 +18,7 @@ EntityID const TeamManager::get_random_team() const {
     if (teams.size() == 0) return NULL_ENTITY;
     uint32_t blue = simulation->get_ent(teams[0]).player_count;
     uint32_t red = simulation->get_ent(teams[1]).player_count;
-    if (blue > red * 4) {
+    if (blue > red * 6) {
         return teams[1];
     } else {
         return teams[0];
