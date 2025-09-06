@@ -110,7 +110,7 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .movement_speed = 0.03,
 }},
     {"Egg", "Something interesting might pop out of this",
-        50.0, 1.0, 12.5, 1.0, 2, RarityID::kEpic, { 
+        50.0, 1.0, 12.5, 1.0, 1, RarityID::kEpic, { 
         .secondary_reload = 3.5,
         .defend_only = 1,
         .rotation_style = PetalAttributes::kNoRot,
