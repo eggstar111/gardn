@@ -14,7 +14,7 @@ struct PlayerBuffs {
     float heal;
     float extra_vision;
     float extra_health;
-    float extra_acceleration = 1;
+    float movement_speed = 1;
     float reduce_reload = 1;
     uint8_t yinyang_count;
     uint8_t is_poisonous : 1;
@@ -35,47 +35,32 @@ static struct PlayerBuffs _get_petal_passive_buffs(Simulation* sim, Entity& play
         struct PetalData const& petal_data = PETAL_DATA[slot_petal_id];
         if (petal_data.attributes.equipment != EquipmentFlags::kNone)
             player.set_equip_flags(player.equip_flags | (1 << petal_data.attributes.equipment));
-        if (slot_petal_id == PetalID::kAntennae) {
-            buffs.extra_vision = fclamp(0.4, buffs.extra_vision, 1);
-        }
-        else if (slot_petal_id == PetalID::kObserver) {
-            buffs.extra_vision = 0.75;
-        }
-        else if (slot_petal_id == PetalID::kThirdEye) {
-            buffs.extra_range = 75;
-        }
-        else if (slot_petal_id == PetalID::kCutter) {
+        
+        if (slot_petal_id == PetalID::kCutter) {
             buffs.has_cutter = 1;
 
         }
         else if (slot_petal_id == PetalID::kCorruption) {
-            buffs.extra_health += 300;
-            buffs.reduce_reload *= 0.8;
-            buffs.extra_acceleration += 0.2;
+            buffs.extra_health += petal_data.attributes.extra_health;
+            buffs.movement_speed += 0.2;
             player.radius = BASE_FLOWER_RADIUS * 1.15;
         }
         else if (slot_petal_id == PetalID::kYinYang) {
             ++buffs.yinyang_count;
         }
-        else if (slot_petal_id == PetalID::kTriplet) {
-            buffs.extra_acceleration += 0.03;
-        }
-        else if (slot_petal_id == PetalID::kQuint) {
-            buffs.extra_acceleration += 0.05;
-        }
+        if (petal_data.attributes.reduce_reload) buffs.reduce_reload *= petal_data.attributes.reduce_reload;
+        buffs.extra_range += petal_data.attributes.extra_range;
+        buffs.extra_vision = std::max(buffs.extra_vision, petal_data.attributes.extra_vision);
         if (!player.loadout[i].already_spawned) continue;
+        buffs.extra_health += petal_data.attributes.extra_health;
+        buffs.movement_speed += petal_data.attributes.movement_speed;
         if (slot_petal_id == PetalID::kLeaf)
             buffs.heal += petal_data.attributes.constant_heal / TPS;
         else if (slot_petal_id == PetalID::kYucca && BIT_AT(player.input, InputFlags::kDefending) && !BIT_AT(player.input, InputFlags::kAttacking))
             buffs.heal += petal_data.attributes.constant_heal / TPS;
         if (slot_petal_id == PetalID::kFaster)
             buffs.extra_rot += 1.0;
-        else if (slot_petal_id == PetalID::kCactus)
-            buffs.extra_health += 20;
-        else if (slot_petal_id == PetalID::kTricac)
-            buffs.extra_health += 60;
-        else if (slot_petal_id == PetalID::kPoisonCactus) {
-            buffs.extra_health += 20;
+        if (slot_petal_id == PetalID::kPoisonCactus) {
             buffs.is_poisonous = 1;
         }
         else if (slot_petal_id == PetalID::kSalt) {
@@ -133,10 +118,7 @@ void tick_player_behavior(Simulation* sim, Entity& player) {
         Entity& camera = sim->get_ent(player.parent);
         camera.set_fov(BASE_FOV * (1 - buffs.extra_vision));
     }
-
-    if (player.acceleration.magnitude() > PLAYER_ACCELERATION * buffs.extra_acceleration)
-        player.acceleration.set_magnitude(PLAYER_ACCELERATION * buffs.extra_acceleration);
-        player.acceleration *= buffs.extra_acceleration;
+    player.speed_ratio *= buffs.movement_speed;
     bool bubble_spawned = false;
     DEBUG_ONLY(assert(player.loadout_count <= MAX_SLOT_COUNT);)
         for (uint32_t i = 0; i < player.loadout_count; ++i) {

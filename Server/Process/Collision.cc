@@ -116,18 +116,18 @@ void on_collide(Simulation *sim, Entity &ent1, Entity &ent2) {
         _pickup_drop(sim, ent1, ent2);
 
     if (ent1.has_component(kWeb) && !ent2.has_component(kPetal) && !ent2.has_component(kDrop))
-        ent2.speed_ratio = 0.5;
+        ent2.speed_ratio *= 0.75;
     if (ent2.has_component(kWeb) && !ent1.has_component(kPetal) && !ent1.has_component(kDrop))
-        ent1.speed_ratio = 0.5;
+        ent1.speed_ratio *= 0.75;
     if (ent1.has_component(kPoisonWeb) && !ent2.has_component(kPetal) && !ent2.has_component(kDrop)) {
-        ent2.speed_ratio = 0.5;
+        ent2.speed_ratio *= 0.75;
         if (ent2.poison_ticks == 0) {
             ent2.poison_ticks = TPS / 2;
             inflict_damage(sim, sim->get_ent(ent1.parent).parent, ent2.id, 5 /2 , DamageType::kPoison);
         }
     }
     if (ent2.has_component(kPoisonWeb) && !ent1.has_component(kPetal) && !ent1.has_component(kDrop)) {
-        ent1.speed_ratio = 0.5;
+        ent1.speed_ratio *= 0.75;
         if (ent1.poison_ticks == 0) {
             ent1.poison_ticks = TPS / 2;
             inflict_damage(sim, sim->get_ent(ent2.parent).parent, ent1.id, 5 / 2  , DamageType::kPoison);

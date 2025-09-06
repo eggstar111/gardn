@@ -71,7 +71,9 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
     {"Rock", "Even more durable, but slower to recharge",
         100.0, 10.0, 12.0, 4, 1, RarityID::kRare, {}},
     {"Cactus", "Not very strong, but somehow increases your maximum health",
-        15.0, 5.0, 15.0, 1.0, 1, RarityID::kRare, {}},
+        15.0, 5.0, 15.0, 1.0, 1, RarityID::kRare, {
+        .extra_health = 20,
+}},
     {"Web", "It's really sticky",
         10.0, 5.0, 10.0, 1.5, 1, RarityID::kRare, {
         .secondary_reload = 0.5,
@@ -104,7 +106,9 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .defend_only = 1
     }},
     {"Triplet", "How about THREE?!",
-        5.0, 8.0, 7.0, 0.8, 3, RarityID::kEpic, {}},
+        5.0, 8.0, 7.0, 0.8, 3, RarityID::kEpic, {
+        .movement_speed = 0.03,
+}},
     {"Egg", "Something interesting might pop out of this",
         50.0, 1.0, 12.5, 1.0, 2, RarityID::kEpic, { 
         .secondary_reload = 3.5,
@@ -129,101 +133,116 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .poison_damage = { 20.0, 0.5 }
     }},
     {"Egg", "Something interesting might pop out of this",
-        50.0, 1.0, 15.0, 1.0, 1, RarityID::kLegendary, { 
+        50.0, 1.0, 15.0, 1.0, 1, RarityID::kLegendary, {
         .secondary_reload = 3.5,
         .defend_only = 1,
         .rotation_style = PetalAttributes::kNoRot,
         .spawns = MobID::kBeetle
     }},
-    {"Rose", "Extremely powerful rose, almost unheard of",
-        5.0, 5.0, 10.0, 3.5, 1, RarityID::kEpic, { 
+    { "Rose", "Extremely powerful rose, almost unheard of",
+        5.0, 5.0, 10.0, 3.5, 1, RarityID::kEpic, {
         .secondary_reload = 1.0,
         .burst_heal = 22,
         .defend_only = 1
-    }},
-    {"Stick", "Harnesses the power of the wind",
-        10.0, 1.0, 15.0, 3.0, 1, RarityID::kMythic, { 
+    } },
+    { "Stick", "Harnesses the power of the wind",
+        10.0, 1.0, 15.0, 3.0, 1, RarityID::kMythic, {
         .secondary_reload = 4.0,
         .defend_only = 1,
         .icon_angle = 1,
         .spawns = MobID::kSandstorm,
         .spawn_count = 2
-    }},
-    {"Stinger", "It really hurts, but it's really fragile",
+    } },
+    { "Stinger", "It really hurts, but it's really fragile",
         5.0, 35.0, 7.0, 4.5, 3, RarityID::kLegendary, {
         .clump_radius = 10
-    }},
-    {"Web", "It's really sticky",
+    } },
+    { "Web", "It's really sticky",
         10.0, 5.0, 10.0, 1.5, 3, RarityID::kLegendary, {
         .clump_radius = 10,
         .secondary_reload = 0.5,
         .defend_only = 1,
+    } },
+    { "Antennae", "Allows your flower to sense foes from farther away",
+        0.0, 0.0, 12.5, 0.0, 0, RarityID::kLegendary, {
+        .equipment = EquipmentFlags::kAntennae,
+        .extra_vision = 0.25,
     }},
-    {"Antennae", "Allows your flower to sense foes from farther away",
-        0.0, 0.0, 12.5, 0.0, 0, RarityID::kLegendary, { .equipment = EquipmentFlags::kAntennae }},
-    {"Cactus", "Not very strong, but somehow increases your maximum health",
+    { "Cactus", "Not very strong, but somehow increases your maximum health",
         15.0, 5.0, 10.0, 1.0, 3, RarityID::kLegendary, {
         .clump_radius = 15,
-    }},
-    {"Heaviest", "This thing is so heavy that nothing gets in the way",
+        .extra_health = 60,
+    } },
+    { "Heaviest", "This thing is so heavy that nothing gets in the way",
         200.0, 10.0, 12.0, 10.0, 1, RarityID::kEpic, {
         .mass = 10,
         .rotation_style = PetalAttributes::kNoRot
+    } },
+    { "Third Eye", "Allows your flower to extend petals further out",
+        0.0, 0.0, 20.0, 0.0, 0, RarityID::kMythic, {
+        .equipment = EquipmentFlags::kThirdEye,
+        .extra_range = 75,
+}},
+    { "Observer", "The one who sees all",
+        0.0, 0.0, 12.5, 0.0, 0, RarityID::kMythic, {
+        .equipment = EquipmentFlags::kObserver,
+        .extra_vision = 0.75,
     }},
-    {"Third Eye", "Allows your flower to extend petals further out",
-        0.0, 0.0, 20.0, 0.0, 0, RarityID::kMythic, { .equipment = EquipmentFlags::kThirdEye }},
-    {"Observer", "The one who sees all", 
-        0.0, 0.0, 12.5, 0.0, 0, RarityID::kMythic, { .equipment = EquipmentFlags::kObserver }},
-    {"Cactus", "Turns your flower poisonous. Enemies will take poison damage on contact",
+    { "Cactus", "Turns your flower poisonous. Enemies will take poison damage on contact",
         15.0, 5.0, 10.0, 1.0, 1, RarityID::kEpic, {
-        .poison_damage = { 1.0, 5.0 }
-    }},
-    {"Salt", "Reflects some damage dealt to the flower. Does not stack with itself",
-        10.0, 10.0, 10.0, 2.5, 1, RarityID::kRare, {}},
-    {"Basic", "Something incredibly rare and useless",
-        10.0, 10.0, 10.0, 2.5, 1, RarityID::kUnique, {}},
-    {"Square", "This shape... it looks familiar...",
+        .poison_damage = { 1.0, 5.0 },
+        .extra_health = 20,
+    } },
+    { "Salt", "Reflects some damage dealt to the flower. Does not stack with itself",
+        10.0, 10.0, 10.0, 2.5, 1, RarityID::kRare, {} },
+    { "Basic", "Something incredibly rare and useless",
+        10.0, 10.0, 10.0, 2.5, 1, RarityID::kUnique, {} },
+    { "Square", "This shape... it looks familiar...",
         10.0, 10.0, 15.0, 2.5, 1, RarityID::kUnique, {
         .icon_angle = M_PI / 4 + 1
-    }},
-    {"Moon", "Where did this come from?",
+    } },
+    { "Moon", "Where did this come from?",
         1000.0, 1.0, 50.0, 10.0, 1, RarityID::kMythic, {
         .secondary_reload = 0.5,
         .mass = 200
-    }},
-    {"Lotus", "Absorbs some poison damage taken by the flower",
+    } },
+    { "Lotus", "Absorbs some poison damage taken by the flower",
         5.0, 5.0, 12.0, 2.0, 1, RarityID::kEpic, {
         .icon_angle = 0.1
-    }},
-    {"Cutter", "Increases the flower's body damage",
-        0.0, 0.0, 40.0, 0.0, 0, RarityID::kEpic, { .equipment = EquipmentFlags::kCutter }},
-    {"Yin Yang", "Alters the flower's petal rotation in interesting ways",
-        15.0, 15.0, 10.0, 2.5, 1, RarityID::kEpic, {}},
-    {"Yggdrasil", "Unfortunately, its powers are useless here",
+    } },
+    { "Cutter", "Increases the flower's body damage",
+        0.0, 0.0, 40.0, 0.0, 0, RarityID::kEpic, {.equipment = EquipmentFlags::kCutter } },
+    { "Yin Yang", "Alters the flower's petal rotation in interesting ways",
+        15.0, 15.0, 10.0, 2.5, 1, RarityID::kEpic, {} },
+    { "Yggdrasil", "Unfortunately, its powers are useless here",
         1.0, 1.0, 12.0, 10.0, 1, RarityID::kUnique, {
         .defend_only = 1,
         .icon_angle = M_PI
-    }},
-    {"Rice", "Spawns instantly, but not very strong",
+    } },
+    { "Rice", "Spawns instantly, but not very strong",
         1.0, 8.0, 13.0, 0.1, 1, RarityID::kEpic, {
         .icon_angle = 0.7
-    }},
-    {"Bone", "Sturdy",
+    } },
+    { "Bone", "Sturdy",
         12.0, 12.0, 12.0, 1.5, 1, RarityID::kLegendary, {
         .icon_angle = 1
-    }},
-    {"Yucca", "Heals the flower, but only while in the defensive position",
+    } },
+    { "Yucca", "Heals the flower, but only while in the defensive position",
         10.0, 5.0, 10.0, 1.0, 1, RarityID::kUnusual, {
         .constant_heal = 3,
         .icon_angle = -1
-    }},
-    {"Corn", "Takes a long time to spawn, but has a lot of health",
+    } },
+    { "Corn", "Takes a long time to spawn, but has a lot of health",
         500.0, 5, 16.0, 8, 1, RarityID::kEpic, {
         .icon_angle = 0.5
-    }},
+    } },
     { "Corruption", "Corrupts one's soul, turning them against their own kind.",
-    0.0, 0.0, 0, 0.0, 0, RarityID::kUnique, {
-    .icon_angle = 0.5
+        0.0, 0.0, 0, 0.0, 0, RarityID::kUnique, {
+        .icon_angle = 0.5,
+        .extra_health = 300,
+        .movement_speed = 0.2,
+        .reduce_reload = 0.8,
+
 } },
     #ifdef DEV
     {"M28", "Wow, A yummy M28",
@@ -243,7 +262,9 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .poison_damage = { 20.0, 1 }
     }},
     { "Quint", "How about FIVE?!",
-        5.0, 8.0, 7.0, 0.8, 5, RarityID::kLegendary, {} },
+        5.0, 8.0, 7.0, 0.8, 5, RarityID::kLegendary, {
+        .movement_speed = 0.05,
+    }},
     { "Wing", "It comes and goes",
         15.0, 15.0, 10.0, 1.5, 3, RarityID::kLegendary, {
         .icon_angle = 1,

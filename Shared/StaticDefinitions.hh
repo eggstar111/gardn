@@ -229,6 +229,11 @@ struct PetalAttributes {
     uint8_t spawns = MobID::kNumMobs;
     uint8_t spawn_count = 0;
     uint8_t equipment = EquipmentFlags::kNone;
+    float extra_health = 0;
+    float movement_speed = 0;
+    float reduce_reload = 0;
+    float extra_range = 0;
+    float extra_vision = 0;
 };
 
 struct PetalData {
