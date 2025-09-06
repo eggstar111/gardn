@@ -27,5 +27,5 @@ void tick_entity_motion(Simulation *sim, Entity &ent) {
     //ent.acceleration.set(0,0);
     ent.collision_velocity.set(0,0);
     ent.speed_ratio = 1;
-    ent.acceleration.set_magnitude(0);
+    ent.acceleration.set_magnitude(5);
 }
