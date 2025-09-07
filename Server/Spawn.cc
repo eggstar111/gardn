@@ -187,20 +187,20 @@ Entity &alloc_web(Simulation *sim, float radius, Entity const &parent) {
 }
 
 Entity& alloc_poison_web(Simulation* sim, float radius, Entity const& parent) {
-    Entity& web = sim->alloc_ent();
-    web.add_component(kPhysics);
-    web.set_x(parent.x);
-    web.set_y(parent.y);
-    web.set_angle(frand() * 2 * M_PI);
-    web.set_radius(radius);
-    web.mass = 1.0;
-    web.friction = 1.0;
-    web.add_component(kRelations);
-    web.set_team(parent.team);
-    web.set_parent(parent.id);
-    web.add_component(kPoisonWeb);
-    entity_set_despawn_tick(web, 10 * TPS);
-    return web;
+    Entity& poison_web = sim->alloc_ent();
+    poison_web.add_component(kPhysics);
+    poison_web.set_x(parent.x);
+    poison_web.set_y(parent.y);
+    poison_web.set_angle(frand() * 2 * M_PI);
+    poison_web.set_radius(radius);
+    poison_web.mass = 1.0;
+    poison_web.friction = 1.0;
+    poison_web.add_component(kRelations);
+    poison_web.set_team(parent.team);
+    poison_web.set_parent(parent.id);
+    poison_web.add_component(kPoisonWeb);
+    entity_set_despawn_tick(poison_web, 10 * TPS);
+    return poison_web;
 }
 
 Entity &alloc_chat(Simulation *sim, std::string &text, Entity const &parent) {

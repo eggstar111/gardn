@@ -8,6 +8,7 @@
 #include <string>
 #include <unistd.h>
 #include <cstdlib>
+#include <Server/Spawn.hh>
 
 
 struct AsymmetricBattle::AsymmetricBattleInternal {
@@ -38,7 +39,96 @@ struct AsymmetricBattle::AsymmetricBattleInternal {
             }
             return;
         }
+        {
+            Simulation& sim = game_instance->simulation;
+            auto& team_manager = game_instance->get_team_manager();
 
+            Entity& blue_team = sim.get_ent(team_manager.teams[0]);
+            Entity& red_team = sim.get_ent(team_manager.teams[1]);
+
+            uint32_t blue_count = blue_team.player_count;
+            uint32_t red_count = red_team.player_count;
+            if (red_count * 6 > blue_count + 6) {
+                Entity* worst_player = nullptr;
+                int lowest_score = INT_MAX;
+
+                // 找分数最低的红队玩家
+                for (uint16_t i = 0; i < ENTITY_CAP; ++i) {
+                    EntityID id(i, 0);
+                    Entity& ent = sim.get_ent(id);
+                    Entity* cam = sim.ent_alive(ent.parent) ? &sim.get_ent(ent.parent) : nullptr;
+                    if (!ent.has_component(kFlower)) continue;
+                    if (ent.color != ColorID::kRed) continue;
+
+                    int score = ent.score;
+                    if (score < lowest_score) {
+                        lowest_score = score;
+                        worst_player = &ent;
+                    }
+                }
+
+                if (worst_player) {
+                    Entity& old_camera = sim.get_ent(worst_player->parent);
+                    old_camera.set_color(ColorID::kBlue);
+                    old_camera.set_team(blue_team.id);
+                    for (uint32_t i = 0; i < MAX_SLOT_COUNT * 2; ++i) {
+                        worst_player->set_loadout_ids(i, PetalID::kNone);
+                        old_camera.set_inventory(i, PetalID::kNone);
+                    }
+                    worst_player->set_color(ColorID::kBlue);
+                    worst_player->set_team(blue_team.id);
+                    worst_player->set_parent(old_camera.id);
+                    worst_player->score = 0;
+
+                    worst_player->health = 0;
+                    blue_team.player_count++;
+                    red_team.player_count--;
+                    game_instance->broadcast_message("A RED player has been forced to join BLUE for balance");
+                }
+            }
+            if (blue_count  > red_count * 6 + 6) {
+                Entity* worst_player = nullptr;
+                int lowest_score = INT_MAX;
+
+                // 找分数最低的蓝队玩家
+                for (uint16_t i = 0; i < ENTITY_CAP; ++i) {
+                    EntityID id(i, 0);
+                    Entity& ent = sim.get_ent(id);
+                    Entity* cam = sim.ent_alive(ent.parent) ? &sim.get_ent(ent.parent) : nullptr;
+
+                    if (!ent.has_component(kFlower)) continue;
+                    if (ent.color != ColorID::kBlue) continue;
+
+                    int score = ent.score;
+                    if (score < lowest_score) {
+                        lowest_score = score;
+                        worst_player = &ent;
+                    }
+                }
+
+                if (worst_player) {
+                    Entity& old_camera = sim.get_ent(worst_player->parent);
+
+                    // 转换成红队
+                    old_camera.set_color(ColorID::kRed);
+                    old_camera.set_team(red_team.id);
+                    for (uint32_t i = 0; i < MAX_SLOT_COUNT * 2; ++i) {
+                        worst_player->set_loadout_ids(i, PetalID::kNone);
+                        old_camera.set_inventory(i, PetalID::kNone);
+                    }
+                    worst_player->set_color(ColorID::kRed);
+                    worst_player->set_team(red_team.id);
+                    worst_player->set_parent(old_camera.id);
+                    worst_player->score = 0;
+                    worst_player->health = 0;
+
+                    blue_team.player_count--;
+                    red_team.player_count++;
+
+                    game_instance->broadcast_message("A BLUE player has been forced to join RED for balance");
+                }
+            }
+        }
         // 首次启动倒计时
         if (!started) {
             started = true;
