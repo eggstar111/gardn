@@ -8,7 +8,7 @@
 #include <string>
 #include <unistd.h>
 #include <cstdlib>
-#include <Server/Spawn.hh>
+#include <climits>
 
 
 struct AsymmetricBattle::AsymmetricBattleInternal {
