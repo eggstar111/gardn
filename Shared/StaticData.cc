@@ -214,8 +214,8 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         0.0, 0.0, 40.0, 0.0, 0, RarityID::kEpic, {.equipment = EquipmentFlags::kCutter } },
     { "Yin Yang", "Alters the flower's petal rotation in interesting ways",
         15.0, 15.0, 10.0, 2.5, 1, RarityID::kEpic, {} },
-    { "Yggdrasil", "Unfortunately, its powers are useless here",
-        1.0, 1.0, 12.0, 10.0, 1, RarityID::kUnique, {
+    { "Yggdrasil", "Give you a second chance",
+        999999.0, 0.0, 12.0, 10.0, 1, RarityID::kUnique, {
         .defend_only = 1,
         .icon_angle = M_PI
     } },

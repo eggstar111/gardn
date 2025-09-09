@@ -18,9 +18,28 @@ static bool _yggdrasil_revival_clause(Simulation *sim, Entity &player) {
 }
 
 void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_id, float amt, uint8_t type) {
-    if (sim->get_ent(def_id).has_component(kMob) && sim->get_ent(atk_id).has_component(kMob) &&
-        (sim->get_ent(def_id).mob_id == MobID::kTargetDummy || sim->get_ent(atk_id).mob_id == MobID::kTargetDummy)) {
-        return;
+    {
+        Entity& def_ent = sim->get_ent(def_id);
+        Entity& atk_ent = sim->get_ent(atk_id);
+
+        // 判断是否有一方是 TargetDummy
+        bool def_is_dummy = def_ent.has_component(kMob) && def_ent.mob_id == MobID::kTargetDummy;
+        bool atk_is_dummy = atk_ent.has_component(kMob) && atk_ent.mob_id == MobID::kTargetDummy;
+
+        // 获取父实体（如果存在）
+        Entity* def_parent = (def_ent.parent != NULL_ENTITY && sim->ent_alive(def_ent.parent)) ? &sim->get_ent(def_ent.parent) : nullptr;
+        Entity* atk_parent = (atk_ent.parent != NULL_ENTITY && sim->ent_alive(atk_ent.parent)) ? &sim->get_ent(atk_ent.parent) : nullptr;
+
+        // 如果一方是 TargetDummy，另一方是生物或者父是生物，则跳过
+        if (def_is_dummy) {
+            if (atk_ent.has_component(kMob) || (atk_parent && atk_parent->has_component(kMob)))
+                return;
+        }
+        else if (atk_is_dummy) {
+            if (def_ent.has_component(kMob) || (def_parent && def_parent->has_component(kMob)))
+                return;
+        }
+
     }
     if (amt <= 0) return;
     if (!sim->ent_alive(def_id)) return;
@@ -69,7 +88,7 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
             */
     }
     if (defender.has_component(kMob) && defender.mob_id == MobID::kTargetDummy) {
-        const float drop_interval = 0.05f;
+        const float drop_interval = 0.025f;
         uint32_t start = ceilf((defender.max_health - old_health) / (defender.max_health * drop_interval));
         uint32_t end = ceilf((defender.max_health - defender.health) / (defender.max_health * drop_interval));
 
@@ -88,6 +107,14 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
                 float dist = radius + frand() * 35.0f;
                 drop.set_x(defender.x + cos(angle) * dist);
                 drop.set_y(defender.y + sin(angle) * dist);
+            }
+            if (frand() < 0.05f) {
+                Entity& ygg = alloc_drop(sim, PetalID::kYggdrasil);
+                float radius = defender.radius + 35;
+                float angle = frand() * 2.0f * M_PI;
+                float dist = radius + frand() * 35.0f;
+                ygg.set_x(defender.x + cos(angle) * dist);
+                ygg.set_y(defender.y + sin(angle) * dist);
             }
             // 追溯攻击者父实体
             Entity* attacker = nullptr;
@@ -125,24 +152,45 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
                     // 导弹角度指向圆心
                     Vector v(predicted_x - x, predicted_y - y);
                     missile.set_angle(v.angle());
-                    missile.acceleration.unit_normal(v.angle()).set_magnitude(40 * PLAYER_ACCELERATION);
                 }
             }
         }
     }
 
 
-
-
-
-    /* yggdrasil revive clause
     if (defender.health == 0 && defender.has_component(kFlower)) {
         if (_yggdrasil_revival_clause(sim, defender)) {
-            defender.health = defender.max_health * 0.25;
-            defender.immunity_ticks = 1.0 * TPS;
+            defender.health = defender.max_health;
+            defender.immunity_ticks = 10.0 * TPS;
+            const int missile_count = 24;
+            const float circle_radius = defender.radius; 
+
+            float center_x = defender.x;
+            float center_y = defender.y;
+
+            for (int j = 0; j < missile_count; ++j) {
+                float angle = 2.0f * M_PI * j / missile_count;
+                float x = center_x + cos(angle) * circle_radius;
+                float y = center_y + sin(angle) * circle_radius;
+
+                Entity& missile = alloc_petal(sim, PetalID::kDandelion, defender);
+                missile.damage = 0;
+                missile.health = missile.max_health = 5000;
+                missile.radius = 60;
+                missile.mass = 10;
+                missile.team = defender.team;
+                entity_set_despawn_tick(missile, 3 * TPS);
+                missile.set_x(x);
+                missile.set_y(y);
+
+                // 导弹角度指向中心
+                Vector v(center_x - x, center_y - y);
+                missile.set_angle(v.angle());
+            }
         }
     }
-    */
+
+
     if (!sim->ent_exists(atk_id)) return;
     Entity &attacker = sim->get_ent(atk_id);
 
