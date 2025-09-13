@@ -4,7 +4,7 @@ extern const uint64_t VERSION_HASH = 19235684321324ull;
 #ifdef DEV
 extern const uint32_t SERVER_PORT = 9002;
 #else
-extern const uint32_t SERVER_PORT = 9001;
+extern const uint32_t SERVER_PORT = 7001;
 #endif
 extern const uint32_t MAX_NAME_LENGTH = 32;
 extern const uint32_t MAX_CHAT_LENGTH = 128;
