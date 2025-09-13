@@ -44,9 +44,6 @@ static struct PlayerBuffs _get_petal_passive_buffs(Simulation* sim, Entity& play
             buffs.extra_health += petal_data.attributes.extra_health;
             player.radius = BASE_FLOWER_RADIUS * 1.15;
         }
-        else if (slot_petal_id == PetalID::kYinYang) {
-            ++buffs.yinyang_count;
-        }
         if (petal_data.attributes.reduce_reload) buffs.reduce_reload *= petal_data.attributes.reduce_reload;
         buffs.extra_range += petal_data.attributes.extra_range;
         buffs.extra_vision = std::max(buffs.extra_vision, petal_data.attributes.extra_vision);
@@ -67,6 +64,9 @@ static struct PlayerBuffs _get_petal_passive_buffs(Simulation* sim, Entity& play
         }
         else if (slot_petal_id == PetalID::kLotus) {
             player.poison_armor = 3.5f / TPS;
+        }
+        else if (slot_petal_id == PetalID::kYinYang) {
+            ++buffs.yinyang_count;
         }
     }
     return buffs;
