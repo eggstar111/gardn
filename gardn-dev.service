@@ -3,7 +3,7 @@ Description=the gardn project development dedicated server.
 
 [Service]
 Type=simple
-ExecStart=/gardn/gardn-dev/Server/build/gardn-server
+ExecStart=/opt/gardn-dev/Server/build/gardn-server
 Restart=always
 
 [Install]
