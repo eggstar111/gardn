@@ -15,5 +15,5 @@ extern const std::string PASSWORD = "a621ab606db2a11f63edc576a729843b8269250dc32
 #ifdef TEST
 extern std::string const WS_URL = "ws://localhost:"+std::to_string(SERVER_PORT);
 #else
-extern std::string const WS_URL = "ws://154.12.60.44:"+std::to_string(SERVER_PORT);
+extern std::string const WS_URL = "ws://gardn.camvan.xyz:"+std::to_string(SERVER_PORT);
 #endif
