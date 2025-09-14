@@ -17,7 +17,7 @@ struct AsymmetricBattle::AsymmetricBattleInternal {
         started(false),
         finished(false),
         restart_message_sent(false),
-        countdown_seconds(1800),
+        countdown_seconds(2400),
         last_broadcast_second(-1),
         winner_color(-1) {
     }
@@ -237,7 +237,7 @@ struct AsymmetricBattle::AsymmetricBattleInternal {
     bool started;
     bool finished;
     bool restart_message_sent; // 新增一个标志位，防止重复播报
-    const int countdown_seconds; // 总秒数（1800）
+    const int countdown_seconds; // 总秒数
     int last_broadcast_second;    // 上次记录的秒数（用于避免重复广播）
     int winner_color;            // -1 未定，或 ColorID 值
     std::chrono::steady_clock::time_point start_time;

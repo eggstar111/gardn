@@ -146,7 +146,7 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .defend_only = 1
     } },
     { "Stick", "Harnesses the power of the wind",
-        10.0, 1.0, 15.0, 3.0, 1, RarityID::kMythic, {
+       999999.0, 0.0, 15.0, 3.0, 1, RarityID::kMythic, {
         .secondary_reload = 4.0,
         .defend_only = 1,
         .icon_angle = 1,
@@ -240,10 +240,8 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
     { "Corruption", "Corrupts one's soul, turning them against their own kind.",
         0.0, 0.0, 0, 0.0, 0, RarityID::kUnique, {
         .icon_angle = 0.5,
-        .extra_health = 500,
-        .movement_speed = 0.2,
+        .extra_health = 200,
         .reduce_reload = 0.5,
-
 } },
     #ifdef DEV
     {"M28", "Wow, A yummy M28",

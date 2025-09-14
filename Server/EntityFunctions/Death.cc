@@ -2,7 +2,7 @@
 
 #include <Server/PetalTracker.hh>
 #include <Server/Spawn.hh>
-
+#include <Server/Server.hh>
 #include <Shared/Entity.hh>
 #include <Shared/Helpers.hh>
 #include <Shared/Map.hh>
@@ -153,22 +153,45 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
             camera.set_inventory(i, PetalID::kBasic);
         }
         if (ent.color == ColorID::kRed) {
-            for (uint32_t i = num_left; i < loadout_slots_at_level(respawn_level); ++i) {
-                PetalTracker::add_petal(sim, PetalID::kStinger);
-                camera.set_inventory(i, PetalID::kStinger);
+            std::vector<PetalID::T> candidates = {
+                PetalID::kTriWing,
+                PetalID::kQuint,
+                PetalID::kPoisonPeas2,
+                PetalID::kTringer,
+                PetalID::kBeetleEgg
+            };
+
+            for (uint32_t i = 0; i < loadout_slots_at_level(respawn_level) -  1; ++i) {
+                PetalID::T chosen = candidates[std::rand() % candidates.size()];
+                PetalTracker::add_petal(sim, chosen);
+                camera.set_inventory(i, chosen);
             }
+
             PetalTracker::add_petal(sim, PetalID::kCorruption);
             camera.set_inventory(loadout_slots_at_level(respawn_level) - 1, PetalID::kCorruption);
             PetalTracker::add_petal(sim, PetalID::kBubble);
             camera.set_inventory(loadout_slots_at_level(respawn_level) + 1, PetalID::kBubble);
+            PetalTracker::add_petal(sim, PetalID::kAzalea);
+            camera.set_inventory(loadout_slots_at_level(respawn_level) + 2, PetalID::kAzalea);
+            PetalTracker::add_petal(sim, PetalID::kAzalea);
+            camera.set_inventory(loadout_slots_at_level(respawn_level) + 3, PetalID::kAzalea);
+            PetalTracker::add_petal(sim, PetalID::kAzalea);
+            camera.set_inventory(loadout_slots_at_level(respawn_level) + 4, PetalID::kTriweb);
+            Entity* lowest_dummy = nullptr;
             for (uint16_t i = 0; i < ENTITY_CAP; ++i) {
-                EntityID id(i, 0);  
+                EntityID id(i, 0);
                 if (!sim->ent_exists(id)) continue;
-                Entity& target = sim->get_ent(id); 
-                if (target.mob_id == MobID::kTargetDummy) {
-                    target.health = (target.health >= 1000) ? target.health - 1000 : 0;
-                    break;
+                Entity& ent = sim->get_ent(id);
+                if (ent.mob_id == MobID::kTargetDummy) {
+                    if (!lowest_dummy || ent.health < lowest_dummy->health) {
+                        lowest_dummy = &ent;
+                    }
                 }
+            }
+
+            if (lowest_dummy) {
+                lowest_dummy->health = (lowest_dummy->health >= 2000) ? lowest_dummy->health - 2000 : 0;
+                Server::game.broadcast_message("Red team player down -- TargetDummy takes 2000 damage");
             }
         }
         PetalTracker::add_petal(sim, PetalID::kRose);

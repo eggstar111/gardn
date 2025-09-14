@@ -24,7 +24,7 @@ Entity &alloc_drop(Simulation *sim, PetalID::T drop_id) {
 
     drop.add_component(kDrop);
     drop.set_drop_id(drop_id);
-    entity_set_despawn_tick(drop, 10 * (2 + PETAL_DATA[drop_id].rarity) * TPS);
+    entity_set_despawn_tick(drop, 5 * (2 + PETAL_DATA[drop_id].rarity) * TPS);
     drop.immunity_ticks = TPS / 3;
     return drop;
 }

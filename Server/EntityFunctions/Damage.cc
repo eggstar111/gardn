@@ -48,7 +48,7 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
     DEBUG_ONLY(assert(!defender.pending_delete);)
     DEBUG_ONLY(assert(defender.has_component(kHealth));)
     // if defender is in ghost mode, ignore damage
-    if (defender.ghost_mode) return;
+    if (defender.ghost_mode ||  sim->get_ent(atk_id).ghost_mode) return;
     if (defender.immunity_ticks > 0) return;
     if (type == DamageType::kContact) amt -= defender.armor;
     else if (type == DamageType::kPoison) amt -= defender.poison_armor;
@@ -91,7 +91,10 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
         const float drop_interval = 0.025f;
         uint32_t start = ceilf((defender.max_health - old_health) / (defender.max_health * drop_interval));
         uint32_t end = ceilf((defender.max_health - defender.health) / (defender.max_health * drop_interval));
-
+        if (defender.health == 0) {
+            defender.set_ghost_mode(1);
+            defender.health = 1;
+        }
         for (uint32_t i = start; i < end; ++i) {
             // µôÂäÊ·Ê«µÀ¾ß
             std::vector<uint32_t> epic_indices;
@@ -108,7 +111,7 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
                 drop.set_x(defender.x + cos(angle) * dist);
                 drop.set_y(defender.y + sin(angle) * dist);
             }
-            if (frand() < 0.05f) {
+            if (frand() < 0.01f) {
                 Entity& ygg = alloc_drop(sim, PetalID::kYggdrasil);
                 float radius = defender.radius + 35;
                 float angle = frand() * 2.0f * M_PI;
@@ -161,7 +164,7 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
     if (defender.health == 0 && defender.has_component(kFlower)) {
         if (_yggdrasil_revival_clause(sim, defender)) {
             defender.health = defender.max_health;
-            defender.immunity_ticks = 10.0 * TPS;
+            defender.immunity_ticks = 3.0 * TPS;
             const int missile_count = 24;
             const float circle_radius = defender.radius; 
 

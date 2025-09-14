@@ -124,14 +124,27 @@ void GameInstance::add_client(Client *client) {
     #endif
     
     ent.set_fov(BASE_FOV);
-    ent.set_respawn_level(1);
+    ent.set_respawn_level(30);
 
     if (simulation.get_ent(team).color == ColorID::kRed) {
         ent.set_respawn_level(99);
         ent.set_inventory(loadout_slots_at_level(ent.respawn_level) - 1, PetalID::kCorruption);
         ent.set_inventory(loadout_slots_at_level(ent.respawn_level) + 1, PetalID::kBubble);
-        for (uint32_t i = 0; i < loadout_slots_at_level(ent.respawn_level) - 1; ++i)
-            ent.set_inventory(i, PetalID::kStinger);
+        // 候选池
+        std::vector<PetalID::T> candidates = {
+            PetalID::kTriWing,
+            PetalID::kQuint,
+            PetalID::kPoisonPeas2,
+            PetalID::kTringer,
+            PetalID::kBeetleEgg
+        };
+
+        for (uint32_t i = 0; i < loadout_slots_at_level(ent.respawn_level) - 1; ++i) {
+            // 从候选池中随机选择一个
+            PetalID::T chosen = candidates[std::rand() % candidates.size()];
+            ent.set_inventory(i, chosen);
+        }
+
        
     }
     else {
