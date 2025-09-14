@@ -110,8 +110,8 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .movement_speed = 0.03,
 }},
     {"Egg", "Something interesting might pop out of this",
-        50.0, 1.0, 12.5, 1.0, 1, RarityID::kEpic, { 
-        .secondary_reload = 3.5,
+        200.0, 1.0, 12.5, 1.0, 1, RarityID::kEpic, { 
+        .secondary_reload = 1.0,
         .defend_only = 1,
         .rotation_style = PetalAttributes::kNoRot,
         .spawns = MobID::kSoldierAnt
@@ -133,8 +133,8 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .poison_damage = { 20.0, 0.5 }
     }},
     {"Egg", "Something interesting might pop out of this",
-        50.0, 1.0, 15.0, 1.0, 1, RarityID::kLegendary, {
-        .secondary_reload = 3.5,
+        200.0, 1.0, 15.0, 1.0, 1, RarityID::kLegendary, {
+        .secondary_reload = 2.0,
         .defend_only = 1,
         .rotation_style = PetalAttributes::kNoRot,
         .spawns = MobID::kBeetle
