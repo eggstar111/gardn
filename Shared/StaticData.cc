@@ -241,7 +241,7 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         0.0, 0.0, 0, 0.0, 0, RarityID::kUnique, {
         .icon_angle = 0.5,
         .extra_health = 200,
-        .reduce_reload = 0.5,
+        //.reduce_reload = 0.5,
 } },
     #ifdef DEV
     {"M28", "Wow, A yummy M28",
