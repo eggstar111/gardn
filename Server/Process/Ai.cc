@@ -222,7 +222,7 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
             Entity& bullet = alloc_petal(sim, PetalID::kBullet, ent);
             entity_set_despawn_tick(bullet, 3 * TPS);
             bullet.damage = 5;
-            bullet.health = bullet.max_health = 20;
+            bullet.health = bullet.max_health = 10;
             bullet.radius = ent.radius * 0.4f;
             bullet.set_angle(predicted_v.angle());
 

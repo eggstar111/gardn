@@ -90,7 +90,7 @@ namespace PetalID {
         kTriWing,
         kPoisonWeb,
         kBullet,
-        kTank,
+        kTankEgg,
         kNumPetals
     };
 };

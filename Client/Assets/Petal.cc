@@ -974,7 +974,7 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.fill();
             ctx.stroke();
             break;
-        case PetalID::kTank:
+        case PetalID::kTankEgg:
             ctx.set_fill(0xffc0c0c0);
             ctx.set_stroke(0xff909090);
             ctx.begin_path();
