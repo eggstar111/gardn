@@ -273,6 +273,20 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .secondary_reload = 0.5,
         .defend_only = 1,
         .poison_damage = { 5.0, 1.0 },
+    }},
+     { "Bullet", "You can actually shoot this one",
+        20.0, 20.0, 10.0, 0.25, 1, RarityID::kEpic, {
+        .secondary_reload = 0.25,
+        .defend_only = 1,
+        .icon_angle = 1,
+        .rotation_style = PetalAttributes::kFollowRot
+    }},
+    { "Egg", "Something interesting might pop out of this",
+        200.0, 1.0, 15.0, 5.0, 1, RarityID::kMythic, {
+        .secondary_reload = 3.0,
+        .defend_only = 1,
+        .rotation_style = PetalAttributes::kNoRot,
+        .spawns = MobID::kTank
     } },
 };
 
@@ -433,6 +447,12 @@ struct MobData const MOB_DATA[MobID::kNumMobs] = {
         RarityID::kUnique, {4000.0}, 15.0, {50.0}, 50000, {
        PetalID::kTringer
     }, {.stationary = 1 } },
+     {
+        "Tank",
+        "???",
+        RarityID::kEpic, {200.0, 400.0}, 20.0, {40.0, 80.0}, 400, {
+        PetalID::kBullet,PetalID::kTank,
+    }, {.aggro_radius = 1200 } },
 };
 
 std::array<StaticArray<float, MAX_DROPS_PER_MOB>, MobID::kNumMobs> const MOB_DROP_CHANCES = [](){

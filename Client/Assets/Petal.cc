@@ -965,6 +965,24 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.fill();
             ctx.stroke();
             break;
+        case PetalID::kBullet:
+            ctx.set_fill(0xffc0c0c0);
+            ctx.set_stroke(0xff909090);
+            ctx.set_line_width(3);
+            ctx.begin_path();
+            ctx.arc(0, 0, r);
+            ctx.fill();
+            ctx.stroke();
+            break;
+        case PetalID::kTank:
+            ctx.set_fill(0xffc0c0c0);
+            ctx.set_stroke(0xff909090);
+            ctx.begin_path();
+            ctx.ellipse(0, 0, r * 0.95, r * 1.35);
+            ctx.fill();
+            ctx.set_line_width(3);
+            ctx.stroke();
+            break;
         #ifdef DEV
         case PetalID::kM28:
             ctx.begin_path();

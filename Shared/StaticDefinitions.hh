@@ -89,6 +89,8 @@ namespace PetalID {
         kQuint,
         kTriWing,
         kPoisonWeb,
+        kBullet,
+        kTank,
         kNumPetals
     };
 };
@@ -121,6 +123,7 @@ namespace MobID {
         kSquare,
         kDigger,
         kTargetDummy,
+        kTank,
         kNumMobs
     };
 };

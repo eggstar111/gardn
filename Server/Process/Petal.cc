@@ -28,6 +28,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
     if (BIT_AT(petal.flags, EntityFlags::kIsDespawning)) {
         switch (petal.petal_id) {
             case PetalID::kMissile:
+            case PetalID::kBullet:
             case PetalID::kDandelion: {
                 petal.acceleration.unit_normal(petal.angle).set_magnitude(4 * PLAYER_ACCELERATION);
                 break;
@@ -59,6 +60,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
             }
             switch (petal.petal_id) {
                 case PetalID::kMissile:
+                case PetalID::kBullet:
                 case PetalID::kDandelion:
                     if (BIT_AT(player.input, InputFlags::kAttacking)) {
                         petal.acceleration.unit_normal(petal.angle).set_magnitude(4 * PLAYER_ACCELERATION);

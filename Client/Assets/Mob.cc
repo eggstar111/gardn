@@ -720,6 +720,22 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.set_line_width(0.5);
             ctx.stroke();
             break;
+        case MobID::kTank:
+            ctx.set_fill(0xff999999);
+            ctx.set_stroke(0xff727272);
+            ctx.set_line_width(3);
+            ctx.begin_path();
+            ctx.rect(0, -radius * 0.9 / 2, 1.8 * radius, radius * 0.9);
+            ctx.fill();
+            ctx.stroke();
+            ctx.set_fill(0xffc0c0c0);
+            ctx.set_stroke(0xff909090);
+            ctx.set_line_width(3);
+            ctx.begin_path();
+            ctx.arc(0, 0, radius);
+            ctx.fill();
+            ctx.stroke();
+            break;
         default:
             assert(!"Didn't cover mob render");
             break;

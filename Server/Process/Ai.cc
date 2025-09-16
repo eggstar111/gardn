@@ -5,7 +5,6 @@
 #include <Shared/Entity.hh>
 #include <Shared/Simulation.hh>
 #include <Shared/StaticData.hh>
-
 #include <cmath>
 
 static void _focus_lose_clause(Entity &ent, Vector const &v) {
@@ -181,9 +180,79 @@ static void tick_hornet_aggro(Simulation *sim, Entity &ent) {
             ent.target = NULL_ENTITY;
         }
         ent.target = find_nearest_enemy(sim, ent, ent.detection_radius);
-        tick_bee_passive(sim, ent);;
+        tick_bee_passive(sim, ent);
     }
 }
+
+
+static void tick_tank_aggro(Simulation* sim, Entity& ent) {
+    if (sim->ent_alive(ent.target)) {
+        Entity& target = sim->get_ent(ent.target);
+        Vector v(target.x - ent.x, target.y - ent.y);
+        _focus_lose_clause(ent, v);
+        float dist = v.magnitude();
+
+        const float BULLET_SPEED = 40.0f * PLAYER_ACCELERATION;
+
+        // 后退逻辑：距离小于 250 时后退
+        if (dist < 380) {
+            v.set_magnitude(-PLAYER_ACCELERATION * 0.35f); // 反向加速度
+            ent.acceleration = v;
+        }
+        else if (dist > 400) {
+            v.set_magnitude(PLAYER_ACCELERATION * 0.975f);
+            ent.acceleration = v;
+        }
+        else {
+            Vector circle_v(v.y, -v.x); // 右手法向量，顺时针
+            circle_v.set_magnitude(PLAYER_ACCELERATION * 0.7f);
+            ent.acceleration = circle_v;
+        }
+
+        // 预测目标位置射击
+        float travel_time_in_frames = dist / BULLET_SPEED;
+        float predicted_target_x = target.x + target.velocity.x * travel_time_in_frames * 5.5f;
+        float predicted_target_y = target.y + target.velocity.y * travel_time_in_frames * 5.5f;
+        Vector predicted_v(predicted_target_x - ent.x, predicted_target_y - ent.y);
+        ent.set_angle(predicted_v.angle());
+
+        // 射击
+        if (ent.ai_tick >= 0.5f * TPS && dist < 800) {
+            ent.ai_tick = 0;
+            Entity& bullet = alloc_petal(sim, PetalID::kBullet, ent);
+            entity_set_despawn_tick(bullet, 3 * TPS);
+            bullet.damage = 5;
+            bullet.health = bullet.max_health = 20;
+            bullet.radius = ent.radius * 0.4f;
+            bullet.set_angle(predicted_v.angle());
+
+            float offset = ent.radius * 1.8f;
+            Vector spawn_offset;
+            spawn_offset.unit_normal(ent.angle).set_magnitude(offset);
+            bullet.x = ent.x + spawn_offset.x;
+            bullet.y = ent.y + spawn_offset.y;
+            bullet.acceleration.unit_normal(predicted_v.angle()).set_magnitude(BULLET_SPEED);
+
+            // 后坐力
+            Vector kb;
+            kb.unit_normal(ent.angle - M_PI).set_magnitude(2.5f * PLAYER_ACCELERATION);
+            ent.velocity += kb;
+        }
+
+        return;
+    }
+    else {
+        if (!(ent.target == NULL_ENTITY)) {
+            ent.ai_state = AIState::kIdle;
+            ent.ai_tick = 0;
+            ent.target = NULL_ENTITY;
+        }
+        ent.target = find_nearest_enemy(sim, ent, ent.detection_radius);
+        tick_bee_passive(sim, ent);
+    }
+}
+
+
 
 static void tick_centipede_passive(Simulation *sim, Entity &ent) {
    
@@ -506,6 +575,10 @@ void tick_ai_behavior(Simulation *sim, Entity &ent) {
             break;
         case MobID::kDigger:
             tick_digger(sim, ent);
+            break;
+        case MobID::kTank:
+            tick_tank_aggro(sim, ent);
+            break;
         default:
             break;
     }
