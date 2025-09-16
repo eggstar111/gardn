@@ -15,6 +15,7 @@ set(SOURCES
     Process/Chat.cc
     Process/Collision.cc
     Process/Culling.cc
+    Process/Curse.cc
     Process/Flower.cc
     Process/Health.cc
     Process/Motion.cc
