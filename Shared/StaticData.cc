@@ -282,8 +282,8 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .rotation_style = PetalAttributes::kFollowRot
     }},
     { "Egg", "Something interesting might pop out of this",
-        200.0, 1.0, 15.0, 5.0, 1, RarityID::kMythic, {
-        .secondary_reload = 3.0,
+        200.0, 1.0, 15.0, 15.0, 1, RarityID::kMythic, {
+        .secondary_reload = 5.0,
         .defend_only = 1,
         .rotation_style = PetalAttributes::kNoRot,
         .spawns = MobID::kTank
