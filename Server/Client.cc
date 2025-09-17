@@ -131,7 +131,7 @@ void Client::on_message(WebSocket* ws, std::string_view message, uint64_t code) 
                         float min_dist = ent.radius + other.radius;
 
                         if (dist2 < min_dist * min_dist) {
-                            float dist = sqrt(dist2);
+                            float dist = std::sqrt(dist2);
                             if (dist < 0.0001f) dist = 0.0001f; // 防止除零
 
                             // 计算分离向量
