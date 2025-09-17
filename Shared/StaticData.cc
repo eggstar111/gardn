@@ -108,37 +108,37 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
     {"Triplet", "How about THREE?!",
         5.0, 8.0, 7.0, 0.8, 3, RarityID::kEpic, {
         .movement_speed = 0.03,
-}},
-    {"Egg", "Something interesting might pop out of this",
-        200.0, 1.0, 12.5, 1.0, 1, RarityID::kEpic, { 
+    }},
+    { "Egg", "Something interesting might pop out of this",
+        200.0, 1.0, 12.5, 1.0, 1, RarityID::kEpic, {
         .secondary_reload = 1.0,
         .defend_only = 1,
         .rotation_style = PetalAttributes::kNoRot,
         .spawns = MobID::kSoldierAnt
-    }},
-    {"Iris", "Deals its effects quicker than traditional irises",
-        10.0, 5.0, 7.0, 5.0, 1, RarityID::kEpic, { 
+    } },
+    { "Iris", "Deals its effects quicker than traditional irises",
+        10.0, 5.0, 7.0, 5.0, 1, RarityID::kEpic, {
         .poison_damage = { 15.0, 4.0 }
-    }},
-    {"Pollen", "Asthmatics beware",
+    } },
+    { "Pollen", "Asthmatics beware",
         7.0, 8.0, 7.0, 1, 3, RarityID::kEpic, {
         .secondary_reload = 0.5,
         .defend_only = 1
-    }},
-    {"Peas", "4 in 1 deal, now with a secret ingredient: poison",
+    } },
+    { "Peas", "4 in 1 deal, now with a secret ingredient: poison",
         5.0, 2.0, 7.0, 1.0, 4, RarityID::kEpic, {
         .clump_radius = 8,
         .secondary_reload = 0.1,
         .defend_only = 1,
         .poison_damage = { 20.0, 0.5 }
-    }},
-    {"Egg", "Something interesting might pop out of this",
+    } },
+    { "Egg", "Something interesting might pop out of this",
         200.0, 1.0, 15.0, 1.0, 1, RarityID::kLegendary, {
         .secondary_reload = 2.0,
         .defend_only = 1,
         .rotation_style = PetalAttributes::kNoRot,
         .spawns = MobID::kBeetle
-    }},
+    } },
     { "Rose", "Extremely powerful rose, almost unheard of",
         5.0, 5.0, 10.0, 3.5, 1, RarityID::kEpic, {
         .secondary_reload = 1.0,
@@ -167,7 +167,7 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         0.0, 0.0, 12.5, 0.0, 0, RarityID::kLegendary, {
         .equipment = EquipmentFlags::kAntennae,
         .extra_vision = 0.25,
-    }},
+    } },
     { "Cactus", "Not very strong, but somehow increases your maximum health",
         15.0, 5.0, 10.0, 1.0, 3, RarityID::kLegendary, {
         .clump_radius = 15,
@@ -182,12 +182,13 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         0.0, 0.0, 20.0, 0.0, 0, RarityID::kMythic, {
         .equipment = EquipmentFlags::kThirdEye,
         .extra_range = 75,
-}},
+} },
     { "Observer", "The one who sees all",
-        0.0, 0.0, 12.5, 0.0, 0, RarityID::kMythic, {
+        0.0, 0.0, 12.5, 0.0, 0, RarityID::kUnique, {
         .equipment = EquipmentFlags::kObserver,
         .extra_vision = 0.75,
-    }},
+        .controls = PetalID::kMissile,
+    } },
     { "Cactus", "Turns your flower poisonous. Enemies will take poison damage on contact",
         15.0, 5.0, 10.0, 1.0, 1, RarityID::kEpic, {
         .poison_damage = { 1.0, 5.0 },
@@ -202,9 +203,10 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .icon_angle = M_PI / 4 + 1
     } },
     { "Moon", "Where did this come from?",
-        1000.0, 1.0, 50.0, 10.0, 1, RarityID::kMythic, {
+        1000.0, 1.0, 90.0, 10.0, 1, RarityID::kLegendary, {
         .secondary_reload = 0.5,
-        .mass = 200
+        .mass = 400,
+        .controls = PetalID::kMoon,
     } },
     { "Lotus", "Absorbs some poison damage taken by the flower",
         5.0, 5.0, 12.0, 2.0, 1, RarityID::kEpic, {
@@ -287,6 +289,20 @@ struct PetalData const PETAL_DATA[PetalID::kNumPetals] = {
         .defend_only = 1,
         .rotation_style = PetalAttributes::kNoRot,
         .spawns = MobID::kTank
+    } },
+    { "Drone", "Use your left mouse button to control the drones",
+        20.0, 20.0, 15.0, 7, 1, RarityID::kLegendary, {
+        .secondary_reload = 0.1,
+        .defend_only = 1,
+        .rotation_style = PetalAttributes::kFollowRot,
+        .controls = PetalID::kDrone,
+    } },
+    { "DestroyerBullet", "You can actually shoot this one",
+        30.0, 70.0, 20.0, 10, 1, RarityID::kEpic, {
+        .secondary_reload = 0.25,
+        .defend_only = 1,
+        .icon_angle = 1,
+        .rotation_style = PetalAttributes::kFollowRot
     } },
 };
 
@@ -451,7 +467,7 @@ struct MobData const MOB_DATA[MobID::kNumMobs] = {
         "Tank",
         "???",
         RarityID::kEpic, {200.0, 400.0}, 20.0, {40.0, 80.0}, 400, {
-        PetalID::kBullet,PetalID::kTankEgg,
+        PetalID::kBullet, PetalID::kTankEgg, PetalID::kDrone, PetalID::kObserver,PetalID::kDestroyerBullet,
     }, {.aggro_radius = 1200 } },
 };
 

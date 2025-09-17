@@ -181,6 +181,7 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
             { MobID::kEvilCentipede, 10000 },
             { MobID::kMassiveBeetle, 2000 },
             { MobID::kAntHole, 2000 },
+            { MobID::kTank, 1000 },
             { MobID::kSquare, 1 }
         },
         .difficulty = 2,

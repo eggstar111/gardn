@@ -965,10 +965,11 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.fill();
             ctx.stroke();
             break;
+        case PetalID::kDestroyerBullet:
         case PetalID::kBullet:
             ctx.set_fill(0xffc0c0c0);
             ctx.set_stroke(0xff909090);
-            ctx.set_line_width(3);
+            ctx.set_line_width(r * 0.15);
             ctx.begin_path();
             ctx.arc(0, 0, r);
             ctx.fill();
@@ -983,6 +984,26 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.set_line_width(3);
             ctx.stroke();
             break;
+        case PetalID::kDrone: {
+            ctx.set_fill(0xffc0c0c0);
+            ctx.set_stroke(0xff909090);
+            float angle_offset = -M_PI / 2; // 顶点朝上
+            ctx.begin_path();
+            for (int i = 0; i < 3; i++) {
+                float angle = i * 2.0f * M_PI / 3.0f + angle_offset;
+                float x = r * cos(angle);
+                float y = r * sin(angle);
+                if (i == 0)
+                    ctx.move_to(x, y);
+                else
+                    ctx.line_to(x, y);
+            }
+            ctx.close_path();
+            ctx.fill();
+            ctx.set_line_width(r * 0.15);
+            ctx.stroke();
+            break;
+        }
         #ifdef DEV
         case PetalID::kM28:
             ctx.begin_path();

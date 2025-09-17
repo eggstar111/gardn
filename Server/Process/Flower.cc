@@ -5,7 +5,7 @@
 #include <Shared/Entity.hh>
 #include <Shared/Simulation.hh>
 #include <Shared/StaticData.hh>
-
+#include <Server/Client.hh>
 #include <cmath>
 
 struct PlayerBuffs {

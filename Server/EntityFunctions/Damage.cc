@@ -111,13 +111,16 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
                 drop.set_x(defender.x + cos(angle) * dist);
                 drop.set_y(defender.y + sin(angle) * dist);
             }
-            if (frand() < 0.01f) {
+            if (frand() < 0.02f) {
                 Entity& ygg = alloc_drop(sim, PetalID::kYggdrasil);
                 float radius = defender.radius + 35;
                 float angle = frand() * 2.0f * M_PI;
                 float dist = radius + frand() * 35.0f;
                 ygg.set_x(defender.x + cos(angle) * dist);
                 ygg.set_y(defender.y + sin(angle) * dist);
+            }
+            if (frand() < 0.02f) {
+                Entity& tank = alloc_mob(sim, MobID::kTank, defender.x, defender.x, NULL_ENTITY);
             }
             // ×·ËÝ¹¥»÷Õß¸¸ÊµÌå
             Entity* attacker = nullptr;

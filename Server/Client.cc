@@ -102,6 +102,64 @@ void Client::on_message(WebSocket* ws, std::string_view message, uint64_t code) 
             else accel.set_magnitude(m / 200 * PLAYER_ACCELERATION);
             player.acceleration = accel;
         }
+        // 先计算鼠标在世界空间的坐标
+        float mouse_world_x = player.x + client->x / camera.fov;
+        float mouse_world_y = player.y + client->y / camera.fov;
+
+        // 遍历玩家装备的花瓣
+        for (uint32_t i = 0; i < player.loadout_count; ++i) {
+            LoadoutSlot const& slot = player.loadout[i];
+            PetalID::T slot_petal_id = slot.get_petal_id();
+            PetalData const& petal_data = PETAL_DATA[slot_petal_id];
+
+            if (petal_data.attributes.controls != PetalID::kNone) {
+                PetalID::T controlled_id = petal_data.attributes.controls;
+
+                simulation->for_each_entity([&](Simulation* sim2, Entity& ent) {
+                    if (ent.parent != player.id) return;          // 必须是该玩家的
+                    if (ent.petal_id != controlled_id) return;    // 必须是被控制的花瓣类型
+
+                    // ==== 检查与其他同类实体的重叠 ====
+                    sim2->for_each_entity([&](Simulation* sim3, Entity& other) {
+                        if (&other == &ent) return;               // 跳过自己
+                        if (other.parent != player.id) return;    // 只管本玩家的
+                        if (other.petal_id != controlled_id) return;
+
+                        float dx = ent.x - other.x;
+                        float dy = ent.y - other.y;
+                        float dist2 = dx * dx + dy * dy;
+                        float min_dist = ent.radius + other.radius;
+
+                        if (dist2 < min_dist * min_dist) {
+                            float dist = sqrt(dist2);
+                            if (dist < 0.0001f) dist = 0.0001f; // 防止除零
+
+                            // 计算分离向量
+                            float overlap = 0.5f * (min_dist - dist);
+                            float nx = dx / dist;
+                            float ny = dy / dist;
+
+                            // 推开双方
+                            ent.x += nx * overlap * 4;
+                            ent.y += ny * overlap * 4;
+                            other.x -= nx * overlap * 4;
+                            other.y -= ny * overlap * 4;
+                        }
+                        });
+
+                    // ==== 控制朝向 ====
+                    Vector aim(mouse_world_x - ent.x, mouse_world_y - ent.y);
+                    
+                        ent.set_angle(aim.angle());
+                    if (BIT_AT(player.input, InputFlags::kDefending)) {
+                        ent.set_angle(aim.angle() + M_PI);
+                    }
+                    });
+
+            }
+        }
+
+
         VALIDATE(validator.validate_uint8());
         player.input = reader.read<uint8_t>();
         //store player's acceleration and input in camera (do not reset ever)

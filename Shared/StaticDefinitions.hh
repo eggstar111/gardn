@@ -91,6 +91,8 @@ namespace PetalID {
         kPoisonWeb,
         kBullet,
         kTankEgg,
+        kDrone,
+        kDestroyerBullet,
         kNumPetals
     };
 };
@@ -238,6 +240,7 @@ struct PetalAttributes {
     float extra_range = 0;
     float extra_vision = 0;
     float armor = 0;
+    PetalID::T controls = PetalID::kNone;
 };
 
 struct PetalData {
