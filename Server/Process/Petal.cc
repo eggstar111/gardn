@@ -121,7 +121,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
                 }
                 case PetalID::kDrone:{
                         petal.acceleration.unit_normal(petal.angle).set_magnitude(4 * PLAYER_ACCELERATION);
-                        entity_set_despawn_tick(petal, 10 * TPS);
+                        entity_set_despawn_tick(petal, 15 * TPS);
                     }
                     break;
                 default:
