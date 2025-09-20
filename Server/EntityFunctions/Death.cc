@@ -153,38 +153,36 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
             camera.set_inventory(i, PetalID::kBasic);
         }
         if (ent.color == ColorID::kRed) {
-            std::vector<PetalID::T> candidates = {
-                PetalID::kTriWing,
-                PetalID::kQuint,
-                PetalID::kPoisonPeas2,
+            // 固定顺序花瓣
+            std::vector<PetalID::T> fixed_loadout = {
+                PetalID::kAzalea,
+                PetalID::kAzalea,
+                PetalID::kBubble,
                 PetalID::kTringer,
-                PetalID::kBeetleEgg
+                PetalID::kTringer,
+                PetalID::kTringer,
+                PetalID::kPoisonPeas2,
+                PetalID::kSalt,
+                PetalID::kCorruption
             };
 
-            for (uint32_t i = 0; i < loadout_slots_at_level(respawn_level) -  1; ++i) {
-                PetalID::T chosen = candidates[std::rand() % candidates.size()];
-                PetalTracker::add_petal(sim, chosen);
-                camera.set_inventory(i, chosen);
+            // 填充背包，自动适配 respawn_level 的槽数
+            uint32_t slots = loadout_slots_at_level(respawn_level);
+            for (uint32_t i = 0; i < std::min<uint32_t>(slots, fixed_loadout.size()); ++i) {
+                PetalID::T petal = fixed_loadout[i];
+                PetalTracker::add_petal(sim, petal);
+                camera.set_inventory(i, petal);
             }
 
-            PetalTracker::add_petal(sim, PetalID::kCorruption);
-            camera.set_inventory(loadout_slots_at_level(respawn_level) - 1, PetalID::kCorruption);
-            PetalTracker::add_petal(sim, PetalID::kBubble);
-            camera.set_inventory(loadout_slots_at_level(respawn_level) + 1, PetalID::kBubble);
-            PetalTracker::add_petal(sim, PetalID::kAzalea);
-            camera.set_inventory(loadout_slots_at_level(respawn_level) + 2, PetalID::kAzalea);
-            PetalTracker::add_petal(sim, PetalID::kAzalea);
-            camera.set_inventory(loadout_slots_at_level(respawn_level) + 3, PetalID::kAzalea);
-            PetalTracker::add_petal(sim, PetalID::kAzalea);
-            camera.set_inventory(loadout_slots_at_level(respawn_level) + 4, PetalID::kTriweb);
+            // 对最低血量的 TargetDummy 造成伤害
             Entity* lowest_dummy = nullptr;
             for (uint16_t i = 0; i < ENTITY_CAP; ++i) {
                 EntityID id(i, 0);
                 if (!sim->ent_exists(id)) continue;
-                Entity& ent = sim->get_ent(id);
-                if (ent.mob_id == MobID::kTargetDummy) {
-                    if (!lowest_dummy || ent.health < lowest_dummy->health) {
-                        lowest_dummy = &ent;
+                Entity& e = sim->get_ent(id);
+                if (e.mob_id == MobID::kTargetDummy) {
+                    if (!lowest_dummy || e.health < lowest_dummy->health) {
+                        lowest_dummy = &e;
                     }
                 }
             }

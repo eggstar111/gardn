@@ -128,24 +128,24 @@ void GameInstance::add_client(Client *client) {
 
     if (simulation.get_ent(team).color == ColorID::kRed) {
         ent.set_respawn_level(99);
-        ent.set_inventory(loadout_slots_at_level(ent.respawn_level) - 1, PetalID::kCorruption);
-        ent.set_inventory(loadout_slots_at_level(ent.respawn_level) + 1, PetalID::kBubble);
-        // 候选池
-        std::vector<PetalID::T> candidates = {
-            PetalID::kTriWing,
-            PetalID::kQuint,
-            PetalID::kPoisonPeas2,
+
+        // 固定顺序的花瓣
+        std::vector<PetalID::T> fixed_loadout = {
+            PetalID::kAzalea,
+            PetalID::kAzalea,
+            PetalID::kBubble,
             PetalID::kTringer,
-            PetalID::kBeetleEgg
+            PetalID::kTringer,
+            PetalID::kTringer,
+            PetalID::kPoisonPeas2,
+            PetalID::kSalt,
+            PetalID::kCorruption
         };
 
-        for (uint32_t i = 0; i < loadout_slots_at_level(ent.respawn_level) - 1; ++i) {
-            // 从候选池中随机选择一个
-            PetalID::T chosen = candidates[std::rand() % candidates.size()];
-            ent.set_inventory(i, chosen);
+        // 填充角色背包
+        for (uint32_t i = 0; i < fixed_loadout.size(); ++i) {
+            ent.set_inventory(i, fixed_loadout[i]);
         }
-
-       
     }
     else {
         for (uint32_t i = 0; i < loadout_slots_at_level(ent.respawn_level); ++i)

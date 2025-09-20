@@ -12,7 +12,7 @@ inline uint32_t const ARENA_WIDTH = 40000;
 inline uint32_t const ARENA_HEIGHT = 4000;
 #endif
 
-inline uint32_t const MAX_SLOT_COUNT = 12;
+inline uint32_t const MAX_SLOT_COUNT = 9;
 inline uint32_t const LEVELS_PER_EXTRA_SLOT = 10;
 inline uint32_t const LEADERBOARD_SIZE = 10;
 inline uint32_t const MAX_PETALS_IN_CLUMP = 5;
