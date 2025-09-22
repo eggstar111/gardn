@@ -19,7 +19,6 @@ static char _get_key_from_code(std::string const &code) {
         {"Delete", 46},{"Digit0", '0'},{"Digit1", '1'},{"Digit2", '2'},
         {"Digit3", '3'},{"Digit4", '4'},{"Digit5", '5'},{"Digit6", '6'},
         {"Digit7", '7'},{"Digit8", '8'},{"Digit9", '9'},{"Enter", '\r'},
-        {"Enter_2", 13},
         {"Equal", '='},{"Escape", 27},{"F1", 112},{"F10", 121},
         {"F11", 122},{"F12", 123},{"F2", 113},{"F3", 114},
         {"F4", 115},{"F5", 116},{"F6", 117},{"F7", 118},{"F8", 119},
@@ -54,6 +53,7 @@ extern "C" {
 
     void key_event(char *code, uint8_t type) {
         char button = _get_key_from_code(std::string(code));
+        printf("key_event: code='%s', key=%d, type=%d\n", code, (int)button, type);
         if (type == 0) {
             Input::keys_held.insert(button);
             Input::keys_held_this_tick.insert(button);
