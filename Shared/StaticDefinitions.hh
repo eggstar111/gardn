@@ -231,6 +231,7 @@ struct PetalAttributes {
     float extra_rot = 0;
     float poison_armor = 0;
     float damage_reflection = 0;
+    float slow_inflict = 0;
 };
 
 struct PetalData {

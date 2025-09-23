@@ -108,6 +108,10 @@ static void make_petal_tooltip(PetalID::T id) {
             new Ui::StaticText(12, "Damage Reflection: ", {.fill = 0xffcde23b, .h_justify = Style::Left }),
             new Ui::StaticText(12, std::format("{:g}%", a.damage_reflection * 100), {.fill = 0xffffffff, .h_justify = Style::Left })
         }, 0, 0, {.h_justify = Style::Left }) : nullptr,
+        a.slow_inflict ? new Ui::HContainer({
+            new Ui::StaticText(12, "Duration: ", {.fill = 0xffcde23b, .h_justify = Style::Left }),
+            new Ui::StaticText(12, std::format("{:g} s", a.slow_inflict), {.fill = 0xffffffff, .h_justify = Style::Left })
+        }, 0, 0, {.h_justify = Style::Left }) : nullptr,
     }, 5, 2);
     tooltip->style.fill = 0x80000000;
     tooltip->style.round_radius = 6;
