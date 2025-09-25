@@ -738,6 +738,11 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.fill();
             ctx.stroke();
             break;
+        case MobID::kFallenFlower: {
+            attr.flower_attrs.radius = attr.radius;
+            draw_static_flower(ctx, attr.flower_attrs);
+            break;
+        };
         default:
             assert(!"Didn't cover mob render");
             break;

@@ -71,6 +71,36 @@ static Entity &__alloc_mob(Simulation *sim, MobID::T mob_id, float x, float y, E
         mob.set_angle(0);
         mob.set_color(ColorID::kGray);
     }
+    if (mob_id == MobID::kFallenFlower) {
+        mob.add_component(kFlower);
+        mob.set_angle(0);
+        mob.set_color(ColorID::kGray);
+        mob.set_score(level_to_score(30));
+        mob.set_loadout_count(loadout_slots_at_level(30));
+        mob.health = mob.max_health = hp_at_level(30);
+        std::vector<PetalID::T> fixed_loadout = {
+           PetalID::kDahlia,
+           PetalID::kSalt,
+           PetalID::kDahlia,
+           PetalID::kBubble,
+           PetalID::kStinger,
+           PetalID::kIris,
+           PetalID::kStinger,
+           PetalID::kDandelion,
+        };
+
+        // Ìî³ä½ÇÉ«±³°ü
+        for (uint32_t i = 0; i < fixed_loadout.size(); ++i) {
+            PetalID::T pid = fixed_loadout[i];
+            mob.set_inventory(i, pid);
+            LoadoutSlot& slot = mob.loadout[i];
+            mob.set_loadout_ids(i, pid);
+            slot.update_id(sim, pid);
+            slot.force_reload();
+        }
+        for (uint32_t i = 0; i < loadout_slots_at_level(30); ++i)
+            PetalTracker::add_petal(sim, mob.get_inventory(i));
+    }
     return mob;
 }
 
@@ -89,7 +119,7 @@ Entity &alloc_mob(Simulation *sim, MobID::T mob_id, float x, float y, EntityID c
                 ant.set_parent(ent.id);
             }
         }
-        else if (mob_id == MobID::kTargetDummy) {
+        else if (mob_id == MobID::kTargetDummy || mob_id == MobID::kFallenFlower) {
             ent.set_angle(0);
         }
         return ent;

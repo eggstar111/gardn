@@ -118,6 +118,7 @@ namespace MobID {
         kDigger,
         kTargetDummy,
         kTank,
+        kFallenFlower,
         kNumMobs
     };
 };

@@ -1243,6 +1243,20 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
             .aggro_radius = 1200
         }
     },
+    {
+        .name = "Flower",
+        .description = "Friend or foe? You'll never know...",
+        .rarity = RarityID::kEpic,
+        .health = {150},
+        .damage = 25.0,
+        .radius = {25},
+        .xp = 1,
+        .drops = {
+        },
+        .attributes = {
+            .aggro_radius = 2000
+        }
+    },
 }};
 
 std::array<StaticArray<float, MAX_DROPS_PER_MOB>, MobID::kNumMobs> const MOB_DROP_CHANCES = [](){

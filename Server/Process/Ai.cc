@@ -322,6 +322,174 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
     }
 }
 
+
+static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
+    ent.input = 0;
+    if (sim->ent_alive(ent.target)) {
+        Entity& target = sim->get_ent(ent.target);
+        Vector v(target.get_x() - ent.get_x(), target.get_y() - ent.get_y());
+        _focus_lose_clause(ent, v);
+        v.set_magnitude(PLAYER_ACCELERATION);
+        {
+            EntityID dandelion_id = NULL_ENTITY;
+            LoadoutSlot& slot = ent.loadout[7];
+            if (sim->ent_alive(slot.petals[0].ent_id)) {
+                Entity& petal = sim->get_ent(slot.petals[0].ent_id);
+                if (petal.has_component(kPetal) && petal.get_petal_id() == PetalID::kDandelion && !BitMath::at(petal.flags, EntityFlags::kIsDespawning))
+                    dandelion_id = petal.id;
+            }
+            if (dandelion_id != NULL_ENTITY) {
+                Entity& dandelion = sim->get_ent(dandelion_id);
+
+                // --- 预测目标位置 ---
+                Vector simulated_target_pos(target.get_x(), target.get_y());
+                Vector simulated_target_vel(target.velocity.x, target.velocity.y);
+                int MAX_ITER = 20;          // 预测步数
+                float BULLET_SPEED = 4.0f * PLAYER_ACCELERATION; // 蒲公英加速度
+                Vector spawn_pos(dandelion.get_x(), dandelion.get_y());
+
+                for (int i = 0; i < MAX_ITER; ++i) {
+                    Vector to_target = simulated_target_pos - spawn_pos;
+                    to_target.set_magnitude(BULLET_SPEED);
+                    simulated_target_pos += simulated_target_vel;
+                    spawn_pos += to_target;
+                }
+
+                // 计算花瓣到预测目标的向量
+                Vector predicted_v(simulated_target_pos.x - dandelion.get_x(),
+                    simulated_target_pos.y - dandelion.get_y());
+
+                // 判断花瓣角度是否指向预测目标（允许误差 ±15°）
+                float delta_angle = fabs(dandelion.get_angle() - predicted_v.angle());
+                if (delta_angle < M_PI / 12) BitMath::set(ent.input, InputFlags::kAttacking);
+            }
+        }
+        if (ent.health / ent.max_health > 0.4) {
+            if (sim->ent_alive(ent.loadout[3].petals[0].ent_id)) {
+                Entity& bubble = sim->get_ent(ent.loadout[3].petals[0].ent_id);
+
+                // 从花瓣到玩家本体的向量
+                Vector petal_to_player(ent.get_x() - bubble.get_x(), ent.get_y() - bubble.get_y());
+
+                // 花瓣到玩家的向量与花瓣到目标的向量
+                Vector petal_to_target(target.get_x() - bubble.get_x(), target.get_y() - bubble.get_y());
+
+                // 判断是否大致指向目标（误差 ±15°）
+                float delta_angle = fabs(petal_to_player.angle() - petal_to_target.angle());
+                if (delta_angle < M_PI / 12 && (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude() >= 180.0f) {
+                    BitMath::set(ent.input, InputFlags::kDefending);
+                }
+            }
+            float player_to_target_dist = (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude();
+            float min_dist = ent.get_radius() + 150.0f;  // 默认最小安全距离
+
+            bool attack_allowed = false;
+            for (int i = 4; i <= 6; ++i) {
+                if (sim->ent_alive(ent.loadout[i].petals[0].ent_id)) {
+                    Entity& petal = sim->get_ent(ent.loadout[i].petals[0].ent_id);
+
+                    // 扇区中心角 = 当前位置 + 玩家全局 heading
+                    float sector_angle = 0.0f;
+                    sector_angle = 2.0f * M_PI * i / 8 + ent.heading_angle;
+
+                    // 目标相对于玩家的角度（而不是花瓣位置角）
+                    float target_angle = atan2(target.get_y() - ent.get_y(), target.get_x() - ent.get_x());
+
+                    // 计算两者的最小夹角
+                    float delta_angle = fmodf(fabs(sector_angle - target_angle), 2.0f * M_PI);
+                    if (delta_angle > M_PI) delta_angle = 2.0f * M_PI - delta_angle;
+
+                    const float sector_half_width = M_PI / 12.0f; // 30° 扇区
+                    if (delta_angle <= sector_half_width) {
+                        attack_allowed = true;
+                        break; // 只要一个扇区对准即可
+                    }
+                }
+            }
+
+            // 根据距离与花瓣扇区决定动作
+            if (attack_allowed) BitMath::set(ent.input, InputFlags::kAttacking);
+            else if (!attack_allowed) min_dist = ent.get_radius() + 180.0f;
+
+            // 如果玩家离目标太近，保持安全距离
+            if (player_to_target_dist < min_dist) v *= -1;
+        }
+        else {
+            if (sim->ent_alive(ent.loadout[3].petals[0].ent_id)) {
+                Entity& bubble = sim->get_ent(ent.loadout[3].petals[0].ent_id);
+
+                // 向量：目标 → 玩家本体
+                Vector target_to_player(ent.get_x() - target.get_x(), ent.get_y() - target.get_y());
+
+                // 向量：目标 → 泡泡
+                Vector target_to_bubble(bubble.get_x() - target.get_x(), bubble.get_y() - target.get_y());
+
+                // 计算方向差
+                float delta_angle = fabs(target_to_player.angle() - target_to_bubble.angle());
+
+                // 阈值 ±15°，如果泡泡沿着目标→本体射线 → 防守
+                if (delta_angle < M_PI / 12) BitMath::set(ent.input, InputFlags::kDefending);
+            }
+            v *= -1;
+            bool attack_allowed = false;
+            for (int i = 4; i <= 6; ++i) {
+                if (sim->ent_alive(ent.loadout[i].petals[0].ent_id)) {
+                    Entity& petal = sim->get_ent(ent.loadout[i].petals[0].ent_id);
+
+                    // 扇区中心角 = 当前位置 + 玩家全局 heading
+                    float sector_angle = 0.0f;
+                    sector_angle = 2.0f * M_PI * i / 8 + ent.heading_angle;
+
+                    // 目标相对于玩家的角度（而不是花瓣位置角）
+                    float target_angle = atan2(target.get_y() - ent.get_y(), target.get_x() - ent.get_x());
+
+                    // 计算两者的最小夹角
+                    float delta_angle = fmodf(fabs(sector_angle - target_angle), 2.0f * M_PI);
+                    if (delta_angle > M_PI) delta_angle = 2.0f * M_PI - delta_angle;
+
+                    const float sector_half_width = M_PI / 12.0f; // 30° 扇区
+                    if (delta_angle <= sector_half_width) {
+                        attack_allowed = true;
+                        break; // 只要一个扇区对准即可
+                    }
+                }
+            }
+
+            // 根据距离与花瓣扇区决定动作
+            if (attack_allowed) BitMath::set(ent.input, InputFlags::kAttacking);
+        }
+        ent.acceleration = v;
+        ent.set_angle(v.angle());
+        return;
+    }
+    else {
+        if (!(ent.target == NULL_ENTITY)) {
+            ent.ai_state = AIState::kIdle;
+            ent.ai_tick = 0;
+            ent.target = NULL_ENTITY;
+        }
+        ent.target = find_nearest_enemy(sim, ent, ent.detection_radius + ent.get_radius());
+        switch (ent.ai_state) {
+        case AIState::kIdle: {
+            ent.set_angle(frand() * M_PI * 2);
+            ent.ai_state = AIState::kIdleMoving;
+            ent.ai_tick = 0;
+            break;
+        }
+        case AIState::kIdleMoving: {
+            if (ent.ai_tick > 5 * TPS)
+                ent.ai_state = AIState::kIdle;
+            ent.acceleration.unit_normal(ent.get_angle()).set_magnitude(PLAYER_ACCELERATION);
+            break;
+        }
+        case AIState::kReturning: {
+            default_tick_returning(sim, ent);
+            break;
+        }
+        }
+    }
+}
+
 static void tick_centipede_passive(Simulation *sim, Entity &ent) {
     switch(ent.ai_state) {
         case AIState::kIdle: {
@@ -593,6 +761,9 @@ void tick_ai_behavior(Simulation *sim, Entity &ent) {
             break;
         case MobID::kTank:
             tick_tank_aggro(sim, ent);
+            break;
+        case MobID::kFallenFlower:
+            tick_fallenflower_aggro(sim, ent);
             break;
         default:
             break;
