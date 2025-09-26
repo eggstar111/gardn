@@ -460,6 +460,32 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
             // 根据距离与花瓣扇区决定动作
             if (attack_allowed && (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude() <= 200.0f ) BitMath::set(ent.input, InputFlags::kAttacking);
         }
+        const float margin = 120.0f;            // 安全距离
+        const float wall_push_strength = 0.7f; // 推力比例
+
+        Vector push(0, 0);
+
+        // 左墙
+        float dist_left = ent.get_x() - MAP_DATA[0].left;
+        if (dist_left < margin) push.x += wall_push_strength * (margin - dist_left);
+
+        // 右墙
+        float dist_right = MAP_DATA[6].right - ent.get_x();
+        if (dist_right < margin) push.x -= wall_push_strength * (margin - dist_right);
+
+        // 上墙
+        float dist_top = ent.get_y() - MAP_DATA[0].top;
+        if (dist_top < margin) push.y += wall_push_strength * (margin - dist_top);
+
+        // 下墙
+        float dist_bottom = MAP_DATA[0].bottom - ent.get_y();
+        if (dist_bottom < margin) push.y -= wall_push_strength * (margin - dist_bottom);
+
+        // 将推力叠加到原有逃离向量
+        v += push;
+
+        v.unit_normal(v.angle()).set_magnitude(PLAYER_ACCELERATION);
+
         ent.acceleration = v;
         ent.set_angle(v.angle());
         return;
