@@ -148,14 +148,14 @@ std::array<struct PetalData, PetalID::kNumPetals> const PETAL_DATA = {{
     {
         .name = "Dandelion",
         .description = "Its interesting properties prevent healing effects on affected units",
-        .health = 10.0,
+        .health = 25.0,
         .damage = 10.0,
         .radius = 10.0,
         .reload = 1.0,
         .count = 1,
         .rarity = RarityID::kRare,
         .attributes = {
-            .secondary_reload = 0.5,
+            .secondary_reload = 0.1,
             .defend_only = 1,
             .icon_angle = 1,
             .rotation_style = PetalAttributes::kFollowRot
@@ -838,7 +838,7 @@ std::array<struct PetalData, PetalID::kNumPetals> const PETAL_DATA = {{
         .health = 30.0,
         .damage = 70.0,
         .radius = 20.0,
-        .reload = 10.0,
+        .reload = 5.0,
         .count = 1,
         .rarity = RarityID::kEpic,
         .attributes = {
@@ -1244,8 +1244,8 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         }
     },
     {
-        .name = "Flower",
-        .description = "Friend or foe? You'll never know...",
+        .name = "Fallen Flower",
+        .description = "Legend has it that if you win a 1v5 Fallen Flower match, you can summon Wata.",
         .rarity = RarityID::kEpic,
         .health = {150},
         .damage = 25.0,

@@ -42,12 +42,12 @@ struct AsymmetricBattle::AsymmetricBattleInternal {
             Simulation& sim = game_instance->simulation;
             auto& team_manager = game_instance->get_team_manager();
 
-            Entity& blue_team = sim.get_ent(team_manager.get_team(0));
+            Entity& yellow_team = sim.get_ent(team_manager.get_team(0));
             Entity& red_team = sim.get_ent(team_manager.get_team(1));
 
-            uint32_t blue_count = blue_team.player_count;
+            uint32_t yellow_count = yellow_team.player_count;
             uint32_t red_count = red_team.player_count;
-            if (red_count * 6 > blue_count + 6) {
+            if (red_count * 6 > yellow_count + 6) {
                 Entity* worst_player = nullptr;
                 int lowest_score = INT_MAX;
 
@@ -68,35 +68,35 @@ struct AsymmetricBattle::AsymmetricBattleInternal {
 
                 if (worst_player) {
                     Entity& old_camera = sim.get_ent(worst_player->get_parent());
-                    old_camera.set_color(ColorID::kBlue);
-                    old_camera.set_team(blue_team.id);
+                    old_camera.set_color(ColorID::kYellow);
+                    old_camera.set_team(yellow_team.id);
                     old_camera.set_player(worst_player->id);
                     for (uint32_t i = 0; i < MAX_SLOT_COUNT * 2; ++i) {
                         worst_player->set_loadout_ids(i, PetalID::kNone);
                         old_camera.set_inventory(i, PetalID::kNone);
                     }
-                    worst_player->set_color(ColorID::kBlue);
-                    worst_player->set_team(blue_team.id);
+                    worst_player->set_color(ColorID::kYellow);
+                    worst_player->set_team(yellow_team.id);
                     worst_player->set_parent(old_camera.id);
                     worst_player->set_score(4000);
                     worst_player->health = 0;
-                    blue_team.player_count++;
+                    yellow_team.player_count++;
                     red_team.player_count--;
-                    game_instance->broadcast_message("A RED player has been forced to join BLUE for balance");
+                    game_instance->broadcast_message("A RED player has been forced to join Yellow for balance");
                 }
             }
-            if (blue_count  > red_count * 6 + 6) {
+            if (yellow_count  > red_count * 6 + 6) {
                 Entity* worst_player = nullptr;
                 int lowest_score = INT_MAX;
 
-                // 找分数最低的蓝队玩家
+                // 找分数最低的黄队玩家
                 for (uint16_t i = 0; i < ENTITY_CAP; ++i) {
                     EntityID id(i, 0);
                     Entity& ent = sim.get_ent(id);
                     Entity* cam = sim.ent_alive(ent.get_parent()) ? &sim.get_ent(ent.get_parent()) : nullptr;
 
                     if (!ent.has_component(kFlower)) continue;
-                    if (ent.get_color() != ColorID::kBlue) continue;
+                    if (ent.get_color() != ColorID::kYellow) continue;
 
                     int score = ent.get_score();
                     if (score < lowest_score) {
@@ -121,10 +121,10 @@ struct AsymmetricBattle::AsymmetricBattleInternal {
                     worst_player->set_parent(old_camera.id);
                     worst_player->set_score(4000);
                     worst_player->health = 0;
-                    blue_team.player_count--;
+                    yellow_team.player_count--;
                     red_team.player_count++;
 
-                    game_instance->broadcast_message("A BLUE player has been forced to join RED for balance");
+                    game_instance->broadcast_message("A Yellow player has been forced to join RED for balance");
                 }
             }
         }
@@ -135,7 +135,7 @@ struct AsymmetricBattle::AsymmetricBattleInternal {
             last_broadcast_second = countdown_seconds;
         }
 
-        // 先检测场上是否存在 TargetDummy（若不存在 -> BLUE 胜利）
+        // 先检测场上是否存在 TargetDummy（若不存在 -> yellow 胜利）
         {
             bool dummy_exists = false;
             Simulation& sim = game_instance->simulation;
@@ -149,11 +149,11 @@ struct AsymmetricBattle::AsymmetricBattleInternal {
                 }
             }
             if (!dummy_exists) {
-                // BLUE 胜利
+                // yellow 胜利
                 finished = true;
                 finish_time = steady_clock::now(); // 记录结束时间
-                winner_color = static_cast<int>(ColorID::kBlue);
-                game_instance->broadcast_message("BLUE HAS WON THE GAME!");
+                winner_color = static_cast<int>(ColorID::kYellow);
+                game_instance->broadcast_message("YELLOW HAS WON THE GAME!");
                 // 立刻也对输家执行一次击杀（后续每帧也会继续杀）
                 kill_losers_continuously();
                 return;

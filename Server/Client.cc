@@ -342,26 +342,6 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
             alloc_mob(simulation, id, x, y, player.get_team());
         }
     }
-    else if (command == "spawnenemy") {
-        MobID::T id;
-        while (iss >> arg) {
-            try { id = std::stoi(arg); }
-            catch (const std::invalid_argument&) { continue; }
-            catch (const std::out_of_range&) { continue; }
-            if (id >= MobID::kNumMobs) continue;
-            alloc_mob(simulation, id, player.get_x(), player.get_y(), player.id);
-        }
-    }
-    else if (command == "spawnenemyto") {
-        MobID::T id;
-        while (iss >> arg) {
-            try { id = std::stoi(arg); }
-            catch (const std::invalid_argument&) { continue; }
-            catch (const std::out_of_range&) { continue; }
-            if (id >= MobID::kNumMobs) continue;
-            alloc_mob(simulation, id, x, y, player.id);
-        }
-    }
     else if (command == "killallmobs") {
         for (uint16_t i = 0; i < ENTITY_CAP; ++i) {
             EntityID id(i, 0);
@@ -387,7 +367,7 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
             player.immunity_ticks = 0;
         }
     }
-    else if (command == "bbck") {
+    else if (command == "bbht") {
         std::vector<PetalID::T> fixed_loadout = {
            PetalID::kDahlia,
            PetalID::kSalt,

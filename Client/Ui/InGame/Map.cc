@@ -59,7 +59,7 @@ void Minimap::on_render(Renderer& ctx) {
 
     // 绘制摄像机自己在最前面
     ctx.set_fill(0xffffe763);
-    ctx.set_stroke(Renderer::HSV(0xffffe763, 0.8));
+    ctx.set_stroke(0xff000000);
     ctx.set_line_width(ARENA_WIDTH / 120);
     ctx.begin_path();
     ctx.arc(camera.get_camera_x(), camera.get_camera_y(), ARENA_WIDTH / 60);

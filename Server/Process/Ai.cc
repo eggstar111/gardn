@@ -359,12 +359,11 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
                 Vector predicted_v(simulated_target_pos.x - dandelion.get_x(),
                     simulated_target_pos.y - dandelion.get_y());
 
-                // 判断花瓣角度是否指向预测目标（允许误差 ±15°）
                 float delta_angle = fabs(dandelion.get_angle() - predicted_v.angle());
-                if (delta_angle < M_PI / 12) BitMath::set(ent.input, InputFlags::kAttacking);
+                if (delta_angle < M_PI / 18) BitMath::set(ent.input, InputFlags::kAttacking);
             }
         }
-        if (ent.health / ent.max_health > 0.4) {
+        if (ent.health / ent.max_health  > 0.35 || ent.health / ent.max_health >= target.health / target.max_health + 0.1) {
             if (sim->ent_alive(ent.loadout[3].petals[0].ent_id)) {
                 Entity& bubble = sim->get_ent(ent.loadout[3].petals[0].ent_id);
 
@@ -376,12 +375,12 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
 
                 // 判断是否大致指向目标（误差 ±15°）
                 float delta_angle = fabs(petal_to_player.angle() - petal_to_target.angle());
-                if (delta_angle < M_PI / 12 && (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude() >= 180.0f) {
+                if (delta_angle < M_PI / 12 && (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude() >= 150.0f) {
                     BitMath::set(ent.input, InputFlags::kDefending);
                 }
             }
             float player_to_target_dist = (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude();
-            float min_dist = ent.get_radius() + 150.0f;  // 默认最小安全距离
+            float min_dist = ent.get_radius() + 180.0f;  // 默认最小安全距离
 
             bool attack_allowed = false;
             for (int i = 4; i <= 6; ++i) {
@@ -399,7 +398,7 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
                     float delta_angle = fmodf(fabs(sector_angle - target_angle), 2.0f * M_PI);
                     if (delta_angle > M_PI) delta_angle = 2.0f * M_PI - delta_angle;
 
-                    const float sector_half_width = M_PI / 12.0f; // 30° 扇区
+                    const float sector_half_width = M_PI / 5.0f; // 30° 扇区
                     if (delta_angle <= sector_half_width) {
                         attack_allowed = true;
                         break; // 只要一个扇区对准即可
@@ -408,9 +407,10 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
             }
 
             // 根据距离与花瓣扇区决定动作
-            if (attack_allowed) BitMath::set(ent.input, InputFlags::kAttacking);
-            else if (!attack_allowed) min_dist = ent.get_radius() + 180.0f;
-
+            if (attack_allowed) {
+                BitMath::set(ent.input, InputFlags::kAttacking);
+                min_dist = ent.get_radius() + 50.0f;
+            }
             // 如果玩家离目标太近，保持安全距离
             if (player_to_target_dist < min_dist) v *= -1;
         }
@@ -418,17 +418,20 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
             if (sim->ent_alive(ent.loadout[3].petals[0].ent_id)) {
                 Entity& bubble = sim->get_ent(ent.loadout[3].petals[0].ent_id);
 
-                // 向量：目标 → 玩家本体
-                Vector target_to_player(ent.get_x() - target.get_x(), ent.get_y() - target.get_y());
+                Vector tp(ent.get_x() - target.get_x(), ent.get_y() - target.get_y());
 
                 // 向量：目标 → 泡泡
-                Vector target_to_bubble(bubble.get_x() - target.get_x(), bubble.get_y() - target.get_y());
+                Vector tb(bubble.get_x() - target.get_x(), bubble.get_y() - target.get_y());
 
-                // 计算方向差
-                float delta_angle = fabs(target_to_player.angle() - target_to_bubble.angle());
+                // 1. 泡泡是否大致在同一方向上
+                float delta_angle = fabs(tp.angle() - tb.angle());
+                if (delta_angle > M_PI) delta_angle = 2 * M_PI - delta_angle;
 
-                // 阈值 ±15°，如果泡泡沿着目标→本体射线 → 防守
-                if (delta_angle < M_PI / 12) BitMath::set(ent.input, InputFlags::kDefending);
+                // 2. 泡泡到目标的投影长度
+                float proj = (tb.x * tp.x + tb.y * tp.y) / tp.magnitude();
+
+                // 3. 判定条件：角度接近，且泡泡在目标和玩家之间
+                if (delta_angle < M_PI / 24 && proj > 0 && proj < tp.magnitude()) BitMath::set(ent.input, InputFlags::kDefending);
             }
             v *= -1;
             bool attack_allowed = false;
@@ -454,9 +457,8 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
                     }
                 }
             }
-
             // 根据距离与花瓣扇区决定动作
-            if (attack_allowed) BitMath::set(ent.input, InputFlags::kAttacking);
+            if (attack_allowed && (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude() <= 200.0f ) BitMath::set(ent.input, InputFlags::kAttacking);
         }
         ent.acceleration = v;
         ent.set_angle(v.angle());

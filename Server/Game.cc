@@ -75,7 +75,7 @@ void GameInstance::init() {
     for (uint32_t i = 0; i < ENTITY_CAP / 2; ++i)
         Map::spawn_random_mob(&simulation, frand() * ARENA_WIDTH, frand() * ARENA_HEIGHT);
     #ifdef GAMEMODE_TDM
-    team_manager.add_team(ColorID::kBlue);
+    team_manager.add_team(ColorID::kYellow);
     team_manager.add_team(ColorID::kRed);
     for (uint32_t i = 0; i < 5; ++i) {
         float x = lerp(MAP_DATA[3].left, MAP_DATA[3].right, (i + 0.5f) / 5.0f);

@@ -22,7 +22,7 @@ void GalleryMob::on_render(Renderer &ctx) {
     ctx.round_rect(-width / 2, -height / 2, width, height, style.round_radius);
     ctx.clip();
     struct MobData const &data = MOB_DATA[id];
-    if (id != MobID::kDigger)
+    if (id != MobID::kDigger && id != MobID::kFallenFlower)
         ctx.rotate(-3*M_PI/4);
     if (id == MobID::kBeetle || id == MobID::kMassiveBeetle)
         ctx.translate(-5,0);
