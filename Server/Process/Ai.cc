@@ -191,9 +191,9 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
         _focus_lose_clause(ent, v);
         float dist = v.magnitude();
 
-        // ÔË¶¯Âß¼­
+        //  Ë¶  ß¼ 
         if (dist < 380) {
-            v.set_magnitude(-PLAYER_ACCELERATION * 0.35f); // ·´Ïò¼ÓËÙ¶È
+            v.set_magnitude(-PLAYER_ACCELERATION * 0.35f); //       Ù¶ 
             ent.acceleration = v;
         }
         else if (dist > 400) {
@@ -201,23 +201,23 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
             ent.acceleration = v;
         }
         else {
-            Vector circle_v(v.y, -v.x); // ÓÒÊÖ·¨ÏòÁ¿£¬Ë³Ê±Õë
+            Vector circle_v(v.y, -v.x); //    Ö·       Ë³Ê±  
             circle_v.set_magnitude(PLAYER_ACCELERATION * 0.7f);
             ent.acceleration = circle_v;
         }
 
-        // --- Ä¿±êÎ»ÖÃÔ¤²âÓëÉä»÷Âß¼­ ---
+        // --- Ä¿  Î»  Ô¤        ß¼  ---
         const float BULLET_ACCEL = 4.0f * PLAYER_ACCELERATION;
         const float BULLET_FRICTION = DEFAULT_FRICTION * 1.5f;
         const float offset = ent.get_radius() * 1.8f;
         const int MAX_ITERATIONS = 50;
 
-        // ×Óµ¯µÄ·¢Éäµã
+        //  Óµ  Ä·    
         Vector spawn_offset;
         spawn_offset.unit_normal(ent.get_angle()).set_magnitude(offset);
         Vector bullet_spawn_pos(ent.get_x() + spawn_offset.x, ent.get_y() + spawn_offset.y);
 
-        // ¸´ÖÆÄ¿±ê³õÊ¼×´Ì¬
+        //     Ä¿   Ê¼×´Ì¬
         Vector simulated_target_pos = Vector(target.get_x(), target.get_y());
         Vector simulated_target_vel = Vector(target.velocity.x, target.velocity.y);
         int simulated_target_slow_ticks = target.slow_ticks;
@@ -225,14 +225,14 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
         float lower_bound = 0.0f;
         float upper_bound = (Vector(target.get_x(), target.get_y()) - bullet_spawn_pos).magnitude() / 10.0f;
 
-        // ¶þ·Ö²éÕÒ×î¼Ñ·ÉÐÐÊ±¼ä
+        //    Ö²     Ñ·   Ê±  
         for (int i = 0; i < MAX_ITERATIONS; ++i) {
             float mid_time = (lower_bound + upper_bound) / 2.0f;
             if (mid_time < 0.01f) {
                 break;
             }
 
-            // Ä£ÄâÄ¿±êºÍ×Óµ¯µ½ mid_time
+            // Ä£  Ä¿    Óµ    mid_time
             Vector current_target_pos = simulated_target_pos;
             Vector current_target_vel = simulated_target_vel;
             int current_target_slow_ticks = simulated_target_slow_ticks;
@@ -240,7 +240,7 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
             Vector current_bullet_vel = Vector(0, 0);
             Vector current_bullet_pos = bullet_spawn_pos;
 
-            // ÁÙÊ±Ô¤²â·½Ïò£¬ÓÃÓÚ×Óµ¯¼ÓËÙ¶È
+            //   Ê±Ô¤ â·½       Óµ    Ù¶ 
             Vector temp_predicted_v = Vector(current_target_pos.x - ent.get_x(), current_target_pos.y - ent.get_y());
 
             for (int frame = 0; frame < (int)ceil(mid_time); ++frame) {
@@ -253,7 +253,7 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
                 current_target_pos += current_target_vel;
 
                 current_bullet_vel *= (1.0f - BULLET_FRICTION);
-                current_bullet_vel += temp_predicted_v.unit_normal(temp_predicted_v.angle()) * BULLET_ACCEL * 1.0f; // 1.0f ¶ÔÓ¦ BULLET_SPEED_RATIO
+                current_bullet_vel += temp_predicted_v.unit_normal(temp_predicted_v.angle()) * BULLET_ACCEL * 1.0f; // 1.0f   Ó¦ BULLET_SPEED_RATIO
                 current_bullet_pos += current_bullet_vel;
             }
 
@@ -268,7 +268,7 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
             }
         }
 
-        // ÕÒµ½×î¼Ñ·ÉÐÐÊ±¼äºó£¬ÔÙ´ÎÄ£ÄâÄ¿±êµ½¸ÃÊ±¼äµã
+        //  Òµ   Ñ·   Ê±    Ù´ Ä£  Ä¿ êµ½  Ê±   
         float final_flight_time = lower_bound;
         Vector final_target_pos = simulated_target_pos;
         Vector final_target_vel = simulated_target_vel;
@@ -284,11 +284,11 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
             final_target_pos += final_target_vel;
         }
 
-        // Ô¤²âÏòÁ¿
+        // Ô¤      
         Vector predicted_v(final_target_pos.x - ent.get_x(), final_target_pos.y - ent.get_y());
         ent.set_angle(predicted_v.angle());
 
-        // Éä»÷
+        //    
         if (ent.ai_tick >= 0.5f * TPS && dist < 800) {
             ent.ai_tick = 0;
             Entity& bullet = alloc_petal(sim, PetalID::kBullet, ent);
@@ -306,7 +306,7 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
 
             bullet.acceleration.unit_normal(predicted_v.angle()).set_magnitude(BULLET_ACCEL);
 
-            // ºó×øÁ¦
+            //       
             Vector kb;
             kb.unit_normal(ent.get_angle() - M_PI).set_magnitude(2.5f * PLAYER_ACCELERATION);
             ent.velocity += kb;
@@ -345,11 +345,11 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
             if (dandelion_id != NULL_ENTITY) {
                 Entity& dandelion = sim->get_ent(dandelion_id);
 
-                // --- Ô¤²âÄ¿±êÎ»ÖÃ ---
+                // --- Ô¤  Ä¿  Î»   ---
                 Vector simulated_target_pos(target.get_x(), target.get_y());
                 Vector simulated_target_vel(target.velocity.x, target.velocity.y);
-                int MAX_ITER = 20;          // Ô¤²â²½Êý
-                float BULLET_SPEED = 4.0f * PLAYER_ACCELERATION; // ÆÑ¹«Ó¢¼ÓËÙ¶È
+                int MAX_ITER = 20;          // Ô¤ â²½  
+                float BULLET_SPEED = 4.0f * PLAYER_ACCELERATION; //  Ñ¹ Ó¢   Ù¶ 
                 Vector spawn_pos(dandelion.get_x(), dandelion.get_y());
 
                 for (int i = 0; i < MAX_ITER; ++i) {
@@ -359,7 +359,7 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
                     spawn_pos += to_target;
                 }
 
-                // ¼ÆËã»¨°êµ½Ô¤²âÄ¿±êµÄÏòÁ¿
+                //    ã»¨ êµ½Ô¤  Ä¿       
                 Vector predicted_v(simulated_target_pos.x - dandelion.get_x(),
                     simulated_target_pos.y - dandelion.get_y());
 
@@ -371,13 +371,13 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
             if (sim->ent_alive(ent.loadout[3].petals[0].ent_id)) {
                 Entity& bubble = sim->get_ent(ent.loadout[3].petals[0].ent_id);
 
-                // ´Ó»¨°êµ½Íæ¼Ò±¾ÌåµÄÏòÁ¿
+                //  Ó»  êµ½  Ò±        
                 Vector petal_to_player(ent.get_x() - bubble.get_x(), ent.get_y() - bubble.get_y());
 
-                // »¨°êµ½Íæ¼ÒµÄÏòÁ¿Óë»¨°êµ½Ä¿±êµÄÏòÁ¿
+                //    êµ½  Òµ      ë»¨ êµ½Ä¿       
                 Vector petal_to_target(target.get_x() - bubble.get_x(), target.get_y() - bubble.get_y());
 
-                // ÅÐ¶ÏÊÇ·ñ´óÖÂÖ¸ÏòÄ¿±ê£¨Îó²î ¡À15¡ã£©
+                //  Ð¶  Ç·    Ö¸  Ä¿ ê£¨      15 ã£©
                 float delta_angle = fabs(petal_to_player.angle() - petal_to_target.angle());
                 if (delta_angle < M_PI / 24 && (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude() >= 150.0f) {
                     BitMath::set(ent.input, InputFlags::kDefending);
@@ -385,48 +385,48 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
                 }
             }
             float player_to_target_dist = (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude();
-            float min_dist = ent.get_radius() + 180.0f;  // Ä¬ÈÏ×îÐ¡°²È«¾àÀë
+            float min_dist = ent.get_radius() + 180.0f;  // Ä¬    Ð¡  È«    
             bool attack_allowed = false;
 
             const float sector_half_width = M_PI / 6.0f;
-            const float prediction_margin = M_PI / 8.0f; // Ô¤²âÌáÇ°½Ç 10¡ã£¨¿Éµ÷£©
+            const float prediction_margin = M_PI / 8.0f; // Ô¤    Ç°   10 ã£¨ Éµ   
 
             for (int i = 4; i <= 6; ++i) {
                 if (!sim->ent_alive(ent.loadout[i].petals[0].ent_id)) continue;
 
                 Entity& petal = sim->get_ent(ent.loadout[i].petals[0].ent_id);
 
-                // ÉÈÇøÖÐÐÄ½Ç = µ±Ç°Î»ÖÃ + Íæ¼ÒÈ«¾Ö heading
+                //        Ä½  =   Ç°Î»   +    È«   heading
                 float sector_angle = 2.0f * M_PI * i / 8 + ent.heading_angle;
 
-                // Ä¿±êÏà¶ÔÓÚÍæ¼ÒµÄ½Ç¶È
+                // Ä¿         ÒµÄ½Ç¶ 
                 float target_angle = atan2(target.get_y() - ent.get_y(), target.get_x() - ent.get_x());
 
-                // ¼ÆËã×îÐ¡¼Ð½Ç [-¦Ð, ¦Ð]
+                //       Ð¡ Ð½  [-  ,   ]
                 float delta_angle = target_angle - sector_angle;
                 while (delta_angle > M_PI) delta_angle -= 2.0f * M_PI;
                 while (delta_angle < -M_PI) delta_angle += 2.0f * M_PI;
 
-                // ÅÐ¶ÏÊÇ·ñÔÚÉÈÇø
+                //  Ð¶  Ç·       
                 if (fabs(delta_angle) <= sector_half_width) {
                     attack_allowed = true;
-                    min_dist = ent.get_radius() + 70.0f; // Õý³£×îÐ¡¾àÀë
-                    break; // Ö»ÒªÒ»¸öÉÈÇø¶Ô×¼¼´¿É
+                    min_dist = ent.get_radius() + 70.0f; //       Ð¡    
+                    break; // Ö»ÒªÒ»        ×¼    
                 }
-                // Ô¤²âÌáÇ°£ºÄ¿±êÔÚÉÈÇøÇ°·½£¨·½ÏòÒ»ÖÂ£©ÇÒ¼´½«½øÈë
+                // Ô¤    Ç°  Ä¿        Ç°        Ò» Â£  Ò¼       
                 else if (delta_angle > 0 && delta_angle <= sector_half_width + prediction_margin) {
-                    min_dist = ent.get_radius() + 155.0f; // ÌáÇ°¼õÐ¡×îÐ¡¾àÀë
-                    // ²»¸Ä±ä attack_allowed£¬ÈÔÐèÉÈÇøÍêÈ«¶Ô×¼²Å¹¥»÷
+                    min_dist = ent.get_radius() + 155.0f; //   Ç°  Ð¡  Ð¡    
+                    //    Ä±  attack_allowed            È«  ×¼ Å¹   
                 }
             }
 
 
-            // ¸ù¾Ý¾àÀëÓë»¨°êÉÈÇø¾ö¶¨¶¯×÷
+            //    Ý¾    ë»¨              
             if (attack_allowed) {
                 BitMath::set(ent.input, InputFlags::kAttacking);
                 min_dist = ent.get_radius() + 90.0f;
             }
-            // Èç¹ûÍæ¼ÒÀëÄ¿±êÌ«½ü£¬±£³Ö°²È«¾àÀë
+            //         Ä¿  Ì«       Ö° È«    
             if (player_to_target_dist < min_dist) v *= -1;
         }
         else {
@@ -435,17 +435,17 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
 
                 Vector tp(ent.get_x() - target.get_x(), ent.get_y() - target.get_y());
 
-                // ÏòÁ¿£ºÄ¿±ê ¡ú ÅÝÅÝ
+                //       Ä¿          
                 Vector tb(bubble.get_x() - target.get_x(), bubble.get_y() - target.get_y());
 
-                // 1. ÅÝÅÝÊÇ·ñ´óÖÂÔÚÍ¬Ò»·½ÏòÉÏ
+                // 1.      Ç·      Í¬Ò»      
                 float delta_angle = fabs(tp.angle() - tb.angle());
                 if (delta_angle > M_PI) delta_angle = 2 * M_PI - delta_angle;
 
-                // 2. ÅÝÅÝµ½Ä¿±êµÄÍ¶Ó°³¤¶È
+                // 2.    Ýµ Ä¿   Í¶Ó°    
                 float proj = (tb.x * tp.x + tb.y * tp.y) / tp.magnitude();
 
-                // 3. ÅÐ¶¨Ìõ¼þ£º½Ç¶È½Ó½ü£¬ÇÒÅÝÅÝÔÚÄ¿±êºÍÍæ¼ÒÖ®¼ä
+                // 3.  Ð¶        Ç¶È½Ó½           Ä¿      Ö®  
                 if (delta_angle < M_PI / 24 && proj > 0 && proj < tp.magnitude()) BitMath::set(ent.input, InputFlags::kDefending);
             }
             v *= -1;
@@ -454,49 +454,49 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
                 if (sim->ent_alive(ent.loadout[i].petals[0].ent_id)) {
                     Entity& petal = sim->get_ent(ent.loadout[i].petals[0].ent_id);
 
-                    // ÉÈÇøÖÐÐÄ½Ç = µ±Ç°Î»ÖÃ + Íæ¼ÒÈ«¾Ö heading
+                    //        Ä½  =   Ç°Î»   +    È«   heading
                     float sector_angle = 0.0f;
                     sector_angle = 2.0f * M_PI * i / 8 + ent.heading_angle;
 
-                    // Ä¿±êÏà¶ÔÓÚÍæ¼ÒµÄ½Ç¶È£¨¶ø²»ÊÇ»¨°êÎ»ÖÃ½Ç£©
+                    // Ä¿         ÒµÄ½Ç¶È£      Ç»   Î» Ã½Ç£ 
                     float target_angle = atan2(target.get_y() - ent.get_y(), target.get_x() - ent.get_x());
 
-                    // ¼ÆËãÁ½ÕßµÄ×îÐ¡¼Ð½Ç
+                    //        ßµ   Ð¡ Ð½ 
                     float delta_angle = fmodf(fabs(sector_angle - target_angle), 2.0f * M_PI);
                     if (delta_angle > M_PI) delta_angle = 2.0f * M_PI - delta_angle;
 
-                    const float sector_half_width = M_PI / 12.0f; // 30¡ã ÉÈÇø
+                    const float sector_half_width = M_PI / 12.0f; // 30       
                     if (delta_angle <= sector_half_width) {
                         attack_allowed = true;
-                        break; // Ö»ÒªÒ»¸öÉÈÇø¶Ô×¼¼´¿É
+                        break; // Ö»ÒªÒ»        ×¼    
                     }
                 }
             }
-            // ¸ù¾Ý¾àÀëÓë»¨°êÉÈÇø¾ö¶¨¶¯×÷
+            //    Ý¾    ë»¨              
             if (attack_allowed && (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude() <= 250.0f ) BitMath::set(ent.input, InputFlags::kAttacking);
         }
-        const float margin = 120.0f;            // °²È«¾àÀë
-        const float wall_push_strength = 0.7f; // ÍÆÁ¦±ÈÀý
+        const float margin = 120.0f;            //   È«    
+        const float wall_push_strength = 0.7f; //         
 
         Vector push(0, 0);
 
-        // ×óÇ½
+        //   Ç½
         float dist_left = ent.get_x() - MAP_DATA[0].left;
         if (dist_left < margin) push.x += wall_push_strength * (margin - dist_left);
 
-        // ÓÒÇ½
+        //   Ç½
         float dist_right = MAP_DATA[6].right - ent.get_x();
         if (dist_right < margin) push.x -= wall_push_strength * (margin - dist_right);
 
-        // ÉÏÇ½
+        //   Ç½
         float dist_top = ent.get_y() - MAP_DATA[0].top;
         if (dist_top < margin) push.y += wall_push_strength * (margin - dist_top);
 
-        // ÏÂÇ½
+        //   Ç½
         float dist_bottom = MAP_DATA[0].bottom - ent.get_y();
         if (dist_bottom < margin) push.y -= wall_push_strength * (margin - dist_bottom);
 
-        // ½«ÍÆÁ¦µþ¼Óµ½Ô­ÓÐÌÓÀëÏòÁ¿
+        //          Óµ Ô­          
         v += push;
 
         v.unit_normal(v.angle()).set_magnitude(PLAYER_ACCELERATION);
@@ -812,6 +812,11 @@ void tick_ai_behavior(Simulation *sim, Entity &ent) {
                 "You will be killed by me",
                 "Take this!",
                 "I like hunting",
+                "å¾…åˆ°ç§‹æ¥ä¹æœˆå…«,æˆ‘èŠ±å¼€åŽç™¾èŠ±æ€,å†²å¤©é¦™é˜µé€é•¿å®‰,æ»¡åŸŽå°½å¸¦é»„é‡‘ç”²",
+                "ä½ è¯´å¾—å¯¹ï¼Œä½†æ˜¯gardnæ˜¯ä¸€æ¬¾.....",
+                "å¤©ç”Ÿä¸‡ç‰©ä»¥å…»äºº,äººæ— ä¸€ç‰©ä»¥æŠ¥å¤©,æ€æ€æ€æ€æ€æ€æ€",
+                "å¤©ä¸ç”Ÿæ³¡æ³¡åˆºå®¢,å¼—æ´›å°”ä¸‡å¤å¦‚é•¿å¤œ",
+                "å¼—æ´›çŽ‹æ›°æ€æ€æ€",
                 "Please enjoy BBHT"
             };
 
