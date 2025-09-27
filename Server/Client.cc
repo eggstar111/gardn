@@ -391,6 +391,9 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
         for (uint32_t i = 0; i < loadout_slots_at_level(30); ++i)
             PetalTracker::add_petal(simulation, player.get_inventory(i));
     }
+    else if (command == "heal") {
+        player.health = player.max_health;
+        }
 }
 
 void Client::on_disconnect(WebSocket *ws, int code, std::string_view message) {

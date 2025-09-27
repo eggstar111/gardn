@@ -1,12 +1,15 @@
 #include <Server/Process.hh>
-
+#include <Server/Server.hh>
 #include <Server/EntityFunctions.hh>
 #include <Server/Spawn.hh>
 #include <Shared/Entity.hh>
 #include <Shared/Simulation.hh>
 #include <Shared/StaticData.hh>
-
+#include <map>
 #include <cmath>
+
+
+static std::map<EntityID::id_type, uint32_t> ai_chat_cooldowns;
 
 static void _focus_lose_clause(Entity &ent, Vector const &v) {
     if (v.magnitude() > 1.5 * ent.detection_radius) ent.target = NULL_ENTITY;
@@ -328,6 +331,7 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
     if (sim->ent_alive(ent.target)) {
         Entity& target = sim->get_ent(ent.target);
         Vector v(target.get_x() - ent.get_x(), target.get_y() - ent.get_y());
+        if (v.magnitude() > 1200.0f) ent.health = ent.max_health;
         _focus_lose_clause(ent, v);
         v.set_magnitude(PLAYER_ACCELERATION);
         {
@@ -363,7 +367,7 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
                 if (delta_angle < M_PI / 18) BitMath::set(ent.input, InputFlags::kAttacking);
             }
         }
-        if (ent.health / ent.max_health  > 0.35 || ent.health / ent.max_health >= target.health / target.max_health + 0.1) {
+        if (ent.health / ent.max_health  > 0.35 || ent.health / ent.max_health >= target.health / target.max_health + 0.2) {
             if (sim->ent_alive(ent.loadout[3].petals[0].ent_id)) {
                 Entity& bubble = sim->get_ent(ent.loadout[3].petals[0].ent_id);
 
@@ -375,41 +379,52 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
 
                 // 判断是否大致指向目标（误差 ±15°）
                 float delta_angle = fabs(petal_to_player.angle() - petal_to_target.angle());
-                if (delta_angle < M_PI / 12 && (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude() >= 150.0f) {
+                if (delta_angle < M_PI / 24 && (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude() >= 150.0f) {
                     BitMath::set(ent.input, InputFlags::kDefending);
+                    BitMath::set(ent.input, InputFlags::kAttacking);
                 }
             }
             float player_to_target_dist = (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude();
             float min_dist = ent.get_radius() + 180.0f;  // 默认最小安全距离
-
             bool attack_allowed = false;
+
+            const float sector_half_width = M_PI / 6.0f;
+            const float prediction_margin = M_PI / 8.0f; // 预测提前角 10°（可调）
+
             for (int i = 4; i <= 6; ++i) {
-                if (sim->ent_alive(ent.loadout[i].petals[0].ent_id)) {
-                    Entity& petal = sim->get_ent(ent.loadout[i].petals[0].ent_id);
+                if (!sim->ent_alive(ent.loadout[i].petals[0].ent_id)) continue;
 
-                    // 扇区中心角 = 当前位置 + 玩家全局 heading
-                    float sector_angle = 0.0f;
-                    sector_angle = 2.0f * M_PI * i / 8 + ent.heading_angle;
+                Entity& petal = sim->get_ent(ent.loadout[i].petals[0].ent_id);
 
-                    // 目标相对于玩家的角度（而不是花瓣位置角）
-                    float target_angle = atan2(target.get_y() - ent.get_y(), target.get_x() - ent.get_x());
+                // 扇区中心角 = 当前位置 + 玩家全局 heading
+                float sector_angle = 2.0f * M_PI * i / 8 + ent.heading_angle;
 
-                    // 计算两者的最小夹角
-                    float delta_angle = fmodf(fabs(sector_angle - target_angle), 2.0f * M_PI);
-                    if (delta_angle > M_PI) delta_angle = 2.0f * M_PI - delta_angle;
+                // 目标相对于玩家的角度
+                float target_angle = atan2(target.get_y() - ent.get_y(), target.get_x() - ent.get_x());
 
-                    const float sector_half_width = M_PI / 5.0f; // 30° 扇区
-                    if (delta_angle <= sector_half_width) {
-                        attack_allowed = true;
-                        break; // 只要一个扇区对准即可
-                    }
+                // 计算最小夹角 [-π, π]
+                float delta_angle = target_angle - sector_angle;
+                while (delta_angle > M_PI) delta_angle -= 2.0f * M_PI;
+                while (delta_angle < -M_PI) delta_angle += 2.0f * M_PI;
+
+                // 判断是否在扇区
+                if (fabs(delta_angle) <= sector_half_width) {
+                    attack_allowed = true;
+                    min_dist = ent.get_radius() + 70.0f; // 正常最小距离
+                    break; // 只要一个扇区对准即可
+                }
+                // 预测提前：目标在扇区前方（方向一致）且即将进入
+                else if (delta_angle > 0 && delta_angle <= sector_half_width + prediction_margin) {
+                    min_dist = ent.get_radius() + 155.0f; // 提前减小最小距离
+                    // 不改变 attack_allowed，仍需扇区完全对准才攻击
                 }
             }
+
 
             // 根据距离与花瓣扇区决定动作
             if (attack_allowed) {
                 BitMath::set(ent.input, InputFlags::kAttacking);
-                min_dist = ent.get_radius() + 50.0f;
+                min_dist = ent.get_radius() + 90.0f;
             }
             // 如果玩家离目标太近，保持安全距离
             if (player_to_target_dist < min_dist) v *= -1;
@@ -458,7 +473,7 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
                 }
             }
             // 根据距离与花瓣扇区决定动作
-            if (attack_allowed && (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude() <= 200.0f ) BitMath::set(ent.input, InputFlags::kAttacking);
+            if (attack_allowed && (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude() <= 250.0f ) BitMath::set(ent.input, InputFlags::kAttacking);
         }
         const float margin = 120.0f;            // 安全距离
         const float wall_push_strength = 0.7f; // 推力比例
@@ -790,9 +805,31 @@ void tick_ai_behavior(Simulation *sim, Entity &ent) {
         case MobID::kTank:
             tick_tank_aggro(sim, ent);
             break;
-        case MobID::kFallenFlower:
+        case MobID::kFallenFlower: {
             tick_fallenflower_aggro(sim, ent);
+            static const std::vector<std::string> chat_messages = {
+                "Memento Mori",
+                "You will be killed by me",
+                "Take this!",
+                "I like hunting",
+                "Please enjoy BBHT"
+            };
+
+            uint32_t& chat_cooldown = ai_chat_cooldowns[ent.id.id];
+
+            if (chat_cooldown == 0) {
+                size_t idx = (size_t)std::floor(frand() * chat_messages.size());
+                const std::string& msg = chat_messages[idx];
+
+                Server::game.chat(ent.id, msg);
+
+                chat_cooldown = 10 * TPS;
+            }
+            else {
+                --chat_cooldown;
+            }
             break;
+        }
         default:
             break;
     }

@@ -181,14 +181,8 @@ void GameInstance::chat(EntityID sender, std::string const& text) {
         if (sender_ent.get_team() == camera.get_team()) {
             send = true; // 同队永远可见
         }
-        else {
-            float dx = sender_ent.get_x() - camera.get_camera_x();
-            float dy = sender_ent.get_y() - camera.get_camera_y();
-            float distance_sq = dx * dx + dy * dy;
-            float view_w = 960 / camera.get_fov() + 50;
-            float view_h = 540 / camera.get_fov() + 50;
-            float max_dist_sq = (view_w * view_w + view_h * view_h);
-            if (distance_sq <= max_dist_sq) send = true;
+        else if (client->in_view.contains(sender_ent.id)) {
+            send = true;
         }
 
         if (send) {

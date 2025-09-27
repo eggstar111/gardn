@@ -28,7 +28,7 @@ struct PlayerBuffs {
 
 static struct PlayerBuffs _get_petal_passive_buffs(Simulation *sim, Entity &player) {
     struct PlayerBuffs buffs = {0};
-    if (player.has_component(kMob)) return buffs;
+    if (player.has_component(kMob) && player.get_mob_id() != MobID::kFallenFlower) return buffs;
     player.set_equip_flags(0);
     for (uint32_t i = 0; i < player.get_loadout_count(); ++i) {
         LoadoutSlot const &slot = player.loadout[i];
@@ -93,7 +93,7 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
     DEBUG_ONLY(assert(player.max_health > 0);)
     PlayerBuffs const buffs = _get_petal_passive_buffs(sim, player);
     float health_ratio = player.health / player.max_health;
-    if (!player.has_component(kMob)) {
+    if (!player.has_component(kMob) || player.get_mob_id() == MobID::kFallenFlower) {
         player.max_health = hp_at_level(score_to_level(player.get_score())) + buffs.extra_health;
         player.damage = BASE_BODY_DAMAGE + buffs.extra_body_damage;
         player.set_radius(BASE_FLOWER_RADIUS + buffs.extra_radius);

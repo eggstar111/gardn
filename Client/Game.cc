@@ -348,7 +348,10 @@ void Game::tick(double time) {
         show_debug = !show_debug;
     if (Input::keys_held_this_tick.contains('\r') && !Game::alive())
         Game::spawn_in();
-
+    if (Input::keys_held_this_tick.contains('='))
+        Game::send_chat("/heal");
+    if (Input::keys_held_this_tick.contains('-'))
+        Game::send_chat("/tpto");
     //clearing operations
     simulation.post_tick();
     Storage::set();

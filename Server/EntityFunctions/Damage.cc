@@ -182,7 +182,7 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
     Entity &attacker = sim->get_ent(atk_id);
 
     if (type != DamageType::kReflect && defender.damage_reflection > 0)
-        inflict_damage(sim, def_id, attacker.base_entity, damage_dealt * defender.damage_reflection, DamageType::kReflect);
+        inflict_damage(sim, defender.base_entity, attacker.base_entity, damage_dealt * defender.damage_reflection, DamageType::kReflect);
     
     if (!sim->ent_alive(atk_id)) return;
 
