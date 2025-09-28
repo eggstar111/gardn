@@ -124,6 +124,8 @@ SINGLE(Name, nametag_visible, uint8_t)
     SINGLE(detection_radius, float, =0) \
     SINGLE(ai_tick, game_tick_t, =0) \
     SINGLE(ai_state, uint8_t, =0) \
+    SINGLE(hunter, uint8_t, =0) \
+    SINGLE(prey, EntityID, =NULL_ENTITY) \
     \
     SINGLE(zone, uint8_t, =0) \
     SINGLE(flags, uint8_t, =0) \

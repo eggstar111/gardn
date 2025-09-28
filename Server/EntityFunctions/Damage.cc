@@ -16,6 +16,16 @@ static bool _yggdrasil_revival_clause(Simulation *sim, Entity &player) {
     return false;
 }
 
+static void mark(Simulation* sim, Entity& defender, Entity& attacker) {
+    for (uint32_t i = 0; i < sim->get_ent(attacker.base_entity).get_loadout_count(); ++i) {
+        if (sim->get_ent(attacker.base_entity).loadout[i].get_petal_id() != PetalID::kMark) continue;
+        sim->get_ent(attacker.base_entity).set_loadout_ids(i, PetalID::kNone);
+        defender.hunter += 1;
+        return;
+    }
+}
+
+
 void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_id, float amt, uint8_t type) {
     {
         Entity& def_ent = sim->get_ent(def_id);
@@ -104,6 +114,16 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
 
                 Entity& tank = alloc_mob(sim, MobID::kTank, defender.get_x(), defender.get_y(), NULL_ENTITY);
             }
+            if (frand() < 0.01f) {
+                Entity& ygg = alloc_drop(sim, PetalID::kMark);
+                float radius = defender.get_radius() + 35;
+                float angle = frand() * 2.0f * M_PI;
+                float dist = radius + frand() * 35.0f;
+                ygg.set_x(defender.get_x() + cos(angle) * dist);
+                ygg.set_y(defender.get_y() + sin(angle) * dist);
+
+                Entity& tank = alloc_mob(sim, MobID::kTank, defender.get_x(), defender.get_y(), NULL_ENTITY);
+            }
             // ×·ËÝ¹¥»÷Õß¸¸ÊµÌå
             Entity* attacker = nullptr;
             if (sim->ent_alive(atk_id)) {
@@ -178,9 +198,11 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
         }
     }
 
+
     if (!sim->ent_exists(atk_id)) return;
     Entity &attacker = sim->get_ent(atk_id);
-
+    if (defender.has_component(kFlower) && !defender.has_component(kMob) && attacker.get_petal_id() == PetalID::kMark)
+        mark(sim, defender, attacker);
     if (type != DamageType::kReflect && defender.damage_reflection > 0)
         inflict_damage(sim, defender.base_entity, attacker.base_entity, damage_dealt * defender.damage_reflection, DamageType::kReflect);
     

@@ -1002,7 +1002,7 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.stroke();
             break;
         }
-        case PetalID::kSoil: {
+        case PetalID::kSoil: 
             ctx.set_fill(0xff695118);
             ctx.set_stroke(0xff554213);
             ctx.begin_path();
@@ -1016,6 +1016,48 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.close_path();
             ctx.fill();
             ctx.set_line_width(3);
+            ctx.stroke();
+            break;
+        case PetalID::kMark: {
+            ctx.set_fill(0xffad1717); 
+            ctx.set_stroke(0xff8c1313);
+            ctx.set_line_width(r*0.15);
+
+
+            const int points = 5;
+            float start_angle = -M_PI / 2;
+            float r_inner = r * sinf(M_PI / 10.0f) / sinf(3.0f * M_PI / 10.0f);
+
+
+            ctx.begin_path();
+            for (int i = 0; i < points * 2; ++i) {
+                float angle = start_angle + i * M_PI / points;
+                float radius = (i % 2 == 0) ? r : r_inner;
+                float x = radius * cosf(angle);
+                float y = radius * sinf(angle);
+
+                if (i == 0)
+                    ctx.move_to(x, y);
+                else
+                    ctx.line_to(x, y);
+            }
+            ctx.close_path();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.begin_path();
+            for (int i = 0; i < points; ++i) {
+                float angle = start_angle + (2 * i + 1) * M_PI / points; 
+                float x = r_inner * cosf(angle);
+                float y = r_inner * sinf(angle);
+
+                if (i == 0)
+                    ctx.move_to(x, y);
+                else
+                    ctx.line_to(x, y);
+            }
+            ctx.close_path();
+            ctx.fill();
             ctx.stroke();
             break;
         }

@@ -717,7 +717,7 @@ std::array<struct PetalData, PetalID::kNumPetals> const PETAL_DATA = {{
         .attributes = {
             .icon_angle = 0.5,
             .extra_health = 400,
-            //.reduce_reload = 0.5f,
+            .reduce_reload = 0.9f,
             .non_removable = 1,
             .extra_radius = 5
         }
@@ -860,6 +860,19 @@ std::array<struct PetalData, PetalID::kNumPetals> const PETAL_DATA = {{
             .icon_angle = 0.5,
             .extra_health = 45,
             .extra_radius = 10
+        }
+    },
+    {
+        .name = "Dark Mark",
+        .description = "Those who are marked will be hunted until death",
+        .health = 20.0,
+        .damage = 5.0,
+        .radius = 15.0,
+        .reload = 7.0,
+        .count = 1,
+        .rarity = RarityID::kUnique,
+        .attributes = {
+            .icon_angle = -0.5,
         }
     },
 }};
@@ -1246,12 +1259,13 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
     {
         .name = "Fallen Flower",
         .description = "Legend has it that if you win a 1v5 Fallen Flower match, you can summon Wata.",
-        .rarity = RarityID::kEpic,
+        .rarity = RarityID::kUnusual,
         .health = {150},
         .damage = 25.0,
         .radius = {25},
         .xp = 1,
         .drops = {
+            PetalID::kMark
         },
         .attributes = {
             .aggro_radius = 2000

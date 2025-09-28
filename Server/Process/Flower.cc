@@ -100,6 +100,46 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
         player.poison_armor = buffs.poison_armor;
         player.damage_reflection = buffs.damage_reflection;
     }
+    if (player.hunter != 0) {
+        uint32_t existing_count = 0;
+
+        // 遍历所有 mob，统计 prey 为当前玩家的数量
+        sim->for_each<kMob>([&](Simulation* sim_ptr, Entity& mob) {
+            if (mob.prey == player.id) {
+                ++existing_count;
+            }
+            });
+
+        int to_spawn = player.hunter - existing_count;
+        if (to_spawn > 0) {
+            float radius = 1000.0f;
+            float start_angle = frand() * 2.0f * M_PI; // 随机起始角度
+            float angle_step = 2.0f * M_PI / to_spawn;
+            const float angle_increment = 20.0f * M_PI / 180.0f; // 遇墙时增加 20 度
+
+            for (int i = 0; i < to_spawn; ++i) {
+                float angle = start_angle + i * angle_step;
+
+                for (int attempt = 0; attempt < 18; ++attempt) { // 最多尝试 18 次 (360°)
+                    float x = player.get_x() + radius * cosf(angle);
+                    float y = player.get_y() + radius * sinf(angle);
+
+                    // 检查是否越界
+                    if (x >= MAP_DATA[0].left && x <= MAP_DATA[6].right &&
+                        y >= MAP_DATA[0].top && y <= MAP_DATA[0].bottom) {
+                        // 合法位置，生成 mob
+                        Entity& mob = alloc_mob(sim, MobID::kFallenFlower, x, y, NULL_ENTITY);
+                        mob.prey = player.id;
+                        BitMath::set(mob.flags, EntityFlags::kNoDrops);
+                        break; // 生成成功，退出调整循环
+                    }
+
+                    angle = fmod(angle + angle_increment, 2.0f * M_PI);
+                    if (angle < 0.0f) angle += 2.0f * M_PI; 
+                }
+            }
+        }
+    }
     player.health = health_ratio * player.max_health;
     if (buffs.heal > 0)
         inflict_heal(sim, player, buffs.heal);
