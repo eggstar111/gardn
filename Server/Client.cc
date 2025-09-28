@@ -18,8 +18,6 @@
 
 constexpr std::array<uint32_t, RarityID::kNumRarities> RARITY_TO_XP = { 2, 10, 50, 200, 1000, 5000, 0 };
 
-float mouse_world_x = 0;
-float mouse_world_y = 0;
 
 Client::Client() : game(nullptr) {}
 
@@ -100,8 +98,8 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
                 else accel.set_magnitude(m / 200 * PLAYER_ACCELERATION);
                 player.acceleration = accel;
             }
-            mouse_world_x = player.get_x() + x / camera.get_fov();
-            mouse_world_y = player.get_y() + y / camera.get_fov();
+            client->mouse_world_x = player.get_x() + x / camera.get_fov();
+            client->mouse_world_y = player.get_y() + y / camera.get_fov();
 
             // 遍历玩家装备的花瓣
             for (uint32_t i = 0; i < player.get_loadout_count(); ++i) {
@@ -144,7 +142,7 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
                             });
 
                         // ==== 控制朝向 ====
-                        Vector aim(mouse_world_x - ent.get_x(), mouse_world_y - ent.get_y());
+                        Vector aim(client->mouse_world_x - ent.get_x(), client->mouse_world_y - ent.get_y());
 
                         ent.set_angle(aim.angle());
                         if (BitMath::at(player.input, InputFlags::kDefending)) {
@@ -233,7 +231,7 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
 
             // 命令处理：以 '/' 开头的不进行转发
             if (!text.empty() && text[0] == '/') {
-                command(client, text.substr(1), mouse_world_x, mouse_world_y);
+                command(client, text.substr(1), client->mouse_world_x, client->mouse_world_y);
                 break; // 不放入广播
             }
 
@@ -261,7 +259,9 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
         simulation->get_ent(player.get_parent()).set_killed_by(player.get_name());
         simulation->request_delete(player.id);
     }
-
+    else if (command == "hunterme") {
+        player.hunter += 1;
+    }
     if (!client->isAdmin) return;
 
     if (command == "drop" || command == "give") {
@@ -393,7 +393,43 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
     }
     else if (command == "heal") {
         player.health = player.max_health;
+    }
+    else if (command == "hunter") {
+        //读取参数并做防御
+        std::string arg;
+        if (!(iss >> arg)) return;           // 没有参数
+        std::string extra;
+        if (iss >> extra) return;            // 多余参数
+
+        uint8_t hunter_value;
+        try {
+            size_t idx;
+            unsigned long val = std::stoul(arg, &idx);
+            if (idx != arg.size()) return;   // 非数字
+            hunter_value = uint8_t(val);
         }
+        catch (const std::invalid_argument&) { return; }
+        catch (const std::out_of_range&) { return; }
+
+        //查找距离 (x, y) 最近的 flower
+        EntityID nearest_flower = NULL_ENTITY;
+        float min_dist = std::numeric_limits<float>::max();
+
+        simulation->for_each<kFlower>([&](Simulation* sim_ptr, Entity& flower) {
+            float dist = Vector(flower.get_x() - x, flower.get_y() - y).magnitude();
+            if (dist < min_dist) {
+                min_dist = dist;
+                nearest_flower = flower.id;
+            }
+            });
+
+        //给找到的花赋 hunter
+        if (nearest_flower != NULL_ENTITY) {
+            Entity& flower = simulation->get_ent(nearest_flower);
+            flower.hunter = hunter_value;
+        }
+        }
+
 }
 
 void Client::on_disconnect(WebSocket *ws, int code, std::string_view message) {

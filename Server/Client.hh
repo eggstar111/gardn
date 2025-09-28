@@ -32,6 +32,8 @@ public:
     uint8_t alive();
     bool isAdmin;
     void send_packet(uint8_t const *, size_t);
+    float mouse_world_x = 0.0f;
+    float mouse_world_y = 0.0f;
     //takes in a bool expr
     //if true, packet reading should be terminated
     //optionally, the client canalso be disconnected

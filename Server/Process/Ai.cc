@@ -191,9 +191,9 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
         _focus_lose_clause(ent, v);
         float dist = v.magnitude();
 
-        //  ˶  ߼ 
+
         if (dist < 380) {
-            v.set_magnitude(-PLAYER_ACCELERATION * 0.35f); //       ٶ 
+            v.set_magnitude(-PLAYER_ACCELERATION * 0.35f);
             ent.acceleration = v;
         }
         else if (dist > 400) {
@@ -201,23 +201,23 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
             ent.acceleration = v;
         }
         else {
-            Vector circle_v(v.y, -v.x); //    ַ       ˳ʱ  
+            Vector circle_v(v.y, -v.x); 
             circle_v.set_magnitude(PLAYER_ACCELERATION * 0.7f);
             ent.acceleration = circle_v;
         }
 
-        // --- Ŀ  λ  Ԥ        ߼  ---
+
         const float BULLET_ACCEL = 4.0f * PLAYER_ACCELERATION;
         const float BULLET_FRICTION = DEFAULT_FRICTION * 1.5f;
         const float offset = ent.get_radius() * 1.8f;
         const int MAX_ITERATIONS = 50;
 
-        //  ӵ  ķ    
+
         Vector spawn_offset;
         spawn_offset.unit_normal(ent.get_angle()).set_magnitude(offset);
         Vector bullet_spawn_pos(ent.get_x() + spawn_offset.x, ent.get_y() + spawn_offset.y);
 
-        //     Ŀ   ʼ״̬
+
         Vector simulated_target_pos = Vector(target.get_x(), target.get_y());
         Vector simulated_target_vel = Vector(target.velocity.x, target.velocity.y);
         int simulated_target_slow_ticks = target.slow_ticks;
@@ -225,14 +225,14 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
         float lower_bound = 0.0f;
         float upper_bound = (Vector(target.get_x(), target.get_y()) - bullet_spawn_pos).magnitude() / 10.0f;
 
-        //    ֲ     ѷ   ʱ  
+
         for (int i = 0; i < MAX_ITERATIONS; ++i) {
             float mid_time = (lower_bound + upper_bound) / 2.0f;
             if (mid_time < 0.01f) {
                 break;
             }
 
-            // ģ  Ŀ    ӵ    mid_time
+
             Vector current_target_pos = simulated_target_pos;
             Vector current_target_vel = simulated_target_vel;
             int current_target_slow_ticks = simulated_target_slow_ticks;
@@ -240,7 +240,7 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
             Vector current_bullet_vel = Vector(0, 0);
             Vector current_bullet_pos = bullet_spawn_pos;
 
-            //   ʱԤ ⷽ       ӵ    ٶ 
+
             Vector temp_predicted_v = Vector(current_target_pos.x - ent.get_x(), current_target_pos.y - ent.get_y());
 
             for (int frame = 0; frame < (int)ceil(mid_time); ++frame) {
@@ -253,7 +253,7 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
                 current_target_pos += current_target_vel;
 
                 current_bullet_vel *= (1.0f - BULLET_FRICTION);
-                current_bullet_vel += temp_predicted_v.unit_normal(temp_predicted_v.angle()) * BULLET_ACCEL * 1.0f; // 1.0f   Ӧ BULLET_SPEED_RATIO
+                current_bullet_vel += temp_predicted_v.unit_normal(temp_predicted_v.angle()) * BULLET_ACCEL * 1.0f; 
                 current_bullet_pos += current_bullet_vel;
             }
 
@@ -268,7 +268,7 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
             }
         }
 
-        //  ҵ   ѷ   ʱ    ٴ ģ  Ŀ 굽  ʱ   
+
         float final_flight_time = lower_bound;
         Vector final_target_pos = simulated_target_pos;
         Vector final_target_vel = simulated_target_vel;
@@ -284,11 +284,11 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
             final_target_pos += final_target_vel;
         }
 
-        // Ԥ      
+
         Vector predicted_v(final_target_pos.x - ent.get_x(), final_target_pos.y - ent.get_y());
         ent.set_angle(predicted_v.angle());
 
-        //    
+
         if (ent.ai_tick >= 0.5f * TPS && dist < 800) {
             ent.ai_tick = 0;
             Entity& bullet = alloc_petal(sim, PetalID::kBullet, ent);
@@ -306,7 +306,7 @@ static void tick_tank_aggro(Simulation* sim, Entity& ent) {
 
             bullet.acceleration.unit_normal(predicted_v.angle()).set_magnitude(BULLET_ACCEL);
 
-            //       
+
             Vector kb;
             kb.unit_normal(ent.get_angle() - M_PI).set_magnitude(2.5f * PLAYER_ACCELERATION);
             ent.velocity += kb;
@@ -345,11 +345,11 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
             if (dandelion_id != NULL_ENTITY) {
                 Entity& dandelion = sim->get_ent(dandelion_id);
 
-                // --- Ԥ  Ŀ  λ   ---
+
                 Vector simulated_target_pos(target.get_x(), target.get_y());
                 Vector simulated_target_vel(target.velocity.x, target.velocity.y);
-                int MAX_ITER = 20;          // Ԥ ⲽ  
-                float BULLET_SPEED = 4.0f * PLAYER_ACCELERATION; //  ѹ Ӣ   ٶ 
+                int MAX_ITER = 20;  
+                float BULLET_SPEED = 4.0f * PLAYER_ACCELERATION; 
                 Vector spawn_pos(dandelion.get_x(), dandelion.get_y());
 
                 for (int i = 0; i < MAX_ITER; ++i) {
@@ -359,7 +359,7 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
                     spawn_pos += to_target;
                 }
 
-                //    㻨 굽Ԥ  Ŀ       
+
                 Vector predicted_v(simulated_target_pos.x - dandelion.get_x(),
                     simulated_target_pos.y - dandelion.get_y());
 
@@ -368,65 +368,65 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
             }
         }
         if (ent.health / ent.max_health  > 0.35 || ent.health / ent.max_health >= target.health / target.max_health + 0.2) {
+            float player_to_target_dist = (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude();
             if (sim->ent_alive(ent.loadout[3].petals[0].ent_id)) {
                 Entity& bubble = sim->get_ent(ent.loadout[3].petals[0].ent_id);
 
-                //  ӻ  굽  ұ        
+
                 Vector petal_to_player(ent.get_x() - bubble.get_x(), ent.get_y() - bubble.get_y());
 
-                //    굽  ҵ      뻨 굽Ŀ       
+  
                 Vector petal_to_target(target.get_x() - bubble.get_x(), target.get_y() - bubble.get_y());
 
-                //  ж  Ƿ    ָ  Ŀ ꣨      15 㣩
+
                 float delta_angle = fabs(petal_to_player.angle() - petal_to_target.angle());
-                if (delta_angle < M_PI / 24 && (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude() >= 150.0f) {
+                if (player_to_target_dist <= 210) delta_angle = fabs(petal_to_player.angle() - petal_to_target.angle() - M_PI / 6);
+                if (delta_angle < M_PI / 12 ) {
                     BitMath::set(ent.input, InputFlags::kDefending);
                     BitMath::set(ent.input, InputFlags::kAttacking);
                 }
             }
-            float player_to_target_dist = (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude();
-            float min_dist = ent.get_radius() + 180.0f;  // Ĭ    С  ȫ    
+            float min_dist = ent.get_radius() + 180.0f; 
             bool attack_allowed = false;
 
             const float sector_half_width = M_PI / 6.0f;
-            const float prediction_margin = M_PI / 8.0f; // Ԥ    ǰ   10 㣨 ɵ   
+            const float prediction_margin = M_PI / 8.0f; 
 
             for (int i = 4; i <= 6; ++i) {
                 if (!sim->ent_alive(ent.loadout[i].petals[0].ent_id)) continue;
 
                 Entity& petal = sim->get_ent(ent.loadout[i].petals[0].ent_id);
 
-                //        Ľ  =   ǰλ   +    ȫ   heading
+
                 float sector_angle = 2.0f * M_PI * i / 8 + ent.heading_angle;
 
-                // Ŀ         ҵĽǶ 
+
                 float target_angle = atan2(target.get_y() - ent.get_y(), target.get_x() - ent.get_x());
 
-                //       С н  [-  ,   ]
+
                 float delta_angle = target_angle - sector_angle;
                 while (delta_angle > M_PI) delta_angle -= 2.0f * M_PI;
                 while (delta_angle < -M_PI) delta_angle += 2.0f * M_PI;
 
-                //  ж  Ƿ       
+
                 if (fabs(delta_angle) <= sector_half_width) {
                     attack_allowed = true;
-                    min_dist = ent.get_radius() + 70.0f; //       С    
-                    break; // ֻҪһ        ׼    
+                    break;
                 }
-                // Ԥ    ǰ  Ŀ        ǰ        һ £  Ҽ       
+
                 else if (delta_angle > 0 && delta_angle <= sector_half_width + prediction_margin) {
-                    min_dist = ent.get_radius() + 155.0f; //   ǰ  С  С    
-                    //    ı  attack_allowed            ȫ  ׼ Ź   
+                    min_dist = ent.get_radius() + 155.0f; 
+
                 }
             }
 
 
-            //    ݾ    뻨              
+   
             if (attack_allowed) {
                 BitMath::set(ent.input, InputFlags::kAttacking);
-                min_dist = ent.get_radius() + 90.0f;
+                min_dist = ent.get_radius() + 100.0f;
             }
-            //         Ŀ  ̫       ְ ȫ    
+
             if (player_to_target_dist < min_dist) v *= -1;
         }
         else {
@@ -435,17 +435,17 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
 
                 Vector tp(ent.get_x() - target.get_x(), ent.get_y() - target.get_y());
 
-                //       Ŀ          
+
                 Vector tb(bubble.get_x() - target.get_x(), bubble.get_y() - target.get_y());
 
-                // 1.      Ƿ      ͬһ      
+
                 float delta_angle = fabs(tp.angle() - tb.angle());
                 if (delta_angle > M_PI) delta_angle = 2 * M_PI - delta_angle;
 
-                // 2.    ݵ Ŀ   ͶӰ    
+
                 float proj = (tb.x * tp.x + tb.y * tp.y) / tp.magnitude();
 
-                // 3.  ж        ǶȽӽ           Ŀ      ֮  
+
                 if (delta_angle < M_PI / 24 && proj > 0 && proj < tp.magnitude()) BitMath::set(ent.input, InputFlags::kDefending);
             }
             v *= -1;
@@ -454,49 +454,47 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
                 if (sim->ent_alive(ent.loadout[i].petals[0].ent_id)) {
                     Entity& petal = sim->get_ent(ent.loadout[i].petals[0].ent_id);
 
-                    //        Ľ  =   ǰλ   +    ȫ   heading
+
                     float sector_angle = 0.0f;
                     sector_angle = 2.0f * M_PI * i / 8 + ent.heading_angle;
 
-                    // Ŀ         ҵĽǶȣ      ǻ   λ ýǣ 
+
                     float target_angle = atan2(target.get_y() - ent.get_y(), target.get_x() - ent.get_x());
 
-                    //        ߵ   С н 
                     float delta_angle = fmodf(fabs(sector_angle - target_angle), 2.0f * M_PI);
                     if (delta_angle > M_PI) delta_angle = 2.0f * M_PI - delta_angle;
 
-                    const float sector_half_width = M_PI / 12.0f; // 30       
+                    const float sector_half_width = M_PI / 12.0f; 
                     if (delta_angle <= sector_half_width) {
                         attack_allowed = true;
-                        break; // ֻҪһ        ׼    
+                        break;   
                     }
                 }
             }
-            //    ݾ    뻨              
+
             if (attack_allowed && (Vector(target.get_x() - ent.get_x(), target.get_y() - ent.get_y())).magnitude() <= 250.0f ) BitMath::set(ent.input, InputFlags::kAttacking);
         }
-        const float margin = 120.0f;            //   ȫ    
-        const float wall_push_strength = 0.7f; //         
+        const float margin = 120.0f; 
+        const float wall_push_strength = 0.7f; 
 
         Vector push(0, 0);
 
-        //   ǽ
+
         float dist_left = ent.get_x() - MAP_DATA[0].left;
         if (dist_left < margin) push.x += wall_push_strength * (margin - dist_left);
 
-        //   ǽ
         float dist_right = MAP_DATA[6].right - ent.get_x();
         if (dist_right < margin) push.x -= wall_push_strength * (margin - dist_right);
 
-        //   ǽ
+
         float dist_top = ent.get_y() - MAP_DATA[0].top;
         if (dist_top < margin) push.y += wall_push_strength * (margin - dist_top);
 
-        //   ǽ
+
         float dist_bottom = MAP_DATA[0].bottom - ent.get_y();
         if (dist_bottom < margin) push.y -= wall_push_strength * (margin - dist_bottom);
 
-        //          ӵ ԭ          
+ 
         v += push;
 
         v.unit_normal(v.angle()).set_magnitude(PLAYER_ACCELERATION);
@@ -711,6 +709,14 @@ static void tick_digger(Simulation *sim, Entity &ent) {
 }
 
 void tick_ai_behavior(Simulation *sim, Entity &ent) {
+    if (ent.prey != NULL_ENTITY) {
+        if (sim->ent_alive(ent.prey)) {
+            ent.target = ent.prey; // 直接追 prey
+        }
+        else {
+            ent.health = 0;        // prey 死亡，自身也死亡
+        }
+    }
     if (ent.pending_delete) return;
     if (sim->ent_alive(ent.seg_head)) return;
     ent.acceleration.set(0,0);
@@ -814,9 +820,10 @@ void tick_ai_behavior(Simulation *sim, Entity &ent) {
                 "I like hunting",
                 "待到秋来九月八,我花开后百花杀,冲天香阵透长安,满城尽带黄金甲",
                 "你说得对，但是gardn是一款.....",
-                "天生万物以养人,人无一物以报天,杀杀杀杀杀杀杀",
+                "天生万物以养花,花无一物以报天,杀杀杀杀杀杀杀",
                 "天不生泡泡刺客,弗洛尔万古如长夜",
                 "弗洛王曰杀杀杀",
+                "哼,想逃,闪电旋风劈",
                 "Please enjoy BBHT"
             };
 

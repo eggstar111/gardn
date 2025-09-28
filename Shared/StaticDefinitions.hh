@@ -85,6 +85,7 @@ namespace PetalID {
         kDrone,
         kDestroyerBullet,
         kSoil,
+        kMark,
         kNumPetals
     };
 };
