@@ -339,7 +339,7 @@ static void tick_fallenflower_aggro(Simulation* sim, Entity& ent) {
             LoadoutSlot& slot = ent.loadout[7];
             if (sim->ent_alive(slot.petals[0].ent_id)) {
                 Entity& petal = sim->get_ent(slot.petals[0].ent_id);
-                if (petal.has_component(kPetal) && petal.get_petal_id() == PetalID::kDandelion && !BitMath::at(petal.flags, EntityFlags::kIsDespawning))
+                if (!BitMath::at(petal.flags, EntityFlags::kIsDespawning))
                     dandelion_id = petal.id;
             }
             if (dandelion_id != NULL_ENTITY) {
@@ -712,6 +712,7 @@ void tick_ai_behavior(Simulation *sim, Entity &ent) {
     if (ent.prey != NULL_ENTITY) {
         if (sim->ent_alive(ent.prey)) {
             ent.target = ent.prey; // 直接追 prey
+            BitMath::unset(ent.flags, EntityFlags::kIsCulled);
         }
         else {
             ent.health = 0;        // prey 死亡，自身也死亡
