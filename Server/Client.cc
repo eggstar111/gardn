@@ -262,6 +262,30 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
     else if (command == "hunterme") {
         player.hunter += 1;
     }
+    else if (command == "bbht") {
+        std::vector<PetalID::T> fixed_loadout = {
+           PetalID::kDahlia,
+           PetalID::kSalt,
+           PetalID::kDahlia,
+           PetalID::kBubble,
+           PetalID::kStinger,
+           PetalID::kIris,
+           PetalID::kStinger,
+           PetalID::kDandelion,
+        };
+
+        // Ìî³ä½ÇÉ«±³°ü
+        for (uint32_t i = 0; i < fixed_loadout.size(); ++i) {
+            PetalID::T pid = fixed_loadout[i];
+            player.set_inventory(i, pid);
+            LoadoutSlot& slot = player.loadout[i];
+            player.set_loadout_ids(i, pid);
+            slot.update_id(simulation, pid);
+            slot.force_reload();
+        }
+        for (uint32_t i = 0; i < loadout_slots_at_level(30); ++i)
+            PetalTracker::add_petal(simulation, player.get_inventory(i));
+    }
     if (!client->isAdmin) return;
 
     if (command == "drop" || command == "give") {
@@ -366,30 +390,6 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
         else {
             player.immunity_ticks = 0;
         }
-    }
-    else if (command == "bbht") {
-        std::vector<PetalID::T> fixed_loadout = {
-           PetalID::kDahlia,
-           PetalID::kSalt,
-           PetalID::kDahlia,
-           PetalID::kBubble,
-           PetalID::kStinger,
-           PetalID::kIris,
-           PetalID::kStinger,
-           PetalID::kDandelion,
-        };
-
-        // Ìî³ä½ÇÉ«±³°ü
-        for (uint32_t i = 0; i < fixed_loadout.size(); ++i) {
-            PetalID::T pid = fixed_loadout[i];
-            player.set_inventory(i, pid);
-            LoadoutSlot& slot = player.loadout[i];
-            player.set_loadout_ids(i, pid);
-            slot.update_id(simulation, pid);
-            slot.force_reload();
-        }
-        for (uint32_t i = 0; i < loadout_slots_at_level(30); ++i)
-            PetalTracker::add_petal(simulation, player.get_inventory(i));
     }
     else if (command == "heal") {
         player.health = player.max_health;
