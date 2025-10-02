@@ -6,7 +6,7 @@
 #include <Shared/Entity.hh>
 #include <Shared/Map.hh>
 #include <Shared/Simulation.hh>
-
+#include <cmath>
 #include <algorithm>
 #include <iostream>
 
