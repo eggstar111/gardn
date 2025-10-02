@@ -112,6 +112,10 @@ static void make_petal_tooltip(PetalID::T id) {
             new Ui::StaticText(12, "Duration: ", {.fill = 0xffcde23b, .h_justify = Style::Left }),
             new Ui::StaticText(12, std::format("{:g} s", a.slow_inflict), {.fill = 0xffffffff, .h_justify = Style::Left })
         }, 0, 0, {.h_justify = Style::Left }) : nullptr,
+        d.name == std::string("Corruption") ? new Ui::HContainer({
+            new Ui::StaticText(12, "Healing limit: ", {.fill = 0xffcde23b, .h_justify = Style::Left }),
+            new Ui::StaticText(12, "10%", {.fill = 0xffffffff, .h_justify = Style::Left })
+        }, 0, 0, {.h_justify = Style::Left }) : nullptr,
     }, 5, 2);
     tooltip->style.fill = 0x80000000;
     tooltip->style.round_radius = 6;
