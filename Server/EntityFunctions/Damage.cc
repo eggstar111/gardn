@@ -81,13 +81,13 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
         }
     }
     if (defender.has_component(kMob) && defender.get_mob_id() == MobID::kTargetDummy) {
+        if (defender.health == 0) {
+            Entity& dummy = alloc_mob(sim, MobID::kTargetDummy, defender.get_x(), defender.get_y(), sim->get_ent(atk_id).get_team());
+            dummy.set_color(sim->get_ent(atk_id).get_color());
+        }
         const float drop_interval = 0.025f;
         uint32_t start = ceilf((defender.max_health - old_health) / (defender.max_health * drop_interval));
         uint32_t end = ceilf((defender.max_health - defender.health) / (defender.max_health * drop_interval));
-        if (defender.health == 0) {
-            defender.immunity_ticks = 99999 * TPS;
-            defender.health = 1;
-        }
         for (uint32_t i = start; i < end; ++i) {
             // µôÂäÊ·Ê«µÀ¾ß
             std::vector<uint32_t> epic_indices;

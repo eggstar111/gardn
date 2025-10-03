@@ -145,8 +145,7 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
         //reset all reloads and stuff
         uint32_t num_left = potential.size();
         //set respawn level
-        uint32_t respawn_level = div_round_up(4.0 * score_to_level(ent.get_score()), 4);
-        if (ent.get_color() == ColorID::kRed) respawn_level = 99;
+        uint32_t respawn_level = div_round_up(3.0 * score_to_level(ent.get_score()), 4);
         if (respawn_level > MAX_LEVEL) respawn_level = MAX_LEVEL;
         camera.set_respawn_level(respawn_level);
         uint32_t max_possible = MAX_SLOT_COUNT + loadout_slots_at_level(respawn_level);
@@ -168,52 +167,10 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
             PetalTracker::add_petal(sim, PetalID::kBasic);
             camera.set_inventory(i, PetalID::kBasic);
         }
-         if (ent.get_color() == ColorID::kRed) {
-            // 固定顺序花瓣
-            std::vector<PetalID::T> fixed_loadout = {
-                PetalID::kAzalea,
-                PetalID::kAzalea,
-                PetalID::kBubble,
-                PetalID::kTringer,
-                PetalID::kTringer,
-                PetalID::kTringer,
-                PetalID::kPoisonPeas2,
-                PetalID::kSalt,
-                PetalID::kCorruption
-            };
-
-            // 填充背包，自动适配 respawn_level 的槽数
-            uint32_t slots = loadout_slots_at_level(respawn_level);
-            for (uint32_t i = 0; i < std::min<uint32_t>(slots, fixed_loadout.size()); ++i) {
-                PetalID::T petal = fixed_loadout[i];
-                PetalTracker::add_petal(sim, petal);
-                camera.set_inventory(i, petal);
-            }
-
-            // 对最低血量的 TargetDummy 造成伤害
-            Entity* lowest_dummy = nullptr;
-            for (uint16_t i = 0; i < ENTITY_CAP; ++i) {
-                EntityID id(i, 0);
-                if (!sim->ent_exists(id)) continue;
-                Entity& e = sim->get_ent(id);
-                if (e.get_mob_id() == MobID::kTargetDummy) {
-                    if (!lowest_dummy || e.health < lowest_dummy->health) {
-                        lowest_dummy = &e;
-                    }
-                }
-            }
-
-            if (lowest_dummy) {
-                lowest_dummy->health = (lowest_dummy->health >= 2000) ? lowest_dummy->health - 2000 : 0;
-                Server::game.broadcast_message("Red team player down -- TargetDummy takes 2000 damage");
-            }
-         }
-         else {
-             PetalTracker::add_petal(sim, PetalID::kRose);
-             camera.set_inventory(loadout_slots_at_level(respawn_level), PetalID::kRose);
-             PetalTracker::add_petal(sim, PetalID::kBubble);
-             camera.set_inventory(loadout_slots_at_level(respawn_level) + 1, PetalID::kBubble);
-         }
+        PetalTracker::add_petal(sim, PetalID::kRose);
+        camera.set_inventory(loadout_slots_at_level(respawn_level), PetalID::kRose);
+        PetalTracker::add_petal(sim, PetalID::kBubble);
+        camera.set_inventory(loadout_slots_at_level(respawn_level) + 1, PetalID::kBubble);
     } else if (ent.has_component(kDrop)) {
         if (BitMath::at(ent.flags, EntityFlags::kIsDespawning))
             PetalTracker::remove_petal(sim, ent.get_drop_id());

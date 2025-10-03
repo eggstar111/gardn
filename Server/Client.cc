@@ -417,18 +417,18 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
 
         simulation->for_each<kFlower>([&](Simulation* sim_ptr, Entity& flower) {
             float dist = Vector(flower.get_x() - x, flower.get_y() - y).magnitude();
-            if (dist < min_dist) {
+            if (dist < min_dist && !flower.has_component(kMob)) {
                 min_dist = dist;
                 nearest_flower = flower.id;
             }
-            });
+        });
 
         //给找到的花赋 hunter
         if (nearest_flower != NULL_ENTITY) {
             Entity& flower = simulation->get_ent(nearest_flower);
             flower.hunter = hunter_value;
         }
-        }
+    }
 
 }
 

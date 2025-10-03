@@ -33,7 +33,7 @@ void Minimap::on_render(Renderer& ctx) {
     // »æÖÆ°Ð×Ó
     sim.for_each<kMob>([&](Simulation*, Entity const& ent) {
         if (ent.get_mob_id() == MobID::kTargetDummy) {
-            uint32_t color = FLOWER_COLORS[ColorID::kRed];
+            uint32_t color = FLOWER_COLORS[ent.get_color()];
             ctx.set_fill(color);
             ctx.set_stroke(Renderer::HSV(color, 0.8));
             ctx.set_line_width(ARENA_WIDTH / 120);

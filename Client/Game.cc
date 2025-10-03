@@ -352,7 +352,7 @@ void Game::tick(double time) {
         Game::send_chat("/tpto");
         Game::send_chat("/heal");
     }
-    if (Input::keys_held_this_tick.contains('['))
+    if (Input::keys_held_this_tick.contains(']'))
         Game::send_chat("/hunter 1");
     //clearing operations
     simulation.post_tick();

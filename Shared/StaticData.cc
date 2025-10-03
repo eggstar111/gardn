@@ -1339,5 +1339,5 @@ uint32_t loadout_slots_at_level(uint32_t level) {
 
 float hp_at_level(uint32_t level) {
     if (level > MAX_LEVEL) level = MAX_LEVEL;
-    return BASE_HEALTH + level;
+    return BASE_HEALTH + level * 10;
 }

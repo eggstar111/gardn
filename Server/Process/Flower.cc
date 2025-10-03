@@ -96,7 +96,7 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
     if (!player.has_component(kMob) || player.get_mob_id() == MobID::kFallenFlower) {
         player.max_health = hp_at_level(score_to_level(player.get_score())) + buffs.extra_health;
         player.damage = BASE_BODY_DAMAGE + buffs.extra_body_damage;
-        player.set_radius(BASE_FLOWER_RADIUS + buffs.extra_radius);
+        player.set_radius(BASE_FLOWER_RADIUS + buffs.extra_radius + score_to_level(player.get_score()) * 0.8f);
         player.poison_armor = buffs.poison_armor;
         player.damage_reflection = buffs.damage_reflection;
     }
@@ -155,7 +155,7 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
 
     if (sim->ent_alive(player.get_parent())) {
         Entity &camera = sim->get_ent(player.get_parent());
-        camera.set_fov(BASE_FOV * (1 - buffs.extra_vision));
+        camera.set_fov(BASE_FOV * (1 - buffs.extra_vision) * sqrt(BASE_FLOWER_RADIUS / player.get_radius()));
     }
     player.speed_ratio *= buffs.movement_speed;
     PetalID::T unstackable_spawned[MAX_SLOT_COUNT];
@@ -215,6 +215,7 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
                 if (petal_slot.reload >= reload_time) {
                     petal_slot.ent_id = alloc_petal(sim, slot_petal_id, player).id;
                     petal_slot.reload = 0;
+                    sim->get_ent(petal_slot.ent_id).set_radius(sim->get_ent(petal_slot.ent_id).get_radius() * player.get_radius() / BASE_FLOWER_RADIUS);
                     slot.already_spawned = 1;
                 } 
                 else
@@ -230,22 +231,22 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
                     if (rotation_count > 0)
                         wanting.unit_normal(2 * M_PI * rot_pos / rotation_count + player.heading_angle);
 
-                    float range = player.get_radius() + 40;
+                    float range = player.get_radius() + 40 * player.get_radius() / BASE_FLOWER_RADIUS;
                     if (BitMath::at(player.input, InputFlags::kAttacking)) { 
                         if (petal_data.attributes.defend_only == 0) 
-                            range = player.get_radius() + 100 + buffs.extra_range; 
+                            range = player.get_radius() + 100 * player.get_radius() / BASE_FLOWER_RADIUS + buffs.extra_range;
                         if (petal.get_petal_id() == PetalID::kWing || petal.get_petal_id() == PetalID::kTriWing) {
                             float wave = sinf((float) petal.lifetime / (0.4 * TPS));
                             wave = wave * wave;
                             range += wave * 120;
                         }
                     }
-                    else if (BitMath::at(player.input, InputFlags::kDefending)) range = player.get_radius() + 15;
+                    else if (BitMath::at(player.input, InputFlags::kDefending)) range = player.get_radius() + 15 * player.get_radius() / BASE_FLOWER_RADIUS;
                     wanting *= range;
                     if (petal_data.attributes.clump_radius > 0) {
                         Vector secondary;
                         secondary.unit_normal(2 * M_PI * j / petal_data.count + player.heading_angle * 0.2)
-                        .set_magnitude(petal_data.attributes.clump_radius);
+                        .set_magnitude(petal_data.attributes.clump_radius * player.get_radius() / BASE_FLOWER_RADIUS);
                         wanting += secondary;
                     }
                     wanting += delta;
@@ -259,6 +260,7 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
                         mob.set_parent(player.id);
                         mob.set_color(player.get_color());
                         mob.base_entity = player.id;
+                        mob.set_radius(mob.get_radius() * player.get_radius() / BASE_FLOWER_RADIUS);
                         BitMath::set(mob.flags, EntityFlags::kDieOnParentDeath);
                         BitMath::set(mob.flags, EntityFlags::kNoDrops);
                         if (petal_data.attributes.spawn_count == 0) {
