@@ -240,7 +240,9 @@ void player_spawn(Simulation *sim, Entity &camera, Entity &player) {
     player.set_parent(camera.id);
     player.set_color(camera.get_color());
     uint32_t power = Map::difficulty_at_level(camera.get_respawn_level());
-    ZoneDefinition const &zone = MAP_DATA[Map::get_suitable_difficulty_zone(power)];
+    ZoneDefinition const& zone = (player.get_color() == ColorID::kRed)
+        ? MAP_DATA[6]   // 红队固定
+        : MAP_DATA[0];  // 蓝队固定
     float spawn_x = lerp(zone.left, zone.right, frand());
     float spawn_y = lerp(zone.top, zone.bottom, frand());
     camera.set_camera_x(spawn_x);
