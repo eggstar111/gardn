@@ -102,25 +102,7 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
             if (ent.deleted_petals[i] != PetalID::kNone && ent.deleted_petals[i] != PetalID::kBasic && ent.get_loadout_ids(i) != PetalID::kCorruption && frand() < 0.95)
                 potential.push_back(ent.deleted_petals[i]);
         }
-        if (ent.get_color() == ColorID::kRed) {
-            std::vector<uint32_t> mythic_indices;
-            for (uint32_t idx = 0; idx < PetalID::kNumPetals; ++idx) {
-                if (PETAL_DATA[idx].rarity == RarityID::kMythic)
-                    mythic_indices.push_back(idx);
-            }
-
-            if (!mythic_indices.empty()) {
-                uint32_t chosen_idx = mythic_indices[rand() % mythic_indices.size()];
-                Entity& drop = alloc_drop(sim, chosen_idx);
-
-                float radius = ent.get_radius() + 35;
-                float angle = frand() * 2.0f * M_PI;
-                float dist = radius + frand() * 35.0f;
-
-                drop.set_x(ent.get_x() + cos(angle) * dist);
-                drop.set_y(ent.get_y() + sin(angle) * dist);
-            }
-        }
+        
         //no need to deleted_petals.clear, the player dies
         std::sort(potential.begin(), potential.end(), [](PetalID::T a, PetalID::T b) {
             return PETAL_DATA[a].rarity < PETAL_DATA[b].rarity;

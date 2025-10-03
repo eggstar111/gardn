@@ -16,12 +16,18 @@ void TeamManager::add_team(uint8_t color) {
 EntityID const TeamManager::get_random_team() const {
     assert(teams.size() > 0);
     if (teams.size() == 0) return NULL_ENTITY;
-    uint32_t yellow = simulation->get_ent(teams[0]).player_count;
-    uint32_t red = simulation->get_ent(teams[1]).player_count;
-    if (yellow > red * 6) {
-        return teams[1];
+
+    uint32_t yellow_count = simulation->get_ent(teams[0]).player_count;
+    uint32_t red_count = simulation->get_ent(teams[1]).player_count;
+
+    if (yellow_count > red_count) {
+        return teams[1]; // 黄队多 → 分配红队
+    }
+    else if (red_count > yellow_count) {
+        return teams[0]; // 红队多 → 分配黄队
     }
     else {
-        return teams[0];
+        // 平衡 → 随机
+        return (frand() < 0.5f) ? teams[0] : teams[1];
     }
 }

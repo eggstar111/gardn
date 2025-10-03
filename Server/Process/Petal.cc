@@ -50,7 +50,6 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
     else if (petal_data.attributes.secondary_reload > 0) {
         if (petal.secondary_reload > petal_data.attributes.secondary_reload * TPS) {
             if (petal_data.attributes.burst_heal > 0 && player.health < player.max_health && player.dandy_ticks == 0) {
-                if (player.get_color() == ColorID::kRed && player.has_component(kFlower) && player.health / player.max_health > 0.1f) return;
                 Vector delta(player.get_x() - petal.get_x(), player.get_y() - petal.get_y());
                 if (delta.magnitude() < petal.get_radius()) {
                     inflict_heal(sim, player, petal_data.attributes.burst_heal);
