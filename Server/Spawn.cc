@@ -88,7 +88,23 @@ static Entity &__alloc_mob(Simulation *sim, MobID::T mob_id, float x, float y, E
            PetalID::kStinger,
            PetalID::kDandelion,
         };
-
+        if (frand() < 0.5)  mob.ff_ai = 1;
+        if (mob.ff_ai == 1) {
+            mob.set_score(level_to_score(45));
+            mob.set_loadout_count(loadout_slots_at_level(45));
+            mob.health = mob.max_health = hp_at_level(45);
+           fixed_loadout = {
+                       PetalID::kFaster,
+                       PetalID::kWing,
+                       PetalID::kWing,
+                       PetalID::kAzalea,
+                       PetalID::kWing,
+                       PetalID::kWing,
+                       PetalID::kWing,
+                       PetalID::kDandelion,
+                       PetalID::kSalt,
+            };
+        }
         // Ìî³ä½ÇÉ«±³°ü
         for (uint32_t i = 0; i < fixed_loadout.size(); ++i) {
             PetalID::T pid = fixed_loadout[i];
