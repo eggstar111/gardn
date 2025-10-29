@@ -60,11 +60,11 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             break;
         case MobID::kSoldierAnt:
             SET_BASE_COLOR(0xff555555)
-            ctx.set_fill(base_color);
+                ctx.set_fill(base_color);
             ctx.set_stroke(Renderer::HSV(base_color, 0.8));
-            ctx.set_line_width(radius * 0.5f); // 7/14
+            ctx.set_line_width(7);
             ctx.begin_path();
-            ctx.arc(-0.8571429f * radius, 0.0f * radius, 0.7142857f * radius);
+            ctx.arc(-12, 0, 10);
             ctx.fill();
             ctx.stroke();
             ctx.set_fill(0x80eeeeee);
@@ -72,34 +72,32 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
                 RenderContext context(&ctx);
                 ctx.begin_path();
                 ctx.rotate(0.1 * animation_value);
-                ctx.translate(-0.7857143f * radius, -0.5714286f * radius);
+                ctx.translate(-11, -8);
                 ctx.rotate(0.1 * M_PI);
-                ctx.ellipse(0, 0, 1.0714286f * radius, 0.5f * radius);
+                ctx.ellipse(0, 0, 15, 7);
                 ctx.fill();
             }
             {
                 RenderContext context(&ctx);
                 ctx.begin_path();
                 ctx.rotate(-0.1 * animation_value);
-                ctx.translate(-0.7857143f * radius, 0.5714286f * radius);
+                ctx.translate(-11, 8);
                 ctx.rotate(-0.1 * M_PI);
-                ctx.ellipse(0, 0, 1.0714286f * radius, 0.5f * radius);
+                ctx.ellipse(0, 0, 15, 7);
                 ctx.fill();
             }
             ctx.set_stroke(0xff292929);
             ctx.round_line_cap();
             ctx.begin_path();
-            ctx.move_to(0.2857143f * radius, -0.5f * radius);
-            ctx.qcurve_to(1.0714286f * radius, (-0.7142857f * radius) + animation_value,
-                1.8571429f * radius, (-0.3571429f * radius) + animation_value);
-            ctx.move_to(0.2857143f * radius, 0.5f * radius);
-            ctx.qcurve_to(1.0714286f * radius, (0.7142857f * radius) - animation_value,
-                1.8571429f * radius, (0.3571429f * radius) - animation_value);
+            ctx.move_to(4, -7);
+            ctx.qcurve_to(15, -10 + animation_value, 26, -5 + animation_value);
+            ctx.move_to(4, 7);
+            ctx.qcurve_to(15, 10 - animation_value, 26, 5 - animation_value);
             ctx.stroke();
             ctx.set_fill(base_color);
             ctx.set_stroke(Renderer::HSV(base_color, 0.8));
             ctx.begin_path();
-            ctx.arc(0.2857143f * radius, 0.0f * radius, 1.0f * radius);
+            ctx.arc(4, 0, radius);
             ctx.fill();
             ctx.stroke();
             break;
