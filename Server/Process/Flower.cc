@@ -272,7 +272,7 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
                     if (petal_data.attributes.clump_radius > 0) {
                         Vector secondary;
                         secondary.unit_normal(2 * M_PI * j / petal_data.count + player.heading_angle * 0.2)
-                        .set_magnitude(petal_data.attributes.clump_radius;
+                        .set_magnitude(petal_data.attributes.clump_radius);
                         wanting += secondary;
                     }
                     wanting += delta;
