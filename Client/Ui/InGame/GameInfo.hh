@@ -66,5 +66,6 @@ namespace Ui {
     Element *make_overlevel_indicator();
     Element *make_mobile_attack_button();
     Element *make_mobile_defend_button();
+    Element* make_mobile_yy_button();
     Element *make_mobile_joystick();
 }

@@ -30,9 +30,9 @@ void Minimap::on_render(Renderer& ctx) {
     Simulation& sim = Game::simulation;
     Entity const& camera = sim.get_ent(Game::camera_id);
 
-    // »æÖÆ°Ð×Ó
+
     sim.for_each<kMob>([&](Simulation*, Entity const& ent) {
-        if (ent.get_mob_id() == MobID::kTargetDummy) {
+        if (ent.get_mob_id() == MobID::kSoccer) {
             uint32_t color = FLOWER_COLORS[ent.get_color()];
             ctx.set_fill(color);
             ctx.set_stroke(Renderer::HSV(color, 0.8));

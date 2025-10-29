@@ -745,6 +745,45 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             draw_static_flower(ctx, attr.flower_attrs);
             break;
         };
+        case MobID::kSoccer: {
+            const float TWO_PI = 2.0f * (float)M_PI;
+
+            // 计算共享边长 s，使六边形贴圆边
+            float s = radius / (1.0f / (2.0f * sinf(M_PI / 5.0f)) * (1.0f + cosf(M_PI / 5.0f)) + sqrtf(3) / 2);
+            float ah = s * sqrtf(3) / 2;                // 六心到边中点
+            float center_dist = s / (2.0f * sinf(M_PI / 5.0f)) * cosf(M_PI / 5.0f) + ah;               // 五心到六心距离
+            ctx.set_line_width(0.1 * radius);
+            // 绘制圆球背景
+            ctx.set_fill(0xff000000);
+            ctx.set_stroke(Renderer::HSV(0xff000000, 0.81));
+            ctx.begin_path();
+            ctx.arc(0, 0, radius);
+            ctx.fill();
+            ctx.stroke();
+
+            // 绘制 5 个六边形
+            for (int k = 0; k < 5; ++k) {
+                float edge_ang = -M_PI_2 + (k + 0.5f) * TWO_PI / 5.0f;
+                float cx = cosf(edge_ang) * center_dist;
+                float cy = sinf(edge_ang) * center_dist;
+                float base_rot = edge_ang + M_PI / 6;
+                ctx.set_fill(0xffffffff);
+                ctx.set_stroke(Renderer::HSV(0xffffffff, 0.81));
+
+                ctx.begin_path();
+                for (int j = 0; j < 6; ++j) {
+                    float ang = base_rot + j * TWO_PI / 6.0f;
+                    float x = cx + cosf(ang) * s;
+                    float y = cy + sinf(ang) * s;
+                    if (j == 0) ctx.move_to(x, y);
+                    else ctx.line_to(x, y);
+                }
+                ctx.close_path();
+                ctx.fill();
+                ctx.stroke();
+            }
+            break;
+        }
         default:
             assert(!"Didn't cover mob render");
             break;

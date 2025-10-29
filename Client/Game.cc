@@ -114,6 +114,9 @@ void Game::init() {
     game_ui_window.add_child(
         Ui::make_mobile_defend_button()
     );
+    game_ui_window.add_child(
+        Ui::make_mobile_yy_button()
+    );
     for (uint8_t i = 0; i < MAX_SLOT_COUNT * 2; ++i) game_ui_window.add_child(new Ui::UiLoadoutPetal(i));
     game_ui_window.add_child(
         Ui::make_leaderboard()

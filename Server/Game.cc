@@ -33,6 +33,12 @@ static void _update_client(Simulation *sim, Client *client) {
         }
     });
 
+    sim->for_each<kMob>([&](Simulation*, Entity& ent) {
+        if (ent.get_mob_id() == MobID::kSoccer) {
+            in_view.insert(ent.id);
+        }
+    });
+
     sim->for_each<kFlower>([&](Simulation*, Entity& ent) {
         if (ent.id != client->camera && ent.get_team() == camera.get_team()) {
             in_view.insert(ent.id);
@@ -77,14 +83,6 @@ void GameInstance::init() {
     #ifdef GAMEMODE_TDM
     team_manager.add_team(ColorID::kYellow);
     team_manager.add_team(ColorID::kRed);
-    for (uint32_t i = 1; i <= 5; ++i) {
-        float cx = (MAP_DATA[i].left + MAP_DATA[i].right) * 0.5f;
-        float cy = (MAP_DATA[i].top + MAP_DATA[i].bottom) * 0.5f;
-        Entity& mob = alloc_mob(&simulation, MobID::kTargetDummy, cx, cy, NULL_ENTITY);
-        mob.set_parent(NULL_ENTITY);
-        mob.set_color(ColorID::kGray);
-        mob.base_entity = NULL_ENTITY;
-    }
     #endif
 }
 
@@ -115,14 +113,30 @@ void GameInstance::add_client(Client *client) {
     #endif
     
     ent.set_fov(BASE_FOV);
-    ent.set_respawn_level(1);
-        for (uint32_t i = 0; i < loadout_slots_at_level(ent.get_respawn_level()); ++i)
-            ent.set_inventory(i, PetalID::kBasic);
-        ent.set_inventory(loadout_slots_at_level(ent.get_respawn_level()), PetalID::kRose);
-        ent.set_inventory(loadout_slots_at_level(ent.get_respawn_level()) + 1, PetalID::kBubble);
 
-        if (frand() < 0.0001 && PetalTracker::get_count(&simulation, PetalID::kUniqueBasic) == 0)
-            ent.set_inventory(0, PetalID::kUniqueBasic);
+        ent.set_respawn_level(99);
+
+        // ¹Ì¶¨Ë³ÐòµÄ»¨°ê
+        std::vector<PetalID::T> fixed_loadout = {
+                PetalID::kAzalea,
+                PetalID::kAzalea,
+                PetalID::kBubble,
+                PetalID::kHeaviest,
+                PetalID::kHeaviest,
+                PetalID::kHeaviest,
+                PetalID::kHeaviest,
+                PetalID::kHeaviest,
+                PetalID::kHeaviest
+        };
+
+        // Ìî³ä½ÇÉ«±³°ü
+        for (uint32_t i = 0; i < fixed_loadout.size(); ++i) {
+            ent.set_inventory(i, fixed_loadout[i]);
+        }
+
+
+        ent.set_inventory(loadout_slots_at_level(ent.get_respawn_level()), PetalID::kYinYang);
+
     for (uint32_t i = 0; i < loadout_slots_at_level(ent.get_respawn_level()); ++i)
         PetalTracker::add_petal(&simulation, ent.get_inventory(i));
     client->camera = ent.id;

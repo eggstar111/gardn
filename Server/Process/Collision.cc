@@ -48,7 +48,7 @@ static void _deal_push(Entity &ent, Vector knockback, float mass_ratio, float sc
 static void _deal_knockback(Entity &ent, Vector knockback, float mass_ratio) {
     if (fabsf(mass_ratio) < 0.01) return;
     float scale = PLAYER_ACCELERATION * 2;
-    knockback *= scale * mass_ratio;
+    knockback *= scale * mass_ratio * ent.knockback;
     ent.collision_velocity += knockback;
     ent.velocity += knockback * 2;
 }

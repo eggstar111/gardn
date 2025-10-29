@@ -26,6 +26,32 @@ struct PlayerBuffs {
     uint8_t equip_flags;
 };
 
+static void redirect_to_nearby_enemy(Simulation* sim, Vector& target_pos, Entity& self) {
+    Entity* nearest_enemy = nullptr;
+    float nearest_dist_sq = 999999;
+
+    sim->for_each<kFlower>([&](Simulation* s, Entity& flower) {
+        if (flower.get_team() == self.get_team()) return;
+
+        float dx = flower.get_x() - target_pos.x;
+        float dy = flower.get_y() - target_pos.y;
+        float dist_sq = dx * dx + dy * dy;
+
+        float threshold = 30.0f + flower.get_radius();
+        if (dist_sq < threshold * threshold) {
+            if (!nearest_enemy || dist_sq < nearest_dist_sq) {
+                nearest_enemy = &flower;
+                nearest_dist_sq = dist_sq;
+            }
+        }
+        });
+
+    if (nearest_enemy) {
+        target_pos.x = nearest_enemy->get_x();
+        target_pos.y = nearest_enemy->get_y();
+    }
+}
+
 static struct PlayerBuffs _get_petal_passive_buffs(Simulation *sim, Entity &player) {
     struct PlayerBuffs buffs = {0};
     if (player.has_component(kMob) && player.get_mob_id() != MobID::kFallenFlower) return buffs;
@@ -131,6 +157,7 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
                         Entity& mob = alloc_mob(sim, MobID::kFallenFlower, x, y, NULL_ENTITY);
                         mob.prey = player.id;
                         BitMath::set(mob.flags, EntityFlags::kNoDrops);
+                        mob.set_name("Hunter");
                         break; // 生成成功，退出调整循环
                     }
 
@@ -251,7 +278,15 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
                     }
                     wanting += delta;
                     wanting *= 0.5;
-                    petal.acceleration = wanting;
+                    Vector final_target = Vector(petal.get_x() + wanting.x, petal.get_y() + wanting.y);
+
+                    // 只有具备锁定属性的花瓣才尝试重定向
+                    if (petal_data.attributes.lock) {
+                        redirect_to_nearby_enemy(sim, final_target, petal);
+                    }
+
+                    // 最终加速度
+                    petal.acceleration = final_target - Vector(petal.get_x(), petal.get_y());
                     game_tick_t sec_reload_ticks = petal_data.attributes.secondary_reload * TPS;
                     if (petal_data.attributes.spawns != MobID::kNumMobs &&
                         petal.secondary_reload > sec_reload_ticks) {

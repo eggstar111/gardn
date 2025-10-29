@@ -28,7 +28,7 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
     {
         .left = 0,
         .top = 0,
-        .right = 5000,
+        .right = 800,
         .bottom = 4000,
         .density = 1,
         .drop_multiplier = 0.3,
@@ -47,9 +47,9 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
         .name = "Easy"
     },
     {
-        .left = 5000,
+        .left = 800,
         .top = 0,
-        .right = 10000,
+        .right = 10800,
         .bottom = 4000,
         .density = 1,
         .drop_multiplier = 0.15,
@@ -70,9 +70,9 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
         .name = "Medium"
     },
     {
-        .left = 10000,
+        .left = 10800,
         .top = 0,
-        .right = 15000,
+        .right = 20800,
         .bottom = 4000,
         .density = 1,
         .drop_multiplier = 0.1,
@@ -88,6 +88,7 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
             { MobID::kMassiveBeetle, 2000 },
             { MobID::kAntHole, 2000 },
             { MobID::kTank, 1000 },
+            { MobID::kFallenFlower, 200 },
             { MobID::kSquare, 1 }
         },
         .difficulty = 2,
@@ -95,9 +96,9 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
         .name = "Hard"
     },
     {
-        .left = 15000,
+        .left = 20800,
         .top = 0,
-        .right = 25000,
+        .right = 30800,
         .bottom = 4000,
         .density = 1,
         .drop_multiplier = 0.025,
@@ -119,9 +120,9 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
         .name = "???"
     },
     {
-        .left = 25000,
+        .left = 30800,
         .top = 0,
-        .right = 30000,
+        .right = 40800,
         .bottom = 4000,
         .density = 1,
         .drop_multiplier = 0.1,
@@ -137,6 +138,7 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
             { MobID::kMassiveBeetle, 2000 },
             { MobID::kAntHole, 2000 },
             { MobID::kTank, 1000 },
+            { MobID::kFallenFlower, 200 },
             { MobID::kSquare, 1 }
         },
         .difficulty = 2,
@@ -144,9 +146,9 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
         .name = "Hard2"
     },
     {
-        .left = 30000,
+        .left = 40800,
         .top = 0,
-        .right = 35000,
+        .right = 50800,
         .bottom = 4000,
         .density = 1,
         .drop_multiplier = 0.15,
@@ -167,9 +169,9 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
         .name = "Medium2"
     },
     {
-        .left = 35000,
+        .left = 50800,
         .top = 0,
-        .right = 40000,
+        .right = 51600,
         .bottom = 4000,
         .density = 1,
         .drop_multiplier = 0.3,

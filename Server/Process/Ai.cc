@@ -843,6 +843,9 @@ void tick_ai_behavior(Simulation *sim, Entity &ent) {
             }
             break;
         }
+        case MobID::kSoccer:
+            ent.set_angle(ent.get_angle() + ent.velocity.magnitude() / 300);
+            break;
         default:
             break;
     }

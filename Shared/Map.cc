@@ -43,7 +43,7 @@ void Map::remove_mob(Simulation *sim, uint32_t zone) {
 void Map::spawn_random_mob(Simulation *sim, float x, float y) {
     uint32_t zone_id = Map::get_zone_from_pos(x, y);
     struct ZoneDefinition const &zone = MAP_DATA[zone_id];
-    if (zone.density * (zone.right - zone.left) * (zone.bottom - zone.top) / (500 * 500) < sim->zone_mob_counts[zone_id]) return;
+    if (zone.density / 2 * (zone.right - zone.left) * (zone.bottom - zone.top) / (500 * 500) < sim->zone_mob_counts[zone_id]) return;
     float sum = 0;
     for (SpawnChance const &s : zone.spawns)
         sum += s.chance;

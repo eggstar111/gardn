@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-inline uint32_t const ARENA_WIDTH = 40000;
+inline uint32_t const ARENA_WIDTH = 51600;
 inline uint32_t const ARENA_HEIGHT = 4000;
 
 inline uint32_t const MAX_SLOT_COUNT = 9;
@@ -86,6 +86,9 @@ namespace PetalID {
         kDestroyerBullet,
         kSoil,
         kMark,
+        kMagnet,
+        kFang,
+        kOcto,
         kNumPetals
     };
 };
@@ -120,6 +123,7 @@ namespace MobID {
         kTargetDummy,
         kTank,
         kFallenFlower,
+        kSoccer,
         kNumMobs
     };
 };
@@ -234,6 +238,7 @@ struct PetalAttributes {
     float poison_armor = 0;
     float damage_reflection = 0;
     float slow_inflict = 0;
+    uint8_t lock = 0;
 };
 
 struct PetalData {

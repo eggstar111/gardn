@@ -94,6 +94,7 @@ SINGLE(Name, nametag_visible, uint8_t)
     SINGLE(acceleration, Vector, .set(0,0)) \
     SINGLE(friction, float, =0) \
     SINGLE(mass, float, =1) \
+    SINGLE(knockback, float, =1) \
     SINGLE(speed_ratio, float, =1) \
     \
     MULTIPLE(loadout, LoadoutSlot, MAX_SLOT_COUNT, .reset()) \

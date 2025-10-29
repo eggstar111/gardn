@@ -80,6 +80,53 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
             }
         }
     }
+    if (defender.has_component(kMob) && defender.get_mob_id() == MobID::kSoccer) {
+            std::vector<uint32_t> epic_indices;
+            for (uint32_t idx = 0; idx < PetalID::kNumPetals; ++idx) {
+                if (PETAL_DATA[idx].rarity == RarityID::kEpic)
+                    epic_indices.push_back(idx);
+            }
+            if (!epic_indices.empty() && frand() < 0.1f) {
+                uint32_t chosen_idx = epic_indices[rand() % epic_indices.size()];
+                Entity& drop = alloc_drop(sim, chosen_idx);
+                float radius = defender.get_radius() + 35;
+                float angle = frand() * 2.0f * M_PI;
+                float dist = radius + frand() * 35.0f;
+                drop.set_x(defender.get_x() + cos(angle) * dist);
+                drop.set_y(defender.get_y() + sin(angle) * dist);
+            }
+
+            std::vector<uint32_t> leg_indices;
+            for (uint32_t idx = 0; idx < PetalID::kNumPetals; ++idx) {
+                if (PETAL_DATA[idx].rarity == RarityID::kLegendary)
+                    leg_indices.push_back(idx);
+            }
+            if (!leg_indices.empty() && frand() < 0.001f) {
+                uint32_t chosen_idx = leg_indices[rand() % leg_indices.size()];
+                Entity& drop = alloc_drop(sim, chosen_idx);
+                float radius = defender.get_radius() + 35;
+                float angle = frand() * 2.0f * M_PI;
+                float dist = radius + frand() * 35.0f;
+                drop.set_x(defender.get_x() + cos(angle) * dist);
+                drop.set_y(defender.get_y() + sin(angle) * dist);
+            }
+
+            std::vector<uint32_t> mythic_indices;
+            for (uint32_t idx = 0; idx < PetalID::kNumPetals; ++idx) {
+                if (PETAL_DATA[idx].rarity == RarityID::kMythic)
+                    mythic_indices.push_back(idx);
+            }
+            if (!mythic_indices.empty() && frand() < 0.00005f) {
+                uint32_t chosen_idx = mythic_indices[rand() % mythic_indices.size()];
+                Entity& drop = alloc_drop(sim, chosen_idx);
+                float radius = defender.get_radius() + 35;
+                float angle = frand() * 2.0f * M_PI;
+                float dist = radius + frand() * 35.0f;
+                drop.set_x(defender.get_x() + cos(angle) * dist);
+                drop.set_y(defender.get_y() + sin(angle) * dist);
+            }
+
+    }
     if (defender.has_component(kMob) && defender.get_mob_id() == MobID::kTargetDummy) {
         if (defender.health == 0) {
             Entity& dummy = alloc_mob(sim, MobID::kTargetDummy, defender.get_x(), defender.get_y(), sim->get_ent(atk_id).get_team());
@@ -201,6 +248,8 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
     Entity &attacker = sim->get_ent(atk_id);
     if (defender.has_component(kFlower) && !defender.has_component(kMob) && attacker.get_petal_id() == PetalID::kMark)
         mark(sim, defender, attacker);
+    if (attacker.get_petal_id() == PetalID::kFang && sim->get_ent(attacker.base_entity).dandy_ticks == 0)
+        inflict_heal(sim, sim->get_ent(attacker.base_entity), PETAL_DATA[attacker.get_petal_id()].damage);
     if (type != DamageType::kReflect && defender.damage_reflection > 0)
         inflict_damage(sim, defender.base_entity, attacker.base_entity, damage_dealt * defender.damage_reflection, DamageType::kReflect);
     

@@ -1061,6 +1061,147 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.stroke();
             break;
         }
+        case PetalID::kMagnet: 
+            ctx.set_stroke(0xff363685);
+            ctx.set_line_width(10.909091f);
+            ctx.begin_path();
+            ctx.move_to(8.953636f, -4.211364f);
+            ctx.qcurve_to(4.572727f, 11.264545f, -5.262727f, 4.949545f);
+            ctx.stroke();
+
+            ctx.set_stroke(0xff4343a4);
+            ctx.set_line_width(6.545455f);
+            ctx.begin_path();
+            ctx.move_to(9.059091f, -4.375455f);
+            ctx.qcurve_to(4.572727f, 11.264545f, -5.263182f, 4.950000f);
+            ctx.stroke();
+
+            ctx.set_stroke(0xff853636);
+            ctx.set_line_width(10.909091f);
+            ctx.begin_path();
+            ctx.move_to(-2.849091f, -11.789545f);
+            ctx.qcurve_to(-15.098182f, -1.365909f, -5.262727f, 4.949545f);
+            ctx.stroke();
+
+            ctx.set_stroke(0xffa44343);
+            ctx.set_line_width(6.545455f);
+            ctx.begin_path();
+            ctx.move_to(-2.743636f, -11.953636f);
+            ctx.qcurve_to(-15.098182f, -1.365909f, -5.262727f, 4.949545f);
+            ctx.stroke();
+
+            ctx.set_stroke(0xff363685);
+            ctx.set_line_width(10.909091f);
+            ctx.begin_path();
+            ctx.move_to(8.953636f, -4.211364f);
+            ctx.qcurve_to(4.572727f, 11.264545f, -5.262727f, 4.949545f);
+            ctx.stroke();
+
+            ctx.set_stroke(0xff4343a4);
+            ctx.set_line_width(6.545455f);
+            ctx.begin_path();
+            ctx.move_to(9.059091f, -4.375455f);
+            ctx.qcurve_to(4.572727f, 11.264545f, -5.263182f, 4.950000f);
+            ctx.stroke();
+
+            ctx.set_stroke(0xff853636);
+            ctx.set_line_width(10.909091f);
+            ctx.begin_path();
+            ctx.move_to(-2.849091f, -11.789545f);
+            ctx.qcurve_to(-15.098182f, -1.365909f, -5.262727f, 4.949545f);
+            ctx.stroke();
+
+            ctx.set_stroke(0xffa44343);
+            ctx.set_line_width(6.545455f);
+            ctx.begin_path();
+            ctx.move_to(-2.743636f, -11.953636f);
+            ctx.qcurve_to(-15.098182f, -1.365909f, -5.262727f, 4.949545f);
+            ctx.stroke();
+            break;
+        case PetalID::kFang: {
+            ctx.set_fill(0xff9c1010);
+            ctx.set_stroke(0xff7e0d0d);
+            ctx.set_line_width(0.2 * r);
+            ctx.round_line_cap();
+            ctx.round_line_join();
+            ctx.begin_path();
+            float long_half = r;
+            float short_half = r / 1.8f; 
+            float bulge = r / 9.0f; 
+            ctx.move_to(-long_half, 0);
+            ctx.line_to(-long_half * 0.4f, short_half * 0.6f);
+            ctx.qcurve_to(
+                0, short_half + bulge,
+                long_half * 0.4f, short_half * 0.6f 
+            );
+            ctx.line_to(long_half, 0);
+            ctx.line_to(long_half * 0.4f, -short_half * 0.6f);
+            ctx.qcurve_to(
+                0, -short_half - bulge,
+                -long_half * 0.4f, -short_half * 0.6f 
+            );
+            ctx.line_to(-long_half, 0);
+            ctx.close_path();
+            ctx.fill();
+            ctx.stroke();
+            break;
+        }
+        case PetalID::kOcto: {
+            const int barrel_count = 8;
+            const float angle_step = 2 * M_PI / barrel_count; 
+
+            for (int i = 0; i < barrel_count; ++i) {
+                float angle = i * angle_step;
+
+                // 炮管长度和宽度
+                float barrel_len = 1.8f * r;
+                float barrel_wid = 0.9f * r;
+
+                // 炮管中心线方向向量
+                float dx = cosf(angle);
+                float dy = sinf(angle);
+
+                // 炮管横向（垂直方向）向量
+                float nx = -dy;
+                float ny = dx;
+
+                // 炮管矩形的四个顶点（以中心为原点）
+                float x0 = dx * 0.0f - nx * (barrel_wid / 2);
+                float y0 = dy * 0.0f - ny * (barrel_wid / 2);
+
+                float x1 = dx * barrel_len - nx * (barrel_wid / 2);
+                float y1 = dy * barrel_len - ny * (barrel_wid / 2);
+
+                float x2 = dx * barrel_len + nx * (barrel_wid / 2);
+                float y2 = dy * barrel_len + ny * (barrel_wid / 2);
+
+                float x3 = dx * 0.0f + nx * (barrel_wid / 2);
+                float y3 = dy * 0.0f + ny * (barrel_wid / 2);
+
+                // 绘制炮管多边形
+                ctx.begin_path();
+                ctx.set_fill(0xff999999);
+                ctx.set_stroke(0xff727272);
+
+                ctx.move_to(x0, y0);
+                ctx.line_to(x1, y1);
+                ctx.line_to(x2, y2);
+                ctx.line_to(x3, y3);
+                ctx.close_path();
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            ctx.set_fill(0xffc0c0c0);
+            ctx.set_stroke(Renderer::HSV(0xffc0c0c0, 0.8));
+            ctx.set_line_width(0.15 * r);
+            ctx.begin_path();
+            ctx.arc(0, 0, r);
+            ctx.fill();
+            ctx.stroke();
+            break;
+        }
+
         default:
             assert(id < PetalID::kNumPetals);
             assert(!"didn't cover petal render");

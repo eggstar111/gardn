@@ -34,7 +34,7 @@ static Entity &__alloc_mob(Simulation *sim, MobID::T mob_id, float x, float y, E
     struct MobData const &data = MOB_DATA[mob_id];
     float seed = frand();
     Entity &mob = sim->alloc_ent();
-
+    if (mob_id == MobID::kSoccer) mob.knockback = 10;
     mob.add_component(kPhysics);
     mob.set_radius(data.radius.get_single(seed));
     mob.set_angle(frand() * 2 * M_PI);
@@ -72,6 +72,7 @@ static Entity &__alloc_mob(Simulation *sim, MobID::T mob_id, float x, float y, E
         mob.set_color(ColorID::kGray);
     }
     if (mob_id == MobID::kFallenFlower) {
+        mob.set_nametag_visible(1);
         mob.add_component(kFlower);
         mob.set_angle(0);
         mob.set_color(ColorID::kGray);
@@ -88,7 +89,23 @@ static Entity &__alloc_mob(Simulation *sim, MobID::T mob_id, float x, float y, E
            PetalID::kStinger,
            PetalID::kDandelion,
         };
-
+        if (frand() < 0.5)  mob.ff_ai = 1;
+        if (mob.ff_ai == 1) {
+            mob.set_score(level_to_score(45));
+            mob.set_loadout_count(loadout_slots_at_level(45));
+            mob.health = mob.max_health = hp_at_level(45);
+           fixed_loadout = {
+                       PetalID::kWing,
+                       PetalID::kFaster,
+                       PetalID::kWing,
+                       PetalID::kSalt,
+                       PetalID::kWing,
+                       PetalID::kAzalea,
+                       PetalID::kWing,
+                       PetalID::kDandelion,
+                       PetalID::kWing,
+            };
+        }
         // 填充角色背包
         for (uint32_t i = 0; i < fixed_loadout.size(); ++i) {
             PetalID::T pid = fixed_loadout[i];
@@ -241,8 +258,8 @@ void player_spawn(Simulation *sim, Entity &camera, Entity &player) {
     player.set_color(camera.get_color());
     uint32_t power = Map::difficulty_at_level(camera.get_respawn_level());
     ZoneDefinition const& zone = (player.get_color() == ColorID::kRed)
-        ? MAP_DATA[6]   // 红队固定
-        : MAP_DATA[0];  // 蓝队固定
+        ? MAP_DATA[6] 
+        : MAP_DATA[0]; 
     float spawn_x = lerp(zone.left, zone.right, frand());
     float spawn_y = lerp(zone.top, zone.bottom, frand());
     camera.set_camera_x(spawn_x);

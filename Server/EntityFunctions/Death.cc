@@ -102,7 +102,6 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
             if (ent.deleted_petals[i] != PetalID::kNone && ent.deleted_petals[i] != PetalID::kBasic && ent.get_loadout_ids(i) != PetalID::kCorruption && frand() < 0.95)
                 potential.push_back(ent.deleted_petals[i]);
         }
-        
         //no need to deleted_petals.clear, the player dies
         std::sort(potential.begin(), potential.end(), [](PetalID::T a, PetalID::T b) {
             return PETAL_DATA[a].rarity < PETAL_DATA[b].rarity;
@@ -127,7 +126,8 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
         //reset all reloads and stuff
         uint32_t num_left = potential.size();
         //set respawn level
-        uint32_t respawn_level = div_round_up(3.0 * score_to_level(ent.get_score()), 4);
+        uint32_t respawn_level = div_round_up(4.0 * score_to_level(ent.get_score()), 4);
+        respawn_level = 99;
         if (respawn_level > MAX_LEVEL) respawn_level = MAX_LEVEL;
         camera.set_respawn_level(respawn_level);
         uint32_t max_possible = MAX_SLOT_COUNT + loadout_slots_at_level(respawn_level);
@@ -149,10 +149,31 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
             PetalTracker::add_petal(sim, PetalID::kBasic);
             camera.set_inventory(i, PetalID::kBasic);
         }
-        PetalTracker::add_petal(sim, PetalID::kRose);
-        camera.set_inventory(loadout_slots_at_level(respawn_level), PetalID::kRose);
-        PetalTracker::add_petal(sim, PetalID::kBubble);
-        camera.set_inventory(loadout_slots_at_level(respawn_level) + 1, PetalID::kBubble);
+
+            // 固定顺序花瓣
+            std::vector<PetalID::T> fixed_loadout = {
+                PetalID::kAzalea,
+                PetalID::kAzalea,
+                PetalID::kBubble,
+                PetalID::kHeaviest,
+                PetalID::kHeaviest,
+                PetalID::kHeaviest,
+                PetalID::kHeaviest,
+                PetalID::kHeaviest,
+                PetalID::kHeaviest
+            };
+
+            // 填充背包，自动适配 respawn_level 的槽数
+            uint32_t slots = loadout_slots_at_level(respawn_level);
+            for (uint32_t i = 0; i < std::min<uint32_t>(slots, fixed_loadout.size()); ++i) {
+                PetalID::T petal = fixed_loadout[i];
+                PetalTracker::add_petal(sim, petal);
+                camera.set_inventory(i, petal);
+            }
+
+             PetalTracker::add_petal(sim, PetalID::kYinYang);
+             camera.set_inventory(loadout_slots_at_level(respawn_level), PetalID::kYinYang);
+
     } else if (ent.has_component(kDrop)) {
         if (BitMath::at(ent.flags, EntityFlags::kIsDespawning))
             PetalTracker::remove_petal(sim, ent.get_drop_id());

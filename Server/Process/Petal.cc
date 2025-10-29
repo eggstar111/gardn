@@ -42,6 +42,43 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
                 petal.acceleration.unit_normal(petal.get_angle()).set_magnitude(2.5 * PLAYER_ACCELERATION);
                 break;
             }
+            case PetalID::kOcto: {
+                ++petal.ai_tick;
+                petal.acceleration.set(0, 0);
+                if (petal.ai_tick >= 1 * TPS) {
+                    petal.ai_tick = 0;
+                    const int barrel_count = 8;
+                    const float angle_step = 2 * M_PI / barrel_count;
+                    const float barrel_len = 1.8f * petal.get_radius();  // 炮管长度
+                    const float spawn_offset = barrel_len;              // 子弹生成距离
+
+                    for (int i = 0; i < barrel_count; ++i) {
+                        float angle = petal.get_angle() + i * angle_step; // 每根炮管相对旋转角
+
+                        // 创建子弹实体
+                        Entity& bullet = alloc_petal(sim, PetalID::kBullet, player);
+                        entity_set_despawn_tick(bullet, 3 * TPS);
+                        bullet.damage = 8;
+                        bullet.health = bullet.max_health = 8;
+                        bullet.set_radius(petal.get_radius() * 0.4f);
+
+                        // 设置子弹角度
+                        bullet.set_angle(angle);
+
+                        // 计算炮管端点坐标（相对实体中心）
+                        Vector spawn_offset_bullet;
+                        spawn_offset_bullet.unit_normal(angle).set_magnitude(spawn_offset);
+
+                        // 设置子弹初始位置
+                        bullet.set_x(petal.get_x() + spawn_offset_bullet.x);
+                        bullet.set_y(petal.get_y() + spawn_offset_bullet.y);
+
+                        // 设置子弹加速度（发射速度）
+                        bullet.acceleration.unit_normal(angle).set_magnitude(2.5f * PLAYER_ACCELERATION);
+                    }
+                }
+                break;
+            }
             default:
                 petal.acceleration.set(0,0);
                 break;
@@ -117,6 +154,35 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
                 case PetalID::kDrone: {
                     petal.acceleration.unit_normal(petal.get_angle()).set_magnitude(4 * PLAYER_ACCELERATION);
                     entity_set_despawn_tick(petal, 15 * TPS);
+                    break;
+                }
+                case PetalID::kMagnet: {
+                    if (BitMath::at(player.input, InputFlags::kAttacking)) {
+                        float attract_range = 500.0f;
+                        sim->for_each<kFlower>([&](Simulation* s, Entity& flower) {
+                            if (flower.get_team() == player.get_team()) return;
+                            if (!sim->ent_alive(flower.id)) return;
+                            float dx = player.get_x() - flower.get_x();
+                            float dy = player.get_y() - flower.get_y();
+                            float dist_sq = dx * dx + dy * dy;
+
+                            if (dist_sq <= attract_range * attract_range) {
+                                Vector delta(dx, dy);
+                                delta.set_magnitude(PLAYER_ACCELERATION * 15);
+                                flower.velocity += delta;
+                            }
+                        });
+                        sim->request_delete(petal.id);
+                    }
+                    break;
+                }
+                case PetalID::kOcto: {
+                    if (BitMath::at(player.input, InputFlags::kAttacking) || BitMath::at(player.input, InputFlags::kDefending)) {
+                        petal.friction = DEFAULT_FRICTION;
+                        petal.acceleration.unit_normal(petal.get_angle()).set_magnitude(40 * PLAYER_ACCELERATION);
+                        entity_set_despawn_tick(petal, 20.0 * TPS);
+                    }
+                    break;
                 }
                 default:
                     break;
