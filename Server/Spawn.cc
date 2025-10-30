@@ -34,13 +34,16 @@ static Entity &__alloc_mob(Simulation *sim, MobID::T mob_id, float x, float y, E
     struct MobData const &data = MOB_DATA[mob_id];
     float seed = frand();
     Entity &mob = sim->alloc_ent();
-    if (mob_id == MobID::kSoccer) mob.knockback = 10;
     mob.add_component(kPhysics);
     mob.set_radius(data.radius.get_single(seed));
     mob.set_angle(frand() * 2 * M_PI);
     mob.set_x(x);
     mob.set_y(y);
     mob.friction = DEFAULT_FRICTION;
+    if (mob_id == MobID::kSoccer) {
+        mob.knockback = 6;
+        mob.friction = DEFAULT_FRICTION / 2;
+    }
     mob.mass = (1 + mob.get_radius() / BASE_FLOWER_RADIUS) * (data.attributes.stationary ? 10000 : 1);
     if (mob_id == MobID::kAntHole)
         BitMath::set(mob.flags, EntityFlags::kNoFriendlyCollision);
