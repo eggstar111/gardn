@@ -227,7 +227,7 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
                 float y = center_y + sin(angle) * circle_radius;
 
                 Entity& missile = alloc_petal(sim, PetalID::kDandelion, defender);
-                missile.damage = 0;
+                missile.damage = 1;
                 missile.health = missile.max_health = 5000;
                 missile.set_radius(60);
                 missile.mass = 10;
