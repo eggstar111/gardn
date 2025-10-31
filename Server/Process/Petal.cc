@@ -58,7 +58,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
                         // 创建子弹实体
                         Entity& bullet = alloc_petal(sim, PetalID::kBullet, player);
                         entity_set_despawn_tick(bullet, 3 * TPS);
-                        bullet.damage = 8;
+                        bullet.damage = 5;
                         bullet.health = bullet.max_health = 8;
                         bullet.set_radius(petal.get_radius() * 0.4f);
 

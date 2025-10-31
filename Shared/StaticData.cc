@@ -896,8 +896,8 @@ std::array<struct PetalData, PetalID::kNumPetals> const PETAL_DATA = {{
     {
         .name = "Fang",
         .description = "Heals based on damage dealt by this petal.",
-        .health = 10.0,
-        .damage = 20.0,
+        .health = 20.0,
+        .damage = 10.0,
         .radius = 15.0,
         .reload = 2.0,
         .count = 1,
