@@ -49,7 +49,7 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
     {
         .left = 800,
         .top = 0,
-        .right = 10800,
+        .right = 5800,
         .bottom = 4000,
         .density = 1,
         .drop_multiplier = 0.15,
@@ -70,9 +70,9 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
         .name = "Medium"
     },
     {
-        .left = 10800,
+        .left = 5800,
         .top = 0,
-        .right = 20800,
+        .right = 10800,
         .bottom = 4000,
         .density = 1,
         .drop_multiplier = 0.1,
@@ -96,9 +96,9 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
         .name = "Hard"
     },
     {
-        .left = 20800,
+        .left = 10800,
         .top = 0,
-        .right = 30800,
+        .right = 15800,
         .bottom = 4000,
         .density = 1,
         .drop_multiplier = 0.025,
@@ -120,9 +120,9 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
         .name = "???"
     },
     {
-        .left = 30800,
+        .left = 15800,
         .top = 0,
-        .right = 40800,
+        .right = 20800,
         .bottom = 4000,
         .density = 1,
         .drop_multiplier = 0.1,
@@ -146,9 +146,9 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
         .name = "Hard2"
     },
     {
-        .left = 40800,
+        .left = 20800,
         .top = 0,
-        .right = 50800,
+        .right = 25800,
         .bottom = 4000,
         .density = 1,
         .drop_multiplier = 0.15,
@@ -169,9 +169,9 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
         .name = "Medium2"
     },
     {
-        .left = 50800,
+        .left = 25800,
         .top = 0,
-        .right = 51600,
+        .right = 26600,
         .bottom = 4000,
         .density = 1,
         .drop_multiplier = 0.3,

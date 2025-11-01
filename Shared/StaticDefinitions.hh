@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-inline uint32_t const ARENA_WIDTH = 51600;
+inline uint32_t const ARENA_WIDTH = 26600;
 inline uint32_t const ARENA_HEIGHT = 4000;
 
 inline uint32_t const MAX_SLOT_COUNT = 9;

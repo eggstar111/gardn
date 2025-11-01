@@ -93,7 +93,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
                     sim->request_delete(petal.id);
                     return;
                 }
-                delta.set_magnitude(PLAYER_ACCELERATION * 4);
+                delta.set_magnitude(PLAYER_ACCELERATION * 6);
                 petal.acceleration = delta;
             }
             switch (petal.get_petal_id()) {
