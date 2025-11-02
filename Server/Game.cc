@@ -8,6 +8,67 @@
 #include <Shared/Entity.hh>
 #include <Shared/Map.hh>
 
+static void balance(Simulation* sim) {
+    Entity& yellow_team = sim->get_ent(Server::game.get_team_manager().get_team(0));
+    Entity& red_team = sim->get_ent(Server::game.get_team_manager().get_team(1));
+
+    auto find_worst_player = [&](uint8_t color) -> Entity* {
+        Entity* worst = nullptr;
+        int lowest_score = INT_MAX;
+
+        sim->for_each<kFlower>([&](Simulation* sim_ptr, Entity& flower) {
+            if (flower.get_color() != color) return;
+            if (flower.has_component(kMob)) return;
+            int score = flower.get_score();
+            if (score < lowest_score) {
+                lowest_score = score;
+                worst = &flower;
+            }
+            });
+
+        return worst;
+        };
+
+    auto reassign_team = [&](Entity& player, uint8_t new_color, EntityID new_team_id) {
+        // 改玩家本体
+        player.set_color(new_color);
+        player.set_team(new_team_id);
+
+        // 改 camera（父实体）
+        EntityID parent_id = player.get_parent();
+        if (sim->ent_alive(parent_id)) {
+            Entity& camera = sim->get_ent(parent_id);
+            camera.set_color(new_color);
+            camera.set_team(new_team_id);
+        }
+
+        // 改所有 parent = player.id 的子实体
+        sim->for_each_entity([&](Simulation* sim_ptr, Entity& ent) {
+            if (ent.get_parent() == player.id) {
+                ent.set_color(new_color);
+                ent.set_team(new_team_id);
+            }
+            });
+        };
+
+    if (red_team.player_count > yellow_team.player_count + 1) {
+        if (Entity* worst_player = find_worst_player(ColorID::kRed)) {
+            reassign_team(*worst_player, ColorID::kYellow, yellow_team.id);
+            ++yellow_team.player_count;
+            --red_team.player_count;
+            Server::game.broadcast_message("A RED player has been forced to join Yellow for balance");
+        }
+    }
+    else if (yellow_team.player_count > red_team.player_count + 1) {
+        if (Entity* worst_player = find_worst_player(ColorID::kYellow)) {
+            reassign_team(*worst_player, ColorID::kRed, red_team.id);
+            --yellow_team.player_count;
+            ++red_team.player_count;
+            Server::game.broadcast_message("A Yellow player has been forced to join RED for balance");
+        }
+    }
+}
+
 static void _update_client(Simulation *sim, Client *client) {
     if (client == nullptr) return;
     if (!client->verified) return;
@@ -121,7 +182,7 @@ void GameInstance::add_client(Client *client) {
                 PetalID::kAzalea,
                 PetalID::kAzalea,
                 PetalID::kBubble,
-                PetalID::kHeaviest,
+                PetalID::kAzalea,
                 PetalID::kHeaviest,
                 PetalID::kHeaviest,
                 PetalID::kHeaviest,
@@ -156,6 +217,7 @@ void GameInstance::remove_client(Client *client) {
             PetalTracker::remove_petal(&simulation, c.get_inventory(i));
         simulation.request_delete(client->camera);
     }
+    balance(&simulation);
     client->game = nullptr;
 }
 

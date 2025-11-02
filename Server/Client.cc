@@ -4,7 +4,6 @@
 #include <Server/PetalTracker.hh>
 #include <Server/Server.hh>
 #include <Server/Spawn.hh>
-
 #include <Helpers/UTF8.hh>
 #include <Server/picosha2.h>
 #include <Shared/Binary.hh>
@@ -430,7 +429,53 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
             flower.hunter = hunter_value;
         }
     }
+    else if (command == "team") {
+        std::string arg;
+        if (!(iss >> arg)) return;
+        std::string extra;
+        if (iss >> extra) return;
 
+        uint8_t team = 0;
+        try {
+            size_t idx;
+            unsigned long val = std::stoul(arg, &idx);
+            if (idx != arg.size()) return;  // 非纯数字
+            team = uint8_t(val);
+        }
+        catch (...) {
+            return;
+        }
+
+        // 限制队伍编号（避免越界）
+        if (team > 1) return;
+
+        // 获取旧队与新队
+        EntityID old_team_id = player.get_team();
+        EntityID new_team_id = Server::game.get_team_manager().get_team(team);
+
+        Entity& old_team = simulation->get_ent(old_team_id);
+        Entity& new_team = simulation->get_ent(new_team_id);
+
+        // 修改队伍人数统计
+        old_team.player_count--;
+        new_team.player_count++;
+
+
+        // 修改 camera（玩家父实体）
+        camera.set_team(new_team_id);
+        camera.set_color(new_team.get_color());
+
+        // 修改 player 本体
+        player.set_team(new_team_id);
+        player.set_color(new_team.get_color());
+
+        simulation->for_each_entity([&](Simulation* sim_ptr, Entity& ent) {
+            if (ent.get_parent() == player.id) {
+                ent.set_team(new_team_id);
+                ent.set_color(new_team.get_color());
+            }
+        });
+    }
 }
 
 void Client::on_disconnect(WebSocket *ws, int code, std::string_view message) {

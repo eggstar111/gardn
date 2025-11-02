@@ -155,7 +155,7 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
                 PetalID::kAzalea,
                 PetalID::kAzalea,
                 PetalID::kBubble,
-                PetalID::kHeaviest,
+                PetalID::kAzalea,
                 PetalID::kHeaviest,
                 PetalID::kHeaviest,
                 PetalID::kHeaviest,

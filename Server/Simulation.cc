@@ -45,6 +45,8 @@ void Simulation::on_tick() {
         if (BitMath::at(ent.flags, EntityFlags::kHasCulling))
             BitMath::set(ent.flags, EntityFlags::kIsCulled);
     });
+    static AsymmetricBattle asymmetric_battle(&Server::game);
+    asymmetric_battle.update();
     for_each<kCamera>(tick_culling_behavior);
     for_each<kFlower>(tick_player_behavior);
     for_each<kMob>(tick_ai_behavior);
@@ -62,8 +64,6 @@ void Simulation::on_tick() {
 
 void Simulation::post_tick() {
     arena_info.reset_protocol();
-    static AsymmetricBattle asymmetric_battle(&Server::game);
-    asymmetric_battle.update();
     for_each_entity([](Simulation *sim, Entity &ent) {
         //no deletions mid tick
         ent.reset_protocol();
