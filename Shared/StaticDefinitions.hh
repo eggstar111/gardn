@@ -89,6 +89,7 @@ namespace PetalID {
         kMagnet,
         kFang,
         kOcto,
+        kAnkh,
         kNumPetals
     };
 };

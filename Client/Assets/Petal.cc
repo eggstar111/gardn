@@ -1201,6 +1201,51 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.stroke();
             break;
         }
+        case PetalID::kAnkh: {
+            ctx.set_fill(0xffa88642);
+            ctx.set_stroke(0xff886d35);
+            ctx.set_line_width(5);
+            ctx.round_line_cap();
+            ctx.round_line_join();
+            ctx.begin_path();
+            ctx.rotate(-3* M_PI/4);
+            // move_to(y, -x)
+            ctx.move_to(-19.37f, 15.406f);
+
+            ctx.bcurve_to(-19.347f, 16.803f, -18.924f, 18.002f, -18.060f, 18.856f);
+            ctx.bcurve_to(-15.293f, 21.590f, -9.050f, 19.766f, -4.112f, 14.770f);
+            ctx.bcurve_to(-0.803f, 11.423f, -0.343f, 7.106f, 0.625f, 4.305f);
+            ctx.bcurve_to(3.573f, 7.501f, 6.283f, 11.075f, 8.935f, 15.223f);
+
+            ctx.line_to(14.031f, 10.067f);
+
+            ctx.bcurve_to(9.561f, 7.283f, 5.710f, 4.371f, 2.263f, 1.161f);
+            ctx.bcurve_to(5.992f, -4.403f, 12.849f, -8.302f, 19.587f, -12.031f);
+
+            ctx.line_to(12.347f, -19.188f);
+
+            ctx.bcurve_to(8.641f, -12.307f, 4.900f, -5.410f, -0.603f, -1.672f);
+            ctx.bcurve_to(-3.885f, -5.122f, -6.809f, -8.932f, -9.588f, -13.279f);
+
+            ctx.line_to(-14.684f, -8.123f);
+
+            ctx.bcurve_to(-10.590f, -5.573f, -7.009f, -2.940f, -3.754f, -0.017f);
+            ctx.bcurve_to(-6.554f, 0.963f, -10.826f, 1.512f, -14.137f, 4.862f);
+            ctx.bcurve_to(-17.532f, 8.297f, -19.421f, 12.332f, -19.371f, 15.406f);
+
+            // Ð¡È¦²¿·Ö
+            ctx.move_to(-15.431f, 13.986f);
+
+            ctx.bcurve_to(-15.397f, 12.233f, -14.091f, 9.726f, -11.895f, 7.504f);
+            ctx.bcurve_to(-8.839f, 4.412f, -5.217f, 3.042f, -3.802f, 4.441f);
+            ctx.bcurve_to(-2.387f, 5.840f, -3.715f, 9.479f, -6.771f, 12.571f);
+            ctx.bcurve_to(-9.826f, 15.661f, -13.451f, 17.035f, -14.866f, 15.636f);
+
+            ctx.close_path();
+            ctx.fill();
+            ctx.stroke();
+            break;
+        }
 
         default:
             assert(id < PetalID::kNumPetals);

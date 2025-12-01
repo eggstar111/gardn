@@ -30,7 +30,8 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
             case PetalID::kMissile: 
             case PetalID::kDandelion:
             case PetalID::kBullet:
-            case PetalID::kDestroyerBullet:{
+            case PetalID::kDestroyerBullet:
+            case PetalID::kAnkh: {
                 petal.acceleration.unit_normal(petal.get_angle()).set_magnitude(4 * PLAYER_ACCELERATION);
                 break;
             }
@@ -101,6 +102,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
                 case PetalID::kDandelion:
                 case PetalID::kBullet:
                 case PetalID::kDestroyerBullet:
+                case PetalID::kAnkh:
                     if (BitMath::at(player.input, InputFlags::kAttacking)) {
                         petal.acceleration.unit_normal(petal.get_angle()).set_magnitude(4 * PLAYER_ACCELERATION);
                         entity_set_despawn_tick(petal, 3 * TPS);

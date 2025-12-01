@@ -171,7 +171,7 @@ std::array<struct PetalData, PetalID::kNumPetals> const PETAL_DATA = {{
         .count = 1,
         .rarity = RarityID::kRare,
         .attributes = {
-            .secondary_reload = 0.1,
+            .secondary_reload = 0.5,
             .defend_only = 1,
             .unstackable = 1,
         }
@@ -920,6 +920,22 @@ std::array<struct PetalData, PetalID::kNumPetals> const PETAL_DATA = {{
             .defend_only = 1,
         }
     },
+    {
+        .name = "Ankh",
+        .description = "An ancient relic.When destroyed, will teleport the flower back to where it was destroyed.",
+        .health = 1.0,
+        .damage = 0.0,
+        .radius = 15.0,
+        .reload = 5.0,
+        .count = 1,
+        .rarity = RarityID::kUnique,
+        .attributes = {
+            .secondary_reload = 0.5,
+            .defend_only = 1,
+            .icon_angle = -3 * M_PI / 4,
+            .rotation_style = PetalAttributes::kFollowRot
+        }
+   },
 }};
 
 std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
