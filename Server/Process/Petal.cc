@@ -30,8 +30,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
             case PetalID::kMissile: 
             case PetalID::kDandelion:
             case PetalID::kBullet:
-            case PetalID::kDestroyerBullet:
-            case PetalID::kAnkh: {
+            case PetalID::kDestroyerBullet:{
                 petal.acceleration.unit_normal(petal.get_angle()).set_magnitude(4 * PLAYER_ACCELERATION);
                 break;
             }
@@ -41,6 +40,12 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
             }
             case PetalID::kDrone: {
                 petal.acceleration.unit_normal(petal.get_angle()).set_magnitude(2.5 * PLAYER_ACCELERATION);
+                break;
+            }
+            case PetalID::kAnkh: {
+                petal.acceleration.unit_normal(petal.get_angle()).set_magnitude(4 * PLAYER_ACCELERATION);
+                if (BitMath::at(player.input, InputFlags::kDefending))
+                    inflict_damage(sim, petal.id, petal.id, 1, DamageType::kContact);
                 break;
             }
             case PetalID::kOcto: {

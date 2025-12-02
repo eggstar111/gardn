@@ -212,7 +212,7 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
     if (defender.has_component(kPetal) && defender.get_petal_id() == PetalID::kAnkh && BitMath::at(defender.flags, EntityFlags::kIsDespawning)) {
             sim->get_ent(defender.base_entity).set_x(defender.get_x());
             sim->get_ent(defender.base_entity).set_y(defender.get_y());
-            defender.immunity_ticks = 0.5 * TPS;
+            sim->get_ent(defender.base_entity).immunity_ticks = 0.5 * TPS;
     }
 
     if (defender.health == 0 && defender.has_component(kFlower)) {
